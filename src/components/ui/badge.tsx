@@ -24,6 +24,8 @@ const badgeVariants = cva(
           "border-success/30 bg-success/10 text-success [a&]:hover:bg-success/20 focus-visible:ring-success/20 dark:focus-visible:ring-success/40",
         muted:
           "border-muted bg-muted text-muted-foreground [a&]:hover:bg-muted/20 focus-visible:ring-muted/20 dark:focus-visible:ring-muted/40",
+        bronze:
+          "border-amber-700/30 bg-amber-700/10 text-amber-700 [a&]:hover:bg-amber-700/20 focus-visible:ring-amber-700/20 dark:focus-visible:ring-amber-700/40",
       },
       mode: {
         default: "",

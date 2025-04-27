@@ -5,7 +5,8 @@ export const CURRENT_USER: User = {
   name: "John Doe",
   email: "john.doe@example.com",
   bio: "Passionate programmer and algorithm enthusiast",
-  avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
+  avatarUrl:
+    "https://sc04.alicdn.com/kf/Hf9dd1ef33c5c4a49a551992506d23b23a.png",
   joinedDate: "2023-01-10T00:00:00Z",
   problemsProgress: {
     "two-sum": {

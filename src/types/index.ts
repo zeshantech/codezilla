@@ -151,3 +151,53 @@ export interface CollectionFilters {
   featured?: boolean;
   sortBy?: SortOption;
 }
+
+// User profile/settings types
+export interface UserSettings {
+  notifications: {
+    email: boolean;
+    browser: boolean;
+    mobile: boolean;
+  };
+  appearance: {
+    theme: "light" | "dark" | "system";
+    codeFont: string;
+    fontSize: number;
+  };
+  preferences: {
+    defaultLanguage: ProgrammingLanguage;
+    defaultTabSize: number;
+    autosave: boolean;
+  };
+  privacy: {
+    showActivity: boolean;
+    showSolutions: boolean;
+    showProfile: boolean;
+  };
+}
+
+export interface UserProfileUpdate {
+  name?: string;
+  bio?: string;
+  avatarUrl?: string;
+  email?: string;
+}
+
+export interface UserStats {
+  totalPoints: number;
+  rank: number;
+  completedProblems: number;
+  completedCollections: number;
+  streak: number;
+  joinedDate: string;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  bio: string;
+  avatarUrl: string;
+  joinedDate: string;
+  settings: UserSettings;
+}

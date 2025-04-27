@@ -9,37 +9,23 @@ import {
   BookOpen,
   ArrowRight,
   Code2,
-  RussianRuble,
   Brain,
-  Link,
 } from "lucide-react";
-
-// Layout components
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AppFooter } from "@/components/layout/AppFooter";
-
-// Feature components
 import { EditorPanel } from "@/components/editor/EditorPanel";
-import { ProblemList } from "@/components/problems/ProblemList";
-import { CollectionList } from "@/components/collections/CollectionList";
-
-// Hooks
 import { useProblems } from "@/hooks/useProblems";
 import { useCollections } from "@/hooks/useCollections";
 import ProblemCard from "@/components/problems/ProblemCard";
 import { Collection, Problem } from "@/types";
 import { CollectionCard } from "@/components/collections/CollectionCard";
 
-// Create a client
 export default function page() {
   const [activeTab, setActiveTab] = useState("playground");
 
-  // Get hooks
   const { featuredProblems } = useProblems();
   const { featuredCollections } = useCollections();
 
-  // Fetch featured problems
-  // Fetch featured collections
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader />
@@ -71,10 +57,10 @@ export default function page() {
 
             <div className="flex-1 w-full max-w-xl">
               <div className="rounded-lg border bg-card shadow-xl overflow-hidden">
-                <div className="flex items-center gap-1 border-b bg-muted/50 px-4 py-3">
-                  <div className="h-3 w-3 rounded-full bg-error"></div>
-                  <div className="h-3 w-3 rounded-full bg-warning"></div>
-                  <div className="h-3 w-3 rounded-full bg-success"></div>
+                <div className="flex items-center gap-1.5 border-b bg-muted/50 px-4 py-3">
+                  <div className="size-3 rounded-full bg-error"></div>
+                  <div className="size-3 rounded-full bg-warning"></div>
+                  <div className="size-3 rounded-full bg-success"></div>
                   <div className="mx-auto text-sm font-medium">logiclab.js</div>
                 </div>
                 <div className="p-4 font-mono text-sm">

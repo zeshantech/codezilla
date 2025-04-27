@@ -1569,6 +1569,11 @@ data-view-byte-offset@^1.0.1:
     es-errors "^1.3.0"
     is-data-view "^1.0.1"
 
+dayjs@^1.11.13:
+  version "1.11.13"
+  resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.13.tgz"
+  integrity sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==
+
 debug@^3.2.7:
   version "3.2.7"
   resolved "https://registry.npmjs.org/debug/-/debug-3.2.7.tgz"
@@ -2657,6 +2662,11 @@ json5@^1.0.2:
     array.prototype.flat "^1.3.1"
     object.assign "^4.1.4"
     object.values "^1.1.6"
+
+keycloak-js@^26.1.5:
+  version "26.1.5"
+  resolved "https://registry.npmjs.org/keycloak-js/-/keycloak-js-26.1.5.tgz"
+  integrity sha512-5m8DQceKgBD+iVyy8GYeOiH3Hu12q6azAxhBRabVnZANt5BEi9r/qEXyOeye9yzrjqPF6RlH48TTTYNd1iXZMQ==
 
 keyv@^4.5.4:
   version "4.5.4"

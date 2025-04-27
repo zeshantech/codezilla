@@ -99,7 +99,7 @@ export function CreateCollectionDialog() {
   });
 
   // Filter problems based on search term
-  const filteredProblems = allProblems.filter(
+  const filteredProblems = allProblems?.filter(
     (problem) =>
       problem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       problem.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -309,7 +309,7 @@ export function CreateCollectionDialog() {
                             <Loader2 className="h-6 w-6 animate-spin text-primary" />
                           </div>
                         ) : (
-                          filteredProblems.map((problem) => {
+                          filteredProblems?.map((problem) => {
                             const isSelected = selectedProblems.some(
                               (p) => p.id === problem.id
                             );

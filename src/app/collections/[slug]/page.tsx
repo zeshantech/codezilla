@@ -17,16 +17,13 @@ import { AppFooter } from "@/components/layout/AppFooter";
 import { useCollections } from "@/hooks/useCollections";
 import { Problem } from "@/types";
 
-// Create a client
-const queryClient = new QueryClient();
-
 interface CollectionDetailPageProps {
   params: {
     slug: string;
   };
 }
 
-function CollectionDetail({ params }: CollectionDetailPageProps) {
+export default function page({ params }: CollectionDetailPageProps) {
   const { slug } = params;
   const { useCollection } = useCollections();
 
@@ -102,11 +99,9 @@ function CollectionDetail({ params }: CollectionDetailPageProps) {
       <main className="flex-1 py-10">
         <div className="container">
           {/* Back button */}
-          <Button variant="ghost" asChild className="mb-6">
-            <Link href="/collections">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Collections
-            </Link>
+          <Button variant="ghost" className="mb-6" href="/collections">
+            <ArrowLeft />
+            Back to Collections
           </Button>
 
           {/* Collection header */}
@@ -162,13 +157,12 @@ function CollectionDetail({ params }: CollectionDetailPageProps) {
               <h2 className="text-2xl font-bold">
                 Problems in this Collection
               </h2>
-              <Button variant="outline" asChild>
-                <Link
-                  href={`/playground/${collection.problems?.[0]?.slug || ""}`}
-                >
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Start Collection
-                </Link>
+              <Button
+                variant="outline"
+                href={`/playground/${collection.problems?.[0]?.slug || ""}`}
+              >
+                <BookOpen />
+                Start Collection
               </Button>
             </div>
 
@@ -195,15 +189,5 @@ function CollectionDetail({ params }: CollectionDetailPageProps) {
 
       <AppFooter />
     </div>
-  );
-}
-
-export default function CollectionDetailPage({
-  params,
-}: CollectionDetailPageProps) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <CollectionDetail params={params} />
-    </QueryClientProvider>
   );
 }

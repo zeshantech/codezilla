@@ -2,16 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Code, Lightbulb, BookOpen, Sun, Moon } from "lucide-react";
+import { Menu, Code, Lightbulb, BookOpen, Sun, Moon, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CreateProblemDialog } from "@/components/dialogs/CreateProblemDialog";
 import { CreateCollectionDialog } from "@/components/dialogs/CreateCollectionDialog";
 import { useTheme } from "next-themes";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CURRENT_USER } from "@/data/mock/users";
 
 export function AppHeader() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const user = CURRENT_USER;
 
   // Check if the current path matches a given path
   const isActive = (path: string) => {
@@ -64,8 +67,15 @@ export function AppHeader() {
         </nav>
 
         {/* Right side items - search + create + user */}
-        <div className="flex items-center ml-auto gap-2">
-          <Button variant="outline">Login</Button>
+        <div className="flex items-center ml-auto gap-3">
+          <Link href="/profile">
+            <Avatar>
+              <AvatarImage src={user.avatarUrl} alt={user.name} />
+              <AvatarFallback>
+                {user.name.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
           <Button
             variant="outline"
             size="icon"
