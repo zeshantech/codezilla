@@ -16,3 +16,13 @@ export function formatCurrency(amount: number): string {
     currency: "USD",
   }).format(amount);
 }
+
+/**
+ * A no-operation function that can be used as a default value for callbacks.
+ * @param args - Any arguments passed to the function (which will be ignored).
+ * @returns Nothing.
+ */
+export function noop(...args: any[]): void {
+  // This function intentionally does nothing
+  return;
+}

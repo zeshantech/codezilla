@@ -76,7 +76,7 @@ export function ProfileDashboard() {
 
   return (
     <div className="space-y-8">
-      <ProfileHeader user={profile} />
+      <ProfileHeader />
 
       <Tabs
         defaultValue="overview"
