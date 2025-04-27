@@ -42,6 +42,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   );
   const [loading, setLoading] = useState(true);
 
+  const fetchUserProfile = async () => {
+    try {
+      if (authenticated && keycloak) {
+        const userProfile = await getProfile();
+        setProfile(userProfile);
+      } else {
+        setProfile(undefined);
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setProfile(undefined);
+    }
+  };
+
+  // Refresh profile when authentication state changes
+  useEffect(() => {
+    if (!loading) {
+      fetchUserProfile();
+    }
+  }, [authenticated, loading]);
+
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -57,7 +78,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setKeycloak(keycloak);
         setAuthenticated(keycloak.authenticated || false);
         setToken(keycloak.token);
-        setProfile(await getProfile());
 
         keycloak.onTokenExpired = () => {
           keycloak
@@ -70,6 +90,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             .catch(() => {
               logout();
             });
+        };
+
+        // Add event listeners for auth state changes
+        keycloak.onAuthSuccess = () => {
+          setAuthenticated(true);
+          setToken(keycloak.token);
+        };
+
+        keycloak.onAuthLogout = () => {
+          setAuthenticated(false);
+          setToken(undefined);
+          setProfile(undefined);
         };
       } catch (error) {
         console.error("Failed to initialize Keycloak", error);

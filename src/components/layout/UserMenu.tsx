@@ -21,7 +21,7 @@ export default function UserMenu() {
   const { authenticated, loading, profile } = auth;
 
   // Get username from profile if available
-  const username = profile?.username;
+  const username = profile?.username || "";
   const displayName = profile
     ? `${profile.firstName || ""} ${profile.lastName || ""}`.trim()
     : "";
@@ -46,14 +46,20 @@ export default function UserMenu() {
     if (profile?.firstName) {
       return profile.firstName.substring(0, 2).toUpperCase();
     }
-    return username ? username.substring(0, 2).toUpperCase() : "U";
+    if (profile?.username) {
+      return profile.username.substring(0, 2).toUpperCase();
+    }
+    return "U";
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer">
-          <AvatarImage src="" alt={username || "User"} />
+          <AvatarImage
+            src={profile?.avatarUrl || ""}
+            alt={username || "User"}
+          />
           <AvatarFallback>{getInitials()}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

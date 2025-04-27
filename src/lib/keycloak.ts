@@ -37,6 +37,13 @@ export const isAuthenticated = (): boolean => {
 };
 
 export const getProfile = async (): Promise<KeycloakProfile | undefined> => {
-  const userInfo = await keycloakInstance?.loadUserInfo();
-  return userInfo as KeycloakProfile;
+  try {
+    if (!keycloakInstance?.authenticated) {
+      return undefined;
+    }
+    return await keycloakInstance.loadUserProfile();
+  } catch (error) {
+    console.error("Failed to load user profile:", error);
+    return undefined;
+  }
 };
