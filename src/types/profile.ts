@@ -1,4 +1,4 @@
-import { Problem, User, Category, ProgrammingLanguage } from "./index";
+import { Problem, User, ProgrammingLanguage } from "./index";
 
 export interface UserProfile extends User {
   settings: UserProfileSettings;

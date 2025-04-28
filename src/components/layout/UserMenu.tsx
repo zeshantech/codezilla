@@ -20,12 +20,6 @@ export default function UserMenu() {
   const auth = useAuth();
   const { authenticated, loading, profile } = auth;
 
-  // Get username from profile if available
-  const username = profile?.username || "";
-  const displayName = profile
-    ? `${profile.firstName || ""} ${profile.lastName || ""}`.trim()
-    : "";
-
   if (loading) {
     return <Skeleton className="size-8 rounded-full" />;
   }
@@ -57,8 +51,8 @@ export default function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer">
           <AvatarImage
-            src={profile?.avatarUrl || ""}
-            alt={username || "User"}
+            src={profile?.attributes.avatar || ""}
+            alt={profile?.firstName || "User"}
           />
           <AvatarFallback>{getInitials()}</AvatarFallback>
         </Avatar>
@@ -67,47 +61,40 @@ export default function UserMenu() {
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
             <span className="font-medium">
-              {displayName || username || "User"}
+              {profile?.firstName} {profile?.lastName}
             </span>
-            {username && (
-              <span className="text-xs text-muted-foreground">@{username}</span>
+            {profile?.username && (
+              <span className="text-xs text-muted-foreground">
+                @{profile?.username}
+              </span>
             )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link
-            href="/profile"
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <User className="h-4 w-4" />
+          <Link href="/profile">
+            <User />
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Code className="h-4 w-4" />
+          <Link href="/dashboard">
+            <Code />
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link
-            href="/settings"
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Settings className="h-4 w-4" />
+          <Link href="/settings">
+            <Settings />
             <span>Settings</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => auth.logout()}
-          className="flex items-center gap-2 text-red-500 cursor-pointer"
+          className="text-error cursor-pointer"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut />
           <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

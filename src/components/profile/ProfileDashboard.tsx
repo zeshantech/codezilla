@@ -50,9 +50,7 @@ export function ProfileDashboard() {
   } = useProfile();
 
   useEffect(() => {
-    // Update URL when tab changes
     if (activeTab === "overview") {
-      // Remove the tab parameter for the default tab
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("tab");
       router.replace(`?${newParams.toString()}`);
@@ -61,7 +59,6 @@ export function ProfileDashboard() {
     }
   }, [activeTab, router, searchParams]);
 
-  // Update active tab when URL changes
   useEffect(() => {
     if (tabParam && validTabs.includes(tabParam)) {
       setActiveTab(tabParam);

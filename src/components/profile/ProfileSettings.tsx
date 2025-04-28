@@ -5,7 +5,6 @@ import { UserProfile, UserProfileSettings } from "@/types/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ProgrammingLanguage } from "@/types";
 import {
   Card,
   CardContent,
@@ -21,6 +20,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  Selector,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -268,7 +268,10 @@ export function ProfileSettings({
                 Update your personal information and public profile
               </CardDescription>
             </CardHeader>
-            <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+            <form
+              onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+              className="space-y-6"
+            >
               <CardContent className="space-y-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                   <Avatar className="w-20 h-20">
@@ -310,68 +313,36 @@ export function ProfileSettings({
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium">
-                    Name
-                  </label>
-                  <Input
-                    id="name"
-                    placeholder="Your name"
-                    {...profileForm.register("name")}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    This is your public display name
-                  </p>
-                  {profileForm.formState.errors.name && (
-                    <p className="text-sm text-destructive">
-                      {profileForm.formState.errors.name.message}
-                    </p>
-                  )}
-                </div>
+                <Input
+                  id="name"
+                  placeholder="Your name"
+                  error={profileForm.formState.errors.name?.message}
+                  {...profileForm.register("name")}
+                  label="Name"
+                  info="This is your public display name"
+                />
 
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    placeholder="your.email@example.com"
-                    type="email"
-                    {...profileForm.register("email")}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    This email will be used for notifications and account
-                    recovery
-                  </p>
-                  {profileForm.formState.errors.email && (
-                    <p className="text-sm text-destructive">
-                      {profileForm.formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
+                <Input
+                  id="email"
+                  placeholder="your.email@example.com"
+                  type="email"
+                  error={profileForm.formState.errors.email?.message}
+                  {...profileForm.register("email")}
+                  label="Email"
+                  info="This email will be used for notifications and account recovery"
+                />
 
-                <div className="space-y-2">
-                  <label htmlFor="bio" className="text-sm font-medium">
-                    Bio
-                  </label>
-                  <Textarea
-                    id="bio"
-                    placeholder="Tell us a bit about yourself"
-                    className="min-h-24 resize-none"
-                    {...profileForm.register("bio")}
-                    value={profileForm.watch("bio") || ""}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    This will be displayed on your public profile
-                  </p>
-                  {profileForm.formState.errors.bio && (
-                    <p className="text-sm text-destructive">
-                      {profileForm.formState.errors.bio.message}
-                    </p>
-                  )}
-                </div>
+                <Textarea
+                  id="bio"
+                  label="Bio"
+                  info="This will be displayed on your public profile"
+                  placeholder="Tell us a bit about yourself"
+                  className="min-h-24 resize-none"
+                  error={profileForm.formState.errors.bio?.message}
+                  {...profileForm.register("bio")}
+                />
               </CardContent>
-              <CardFooter className="flex justify-between border-t px-6 py-4">
+              <CardFooter className="flex justify-between">
                 <p className="text-sm text-muted-foreground">
                   Last updated:{" "}
                   {new Date().toLocaleDateString("en-US", {
@@ -381,7 +352,7 @@ export function ProfileSettings({
                   })}
                 </p>
                 <Button type="submit" loading={isSaving}>
-                  <SaveIcon className="mr-1 h-4 w-4" /> Save Changes
+                  <SaveIcon /> Save Changes
                 </Button>
               </CardFooter>
             </form>
@@ -396,81 +367,60 @@ export function ProfileSettings({
                 Customize how the application looks to you
               </CardDescription>
             </CardHeader>
-            <form onSubmit={appearanceForm.handleSubmit(onAppearanceSubmit)}>
+            <form
+              onSubmit={appearanceForm.handleSubmit(onAppearanceSubmit)}
+              className="space-y-6"
+            >
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Select
-                    onValueChange={(value) =>
-                      appearanceForm.setValue(
-                        "theme",
-                        value as "light" | "dark" | "system"
-                      )
-                    }
-                    defaultValue={appearanceForm.watch("theme")}
-                    label="Theme"
-                    info="Choose your preferred color theme"
-                    error={appearanceForm.formState.errors.theme?.message}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Selector
+                  options={[
+                    { label: "Light", value: "light" },
+                    { label: "Dark", value: "dark" },
+                    { label: "System", value: "system" },
+                  ]}
+                  onChange={(value) =>
+                    appearanceForm.setValue(
+                      "theme",
+                      value as "light" | "dark" | "system"
+                    )
+                  }
+                  defaultValue={appearanceForm.watch("theme")}
+                  label="Theme"
+                  info="Choose your preferred color theme"
+                  error={appearanceForm.formState.errors.theme?.message}
+                />
 
-                <div className="space-y-2">
-                  <Select
-                    onValueChange={(value) =>
-                      appearanceForm.setValue("codeFont", value)
-                    }
-                    defaultValue={appearanceForm.watch("codeFont")}
-                    label="Code Font"
-                    info="Font used in code editors"
-                    error={appearanceForm.formState.errors.codeFont?.message}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select font" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Fira Code">Fira Code</SelectItem>
-                      <SelectItem value="JetBrains Mono">
-                        JetBrains Mono
-                      </SelectItem>
-                      <SelectItem value="Menlo">Menlo</SelectItem>
-                      <SelectItem value="Monaco">Monaco</SelectItem>
-                      <SelectItem value="Consolas">Consolas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Selector
+                  options={[
+                    { label: "Fira Code", value: "Fira Code" },
+                    { label: "JetBrains Mono", value: "JetBrains Mono" },
+                    { label: "Menlo", value: "Menlo" },
+                    { label: "Monaco", value: "Monaco" },
+                    { label: "Consolas", value: "Consolas" },
+                  ]}
+                  onChange={(value) =>
+                    appearanceForm.setValue("codeFont", value)
+                  }
+                  defaultValue={appearanceForm.watch("codeFont")}
+                  label="Code Font"
+                  info="Font used in code editors"
+                  error={appearanceForm.formState.errors.codeFont?.message}
+                />
 
-                <div className="space-y-2">
-                  <label htmlFor="fontSize" className="text-sm font-medium">
-                    Font Size
-                  </label>
-                  <Input
-                    id="fontSize"
-                    type="number"
-                    min="12"
-                    max="24"
-                    {...appearanceForm.register("fontSize", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Size of text in the code editor (12-24)
-                  </p>
-                  {appearanceForm.formState.errors.fontSize && (
-                    <p className="text-sm text-destructive">
-                      {appearanceForm.formState.errors.fontSize.message}
-                    </p>
-                  )}
-                </div>
+                <Input
+                  id="fontSize"
+                  type="number"
+                  min="12"
+                  max="24"
+                  {...appearanceForm.register("fontSize", {
+                    valueAsNumber: true,
+                  })}
+                  label="Font Size"
+                  info="Size of text in the code editor (12-24)"
+                  error={appearanceForm.formState.errors.fontSize?.message}
+                />
               </CardContent>
-              <CardFooter className="flex justify-end border-t px-6 py-4">
+              <CardFooter className="flex justify-end">
                 <Button type="submit" loading={isSaving}>
                   <SaveIcon /> Save Changes
                 </Button>
@@ -479,7 +429,7 @@ export function ProfileSettings({
           </Card>
         </TabsContent>
 
-        <TabsContent value="preferences" className="space-y-4">
+        <TabsContent value="preferences">
           <Card>
             <CardHeader>
               <CardTitle>Coding Preferences</CardTitle>
@@ -487,62 +437,50 @@ export function ProfileSettings({
                 Configure your default coding settings
               </CardDescription>
             </CardHeader>
-            <form onSubmit={preferencesForm.handleSubmit(onPreferencesSubmit)}>
+            <form
+              onSubmit={preferencesForm.handleSubmit(onPreferencesSubmit)}
+              className="space-y-6"
+            >
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Select
-                    onValueChange={(value) =>
-                      preferencesForm.setValue(
-                        "defaultLanguage",
-                        value as "javascript" | "python" | "java" | "cpp"
-                      )
-                    }
-                    defaultValue={preferencesForm.watch("defaultLanguage")}
-                    label="Default Language"
-                    info="Your preferred programming language"
-                    error={
-                      preferencesForm.formState.errors.defaultLanguage?.message
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="javascript">JavaScript</SelectItem>
-                      <SelectItem value="python">Python</SelectItem>
-                      <SelectItem value="java">Java</SelectItem>
-                      <SelectItem value="cpp">C++</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Selector
+                  options={[
+                    { label: "JavaScript", value: "javascript" },
+                    { label: "Python", value: "python" },
+                    { label: "Java", value: "java" },
+                    { label: "C++", value: "cpp" },
+                  ]}
+                  onChange={(value) =>
+                    preferencesForm.setValue(
+                      "defaultLanguage",
+                      value as "javascript" | "python" | "java" | "cpp"
+                    )
+                  }
+                  defaultValue={preferencesForm.watch("defaultLanguage")}
+                  label="Default Language"
+                  info="Your preferred programming language"
+                  error={
+                    preferencesForm.formState.errors.defaultLanguage?.message
+                  }
+                />
 
-                <div className="space-y-2">
-                  <Select
-                    onValueChange={(value) =>
-                      preferencesForm.setValue(
-                        "defaultTabSize",
-                        parseInt(value)
-                      )
-                    }
-                    defaultValue={preferencesForm
-                      .watch("defaultTabSize")
-                      .toString()}
-                    label="Tab Size"
-                    info="Number of spaces for each tab"
-                    error={
-                      preferencesForm.formState.errors.defaultTabSize?.message
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select tab size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="2">2 spaces</SelectItem>
-                      <SelectItem value="4">4 spaces</SelectItem>
-                      <SelectItem value="8">8 spaces</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Selector
+                  options={[
+                    { label: "2 spaces", value: "2" },
+                    { label: "4 spaces", value: "4" },
+                    { label: "8 spaces", value: "8" },
+                  ]}
+                  onChange={(value) =>
+                    preferencesForm.setValue("defaultTabSize", parseInt(value))
+                  }
+                  defaultValue={preferencesForm
+                    .watch("defaultTabSize")
+                    .toString()}
+                  label="Tab Size"
+                  info="Number of spaces for each tab"
+                  error={
+                    preferencesForm.formState.errors.defaultTabSize?.message
+                  }
+                />
 
                 <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
@@ -559,7 +497,7 @@ export function ProfileSettings({
                   />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end border-t px-6 py-4">
+              <CardFooter className="flex justify-end">
                 <Button type="submit" loading={isSaving}>
                   <SaveIcon /> Save Changes
                 </Button>
@@ -578,6 +516,7 @@ export function ProfileSettings({
             </CardHeader>
             <form
               onSubmit={notificationsForm.handleSubmit(onNotificationsSubmit)}
+              className="space-y-6"
             >
               <CardContent className="space-y-6">
                 <div className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -631,7 +570,7 @@ export function ProfileSettings({
                   />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end border-t px-6 py-4">
+              <CardFooter className="flex justify-end">
                 <Button type="submit" loading={isSaving}>
                   <SaveIcon /> Save Changes
                 </Button>
@@ -648,7 +587,10 @@ export function ProfileSettings({
                 Control what information is visible to other users
               </CardDescription>
             </CardHeader>
-            <form onSubmit={privacyForm.handleSubmit(onPrivacySubmit)}>
+            <form
+              onSubmit={privacyForm.handleSubmit(onPrivacySubmit)}
+              className="space-y-6"
+            >
               <CardContent className="space-y-6">
                 <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
@@ -697,7 +639,7 @@ export function ProfileSettings({
                   />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end border-t px-6 py-4">
+              <CardFooter className="flex justify-end">
                 <Button type="submit" loading={isSaving}>
                   {privacyUpdateSuccess ? (
                     <>

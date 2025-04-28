@@ -1,43 +1,50 @@
 import { LucideIcon } from "lucide-react";
 
-export type Difficulty = "Easy" | "Medium" | "Hard";
+export enum DifficultyEnum {
+  EASY = "easy",
+  MEDIUM = "medium",
+  HARD = "hard",
+}
 
 export type ProgrammingLanguage = "javascript" | "python" | "java" | "cpp";
 
-export interface Example {
+export interface ISchema {
+  id: string;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface IExample {
   input: string;
   output: string;
   explanation: string;
 }
 
-export interface TestCase {
+export interface ITestCase {
   input: string;
   expectedOutput: string;
   isHidden?: boolean;
 }
 
-export interface Problem {
-  id: string;
+export interface IProblem extends ISchema {
   title: string;
   slug: string;
-  difficulty: Difficulty;
+  difficulty: DifficultyEnum;
   category: string;
   description: string;
   constraints: string[];
-  examples: Example[];
-  testCases: TestCase[];
+  examples: IExample[];
+  testCases: ITestCase[];
   starterCode: Record<ProgrammingLanguage, string>;
   solution?: Record<ProgrammingLanguage, string>;
   popularity: number;
   completionCount: number;
-  createdAt: string;
-  updatedAt: string;
   createdBy?: string;
   isFeatured?: boolean;
   tags: string[];
 }
 
-export interface ProblemStats {
+export interface IProblemStats {
   attempted: number;
   solved: number;
   submissions: number;
@@ -46,32 +53,28 @@ export interface ProblemStats {
   averageTime: number;
 }
 
-export interface Category {
+export interface ICategory {
   id: string;
   name: string;
   count: number;
   icon: LucideIcon;
 }
 
-export interface Collection {
-  id: string;
+export interface ICollection extends ISchema {
   title: string;
   slug: string;
   description: string;
-  problemIds: string[];
-  problems?: Problem[];
+  problems?: string[] | IProblem[];
   createdBy?: string;
-  createdAt: string;
-  updatedAt: string;
   isPublic: boolean;
   isFeatured?: boolean;
   completionCount: number;
-  difficulty?: Difficulty;
+  difficulty?: DifficultyEnum;
   tags: string[];
 }
 
-export interface UserProblemProgress {
-  problemId: string;
+export interface IUserProblemProgress {
+  problem: string;
   status: "attempted" | "solved" | "not_started";
   submissions: number;
   lastSubmissionDate?: string;
@@ -79,14 +82,8 @@ export interface UserProblemProgress {
   code?: Record<ProgrammingLanguage, string>;
 }
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  bio?: string;
-  avatarUrl?: string;
-  joinedDate: string;
-  problemsProgress: Record<string, UserProblemProgress>;
+export interface IUser extends ISchema {
+  problemsProgress: Record<string, IUserProblemProgress>;
   completedProblems: number;
   completedCollections: number;
   createdProblems: number;
@@ -95,13 +92,13 @@ export interface User {
   points: number;
 }
 
-export interface CodeExecutionRequest {
+export interface ICodeExecutionRequest {
   code: string;
   language: ProgrammingLanguage;
   problemId?: string;
 }
 
-export interface CodeExecutionResult {
+export interface ICodeExecutionResult {
   status: "success" | "error" | "running";
   output: string[];
   error?: string;
@@ -117,7 +114,7 @@ export interface CodeExecutionResult {
   allTestsPassed?: boolean;
 }
 
-export interface EditorConfig {
+export interface IEditorConfig {
   theme: "light" | "dark";
   fontSize: number;
   tabSize: number;
@@ -135,16 +132,16 @@ export type SortOption =
   | "difficulty"
   | "completion_rate";
 
-export interface ProblemFilters {
+export interface IProblemFilters {
   search?: string;
   categories?: string[];
-  difficulties?: Difficulty[];
+  difficulties?: DifficultyEnum[];
   tags?: string[];
   status?: ("attempted" | "solved" | "not_started")[];
   sortBy?: SortOption;
 }
 
-export interface CollectionFilters {
+export interface ICollectionFilters {
   search?: string;
   tags?: string[];
   createdBy?: string;
@@ -153,7 +150,7 @@ export interface CollectionFilters {
 }
 
 // User profile/settings types
-export interface UserSettings {
+export interface IUserSettings {
   notifications: {
     email: boolean;
     browser: boolean;
@@ -176,14 +173,14 @@ export interface UserSettings {
   };
 }
 
-export interface UserProfileUpdate {
+export interface IUserProfileUpdate {
   name?: string;
   bio?: string;
   avatarUrl?: string;
   email?: string;
 }
 
-export interface UserStats {
+export interface IUserStats {
   totalPoints: number;
   rank: number;
   completedProblems: number;
@@ -192,12 +189,22 @@ export interface UserStats {
   joinedDate: string;
 }
 
-export interface UserProfile {
+export interface IUserProfile {
   id: string;
   name: string;
   email: string;
   bio: string;
   avatarUrl: string;
   joinedDate: string;
-  settings: UserSettings;
+  settings: IUserSettings;
+}
+
+export interface IProblemCreateInput {
+  difficulty: DifficultyEnum;
+  complexity: number;
+  topics: string[];
+  customPrompt?: string;
+  exampleCount: number;
+  timeLimit: number;
+  memoryLimit: number;
 }

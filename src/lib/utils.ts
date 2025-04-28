@@ -26,3 +26,17 @@ export function noop(...args: any[]): void {
   // This function intentionally does nothing
   return;
 }
+
+/**
+ * Serializes a Mongoose document or array of documents to a plain JavaScript object.
+ * @param data - The data to serialize.
+ * @returns The serialized data.
+ */
+export const serialize = (data: any) => {
+  if (Array.isArray(data)) {
+    return data.map((doc) => doc.toJSON());
+  } else if (data && typeof data.toJSON === "function") {
+    return data.toJSON();
+  }
+  return data;
+};

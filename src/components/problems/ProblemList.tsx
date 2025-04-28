@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { Problem } from "@/types";
+import { IProblem } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { ProblemCard } from "./ProblemCard";
 import { ProblemFilters } from "./ProblemFilters";
@@ -23,9 +23,9 @@ export function ProblemList() {
             <div key={i} className="h-[220px] rounded-lg bg-muted"></div>
           ))}
         </div>
-      ) : allProblems.length > 0 ? (
+      ) : allProblems?.length ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allProblems.map((problem: Problem) => (
+          {allProblems.map((problem: IProblem) => (
             <ProblemCard key={problem.id} problem={problem} />
           ))}
         </div>

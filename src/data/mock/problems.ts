@@ -1,12 +1,12 @@
-import { Problem } from "@/types";
+import { IProblem } from "@/types";
 import { getStarterCode } from "./starterCode";
 
-export const PROBLEMS: Problem[] = [
+export const PROBLEMS: IProblem[] = [
   {
     id: "two-sum",
     title: "Two Sum",
     slug: "two-sum",
-    difficulty: "Easy",
+    difficulty: "easy",
     category: "Arrays",
     description:
       "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.",
@@ -50,8 +50,8 @@ export const PROBLEMS: Problem[] = [
     starterCode: getStarterCode("two-sum"),
     popularity: 892,
     completionCount: 345,
-    createdAt: "2023-01-15T12:00:00Z",
-    updatedAt: "2023-01-15T12:00:00Z",
+    createdAt: new Date("2023-01-15T12:00:00Z"),
+    updatedAt: new Date("2023-01-15T12:00:00Z"),
     isFeatured: false,
     tags: ["arrays", "hash-table", "beginner"],
   },
@@ -59,7 +59,7 @@ export const PROBLEMS: Problem[] = [
     id: "valid-parentheses",
     title: "Valid Parentheses",
     slug: "valid-parentheses",
-    difficulty: "Easy",
+    difficulty: "easy",
     category: "Stacks",
     description:
       "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid. An input string is valid if: Open brackets must be closed by the same type of brackets. Open brackets must be closed in the correct order. Every close bracket has a corresponding open bracket of the same type.",
@@ -110,8 +110,8 @@ export const PROBLEMS: Problem[] = [
     starterCode: getStarterCode("valid-parentheses"),
     popularity: 756,
     completionCount: 289,
-    createdAt: "2023-02-10T15:30:00Z",
-    updatedAt: "2023-02-10T15:30:00Z",
+    createdAt: new Date("2023-02-10T15:30:00Z"),
+    updatedAt: new Date("2023-02-10T15:30:00Z"),
     isFeatured: true,
     tags: ["stacks", "strings", "beginner"],
   },
@@ -119,7 +119,7 @@ export const PROBLEMS: Problem[] = [
     id: "longest-substring",
     title: "Longest Substring Without Repeating Characters",
     slug: "longest-substring-without-repeating-characters",
-    difficulty: "Medium",
+    difficulty: "medium",
     category: "Strings",
     description:
       "Given a string s, find the length of the longest substring without repeating characters.",
@@ -171,8 +171,8 @@ export const PROBLEMS: Problem[] = [
     starterCode: getStarterCode("longest-substring"),
     popularity: 638,
     completionCount: 201,
-    createdAt: "2023-03-05T09:45:00Z",
-    updatedAt: "2023-03-05T09:45:00Z",
+    createdAt: new Date("2023-03-05T09:45:00Z"),
+    updatedAt: new Date("2023-03-05T09:45:00Z"),
     isFeatured: true,
     tags: ["strings", "sliding-window", "hash-table", "intermediate"],
   },
@@ -180,7 +180,7 @@ export const PROBLEMS: Problem[] = [
     id: "merge-sorted-arrays",
     title: "Merge Sorted Array",
     slug: "merge-sorted-array",
-    difficulty: "Easy",
+    difficulty: "easy",
     category: "Arrays",
     description:
       "You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively. Merge nums1 and nums2 into a single array sorted in non-decreasing order. The final sorted array should not be returned by the function, but instead be stored inside the array nums1. To accommodate this, nums1 has a length of m + n, where the first m elements denote the elements that should be merged, and the last n elements are set to 0 and should be ignored. nums2 has a length of n.",
@@ -227,8 +227,8 @@ export const PROBLEMS: Problem[] = [
     starterCode: getStarterCode("merge-sorted-arrays"),
     popularity: 584,
     completionCount: 245,
-    createdAt: "2023-04-20T14:15:00Z",
-    updatedAt: "2023-04-20T14:15:00Z",
+    createdAt: new Date("2023-04-20T14:15:00Z"),
+    updatedAt: new Date("2023-04-20T14:15:00Z"),
     isFeatured: false,
     tags: ["arrays", "two-pointers", "sorting", "beginner"],
   },
@@ -236,7 +236,7 @@ export const PROBLEMS: Problem[] = [
     id: "binary-search",
     title: "Binary Search",
     slug: "binary-search",
-    difficulty: "Easy",
+    difficulty: "easy",
     category: "Binary Search",
     description:
       "Given an array of integers nums which is sorted in ascending order, and an integer target, write a function to search target in nums. If target exists, then return its index. Otherwise, return -1. You must write an algorithm with O(log n) runtime complexity.",
@@ -280,8 +280,8 @@ export const PROBLEMS: Problem[] = [
     starterCode: getStarterCode("binary-search"),
     popularity: 521,
     completionCount: 278,
-    createdAt: "2023-05-17T11:20:00Z",
-    updatedAt: "2023-05-17T11:20:00Z",
+    createdAt: new Date("2023-05-17T11:20:00Z"),
+    updatedAt: new Date("2023-05-17T11:20:00Z"),
     isFeatured: false,
     tags: ["binary-search", "arrays", "beginner"],
   },
@@ -289,7 +289,7 @@ export const PROBLEMS: Problem[] = [
     id: "best-time-to-buy-sell-stock",
     title: "Best Time to Buy and Sell Stock",
     slug: "best-time-to-buy-and-sell-stock",
-    difficulty: "Easy",
+    difficulty: "easy",
     category: "Dynamic Programming",
     description:
       "You are given an array prices where prices[i] is the price of a given stock on the ith day. You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.",
@@ -330,8 +330,8 @@ export const PROBLEMS: Problem[] = [
     starterCode: getStarterCode("best-time-to-buy-sell-stock"),
     popularity: 735,
     completionCount: 412,
-    createdAt: "2023-06-08T16:50:00Z",
-    updatedAt: "2023-06-08T16:50:00Z",
+    createdAt: new Date("2023-06-08T16:50:00Z"),
+    updatedAt: new Date("2023-06-08T16:50:00Z"),
     isFeatured: true,
     tags: ["dynamic-programming", "arrays", "beginner"],
   },

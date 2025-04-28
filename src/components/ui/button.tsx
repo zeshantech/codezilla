@@ -93,6 +93,7 @@ function Button({
     >
       {loading ? (
         <Spinner
+          size="small"
           className={variant === "outline" ? "text-foreground" : "text-current"}
         />
       ) : null}

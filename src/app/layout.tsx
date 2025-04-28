@@ -1,22 +1,13 @@
+import "@/app/globals.css";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Provider from "./provider";
+import { Inter } from "next/font/google";
+import Providers from "@/app/provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CodeC - Practice Coding Problems",
-  description:
-    "Improve your programming skills with our collection of coding challenges, problems, and exercises.",
+  title: "LogicLab",
+  description: "Practice programming problems",
 };
 
 export default function RootLayout({
@@ -26,10 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Provider>{children}</Provider>
+      <body className={inter.className}>
+        <Providers>
+          <main className="min-h-screen">{children}</main>
+        </Providers>
       </body>
     </html>
   );

@@ -1,4 +1,4 @@
-import Keycloak, { KeycloakProfile } from "keycloak-js";
+import Keycloak, { IProfile } from "keycloak-js";
 
 let keycloakInstance: Keycloak | null = null;
 
@@ -36,12 +36,12 @@ export const isAuthenticated = (): boolean => {
   return !!keycloakInstance?.authenticated;
 };
 
-export const getProfile = async (): Promise<KeycloakProfile | undefined> => {
+export const getProfile = async (): Promise<IProfile | undefined> => {
   try {
     if (!keycloakInstance?.authenticated) {
       return undefined;
     }
-    return await keycloakInstance.loadUserProfile();
+    return (await keycloakInstance.loadUserProfile()) as unknown as IProfile;
   } catch (error) {
     console.error("Failed to load user profile:", error);
     return undefined;

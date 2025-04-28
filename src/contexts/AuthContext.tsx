@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import Keycloak, { KeycloakProfile } from "keycloak-js";
+import Keycloak, { IProfile } from "keycloak-js";
 import { initKeycloak, login, logout, getProfile } from "@/lib/keycloak";
 import { noop } from "@/lib/utils";
 
@@ -13,7 +13,7 @@ type AuthContextType = {
   keycloak: Keycloak | null;
   authenticated: boolean;
   token: string | undefined;
-  profile: KeycloakProfile | undefined;
+  profile: IProfile | undefined;
   loading: boolean;
   login: (redirectUri?: string) => void;
   logout: () => void;
@@ -37,9 +37,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [token, setToken] = useState<string | undefined>(undefined);
-  const [profile, setProfile] = useState<KeycloakProfile | undefined>(
-    undefined
-  );
+  const [profile, setProfile] = useState<IProfile | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
   const fetchUserProfile = async () => {
