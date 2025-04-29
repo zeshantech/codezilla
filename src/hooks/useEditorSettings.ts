@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { EditorConfig, ProgrammingLanguage } from "@/types";
+import { IEditorConfig, ProgrammingLanguage } from "@/types";
+import * as editorSettingsAPI from "@/lib/api/editorSettings/index";
+import { toast } from "sonner";
 
-export interface EditorSettings extends EditorConfig {
+export interface EditorSettings extends IEditorConfig {
   keyboardShortcuts: Record<string, boolean>;
   indentUsingSpaces: boolean;
   highlightActiveLine: boolean;
@@ -13,6 +15,9 @@ export interface EditorSettings extends EditorConfig {
   enableSnippets: boolean;
   language: ProgrammingLanguage;
 }
+
+// Use a default user ID for now
+const DEFAULT_USER_ID = "user123";
 
 const DEFAULT_SETTINGS: EditorSettings = {
   theme: "dark",
@@ -38,104 +43,127 @@ const DEFAULT_SETTINGS: EditorSettings = {
   language: "javascript",
 };
 
-export function useEditorSettings() {
+export function useEditorSettings(userId = DEFAULT_USER_ID) {
   const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Load settings from localStorage on component mount
+  // Generate storage key using user ID for multi-user support
+  const storageKey = `editor-settings-${userId}`;
+
+  // Load settings from localStorage and server on component mount
   useEffect(() => {
-    try {
-      const savedSettings = localStorage.getItem("editor-settings");
-      if (savedSettings) {
-        setSettings(JSON.parse(savedSettings));
-      }
-      setIsLoaded(true);
-    } catch (error) {
-      console.error("Failed to load settings:", error);
-      setIsLoaded(true);
-    }
-  }, []);
-
-  // Update settings
-  const updateSettings = useCallback((newSettings: Partial<EditorSettings>) => {
-    setSettings((prevSettings) => {
-      const updatedSettings = { ...prevSettings, ...newSettings };
-
-      // Save to localStorage
+    const loadSettings = async () => {
       try {
-        localStorage.setItem(
-          "editor-settings",
-          JSON.stringify(updatedSettings)
-        );
-      } catch (error) {
-        console.error("Failed to save settings:", error);
-      }
-
-      return updatedSettings;
-    });
-  }, []);
-
-  // Reset settings to default
-  const resetSettings = useCallback(() => {
-    setSettings(DEFAULT_SETTINGS);
-    try {
-      localStorage.setItem("editor-settings", JSON.stringify(DEFAULT_SETTINGS));
-    } catch (error) {
-      console.error("Failed to save default settings:", error);
-    }
-  }, []);
-
-  // Update a single setting
-  const updateSetting = useCallback(
-    <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => {
-      setSettings((prevSettings) => {
-        const updatedSettings = { ...prevSettings, [key]: value };
-
-        // Save to localStorage
-        try {
-          localStorage.setItem(
-            "editor-settings",
-            JSON.stringify(updatedSettings)
-          );
-        } catch (error) {
-          console.error("Failed to save settings:", error);
+        // First try to load from localStorage for immediate UI display
+        const localSettings = localStorage.getItem(storageKey);
+        if (localSettings) {
+          setSettings(JSON.parse(localSettings));
         }
 
-        return updatedSettings;
-      });
-    },
-    []
-  );
+        // Then try to load from server (which will be more up-to-date)
+        const serverSettings = await editorSettingsAPI.fetchEditorSettings(userId);
+        if (serverSettings) {
+          setSettings(serverSettings);
+          // Update localStorage with server settings
+          localStorage.setItem(storageKey, JSON.stringify(serverSettings));
+        }
 
-  // Toggle boolean settings
-  const toggleSetting = useCallback((key: keyof EditorSettings) => {
-    setSettings((prevSettings) => {
-      const currentValue = prevSettings[key];
-      if (typeof currentValue !== "boolean") {
-        return prevSettings;
+        setIsLoaded(true);
+      } catch (error) {
+        console.error("Failed to load settings:", error);
+        setIsLoaded(true);
       }
+    };
 
-      const updatedSettings = {
-        ...prevSettings,
-        [key]: !currentValue,
-      };
+    loadSettings();
+  }, [storageKey, userId]);
 
-      // Save to localStorage
+  // Update settings both locally and on the server
+  const updateSettings = useCallback(
+    async (newSettings: Partial<EditorSettings>) => {
+      setIsSaving(true);
+
       try {
-        localStorage.setItem(
-          "editor-settings",
-          JSON.stringify(updatedSettings)
-        );
+        const updatedSettings = { ...settings, ...newSettings };
+
+        // Update local state and localStorage
+        setSettings(updatedSettings);
+        localStorage.setItem(storageKey, JSON.stringify(updatedSettings));
+
+        // Update server
+        await editorSettingsAPI.updateEditorSettings(userId, updatedSettings);
+        toast.success("Settings saved successfully");
       } catch (error) {
         console.error("Failed to save settings:", error);
+        toast.error("Failed to save settings");
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [settings, storageKey, userId]
+  );
+
+  // Reset settings to default both locally and on the server
+  const resetSettings = useCallback(async () => {
+    setIsSaving(true);
+
+    try {
+      // Update local state and localStorage
+      setSettings(DEFAULT_SETTINGS);
+      localStorage.setItem(storageKey, JSON.stringify(DEFAULT_SETTINGS));
+
+      // Reset on server
+      await editorSettingsAPI.resetEditorSettings(userId);
+      toast.success("Settings reset to defaults");
+    } catch (error) {
+      console.error("Failed to reset settings:", error);
+      toast.error("Failed to reset settings");
+    } finally {
+      setIsSaving(false);
+    }
+  }, [storageKey, userId]);
+
+  // Update a single setting both locally and on the server
+  const updateSetting = useCallback(
+    async <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => {
+      setIsSaving(true);
+
+      try {
+        const updatedSettings = { ...settings, [key]: value };
+
+        // Update local state and localStorage
+        setSettings(updatedSettings);
+        localStorage.setItem(storageKey, JSON.stringify(updatedSettings));
+
+        // Update server
+        await editorSettingsAPI.updateEditorSettings(userId, updatedSettings);
+        toast.success("Setting updated successfully");
+      } catch (error) {
+        console.error("Failed to update setting:", error);
+        toast.error("Failed to update setting");
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [settings, storageKey, userId]
+  );
+
+  // Toggle boolean setting both locally and on the server
+  const toggleSetting = useCallback(
+    async (key: keyof EditorSettings) => {
+      const currentValue = settings[key];
+      if (typeof currentValue !== "boolean") {
+        return;
       }
 
-      return updatedSettings;
-    });
-  }, []);
+      await updateSetting(key, !currentValue as any);
+    },
+    [settings, updateSetting]
+  );
 
   // Extract editor config from settings
-  const getEditorConfig = useCallback((): EditorConfig => {
+  const getEditorConfig = useCallback((): IEditorConfig => {
     return {
       theme: settings.theme,
       fontSize: settings.fontSize,
@@ -151,6 +179,7 @@ export function useEditorSettings() {
   return {
     settings,
     isLoaded,
+    isSaving,
     updateSettings,
     resetSettings,
     updateSetting,

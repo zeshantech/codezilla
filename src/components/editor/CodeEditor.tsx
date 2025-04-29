@@ -2,28 +2,20 @@
 
 import { useRef, useEffect } from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { ProgrammingLanguage, EditorConfig } from "@/types";
+import { ProgrammingLanguage, IEditorConfig } from "@/types";
 import { Loader2 } from "lucide-react";
 
 interface CodeEditorProps {
   code: string;
   language: ProgrammingLanguage;
   onChange: (value: string) => void;
-  config?: Partial<EditorConfig>;
+  config?: Partial<IEditorConfig>;
   height?: string;
   readOnly?: boolean;
   autoFocus?: boolean;
 }
 
-export function CodeEditor({
-  code,
-  language,
-  onChange,
-  config = {},
-  height = "100%",
-  readOnly = false,
-  autoFocus = false,
-}: CodeEditorProps) {
+export function CodeEditor({ code, language, onChange, config = {}, height = "100%", readOnly = false, autoFocus = false }: CodeEditorProps) {
   const editorRef = useRef<any>(null);
 
   // Convert language codes to Monaco-compatible values
@@ -42,11 +34,9 @@ export function CodeEditor({
     }
   };
 
-  // Handle editor mounting
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
-    // Setup editor configuration
     monaco.editor.defineTheme("logiclab-dark", {
       base: "vs-dark",
       inherit: true,
@@ -79,10 +69,7 @@ export function CodeEditor({
       },
     });
 
-    // Set the theme based on config
-    monaco.editor.setTheme(
-      config.theme === "dark" ? "logiclab-dark" : "logiclab-light"
-    );
+    monaco.editor.setTheme(config.theme === "dark" ? "logiclab-dark" : "logiclab-light");
 
     // Configure editor settings
     editor.updateOptions({

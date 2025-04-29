@@ -10,14 +10,15 @@ const spinnerVariants = cva("flex-col items-center justify-center", {
       false: "hidden",
     },
     size: {
-      small: "text-sm",
-      medium: "text-base",
-      large: "text-lg",
-      xlarge: "text-xl",
+      small: "text-xs",
+      medium: "text-sm",
+      large: "text-base",
+      xlarge: "text-lg",
     },
   },
   defaultVariants: {
     show: true,
+    size: "medium",
   },
 });
 
@@ -44,8 +45,18 @@ export function Spinner({ size, show, children, className }: SpinnerContentProps
   return (
     <span className={cn(spinnerVariants({ show, size }))}>
       <Loader2 className={cn(loaderVariants({ size }), className)} />
-      <div className="mt-2">{children}</div>
+      <div className={cn("mt-2 text-muted-foreground", spinnerVariants({ size }))}>{children}</div>
     </span>
+  );
+}
+
+export function SpinnerBox({ size, show, children, className }: SpinnerContentProps) {
+  return (
+    <div className={cn("flex items-center justify-center h-full", className)}>
+      <Spinner size={size} show={show}>
+        {children}
+      </Spinner>
+    </div>
   );
 }
 

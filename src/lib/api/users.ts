@@ -16,18 +16,11 @@ export async function fetchCurrentUser(userId: string): Promise<IUser | null> {
 }
 
 // Update user profile
-export async function updateUserProfile(
-  userId: string,
-  profileUpdate: IUserProfileUpdate
-): Promise<IUser | null> {
+export async function updateUserProfile(userId: string, profileUpdate: IUserProfileUpdate): Promise<IUser | null> {
   await dbConnect();
 
   try {
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { ...profileUpdate },
-      { new: true, runValidators: true }
-    );
+    const user = await User.findByIdAndUpdate(userId, { ...profileUpdate }, { new: true, runValidators: true });
 
     return user;
   } catch (error) {
@@ -37,10 +30,7 @@ export async function updateUserProfile(
 }
 
 // Get user's problem progress
-export async function getUserProblemProgress(
-  userId: string,
-  problemId: string
-): Promise<IUserProblemProgress | null> {
+export async function getUserProblemProgress(userId: string, problemId: string): Promise<IUserProblemProgress | null> {
   await dbConnect();
 
   try {
@@ -56,11 +46,7 @@ export async function getUserProblemProgress(
 }
 
 // Update user's problem progress
-export async function updateUserProblemProgress(
-  userId: string,
-  problemId: string,
-  progress: Partial<IUserProblemProgress>
-): Promise<boolean> {
+export async function updateUserProblemProgress(userId: string, problemId: string, progress: Partial<IUserProblemProgress>): Promise<boolean> {
   await dbConnect();
 
   try {
@@ -79,10 +65,7 @@ export async function updateUserProblemProgress(
       ...currentProgress,
       ...progress,
       // Always update lastSubmissionDate if submissions change
-      lastSubmissionDate:
-        progress.submissions !== currentProgress.submissions
-          ? new Date().toISOString()
-          : currentProgress.lastSubmissionDate || new Date().toISOString(),
+      lastSubmissionDate: progress.submissions !== currentProgress.submissions ? new Date().toISOString() : currentProgress.lastSubmissionDate || new Date().toISOString(),
     };
 
     // Set the updated progress

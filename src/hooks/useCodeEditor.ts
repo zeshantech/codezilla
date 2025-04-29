@@ -21,30 +21,20 @@ interface UseCodeEditorProps {
   initialCode?: string;
 }
 
-export function useCodeEditor({
-  problem,
-  initialLanguage = "javascript",
-  initialCode,
-}: UseCodeEditorProps = {}) {
+export function useCodeEditor({ problem, initialLanguage = "javascript", initialCode }: UseCodeEditorProps = {}) {
   const [code, setCode] = useState<string>(initialCode || "");
-  const [language, setLanguage] =
-    useState<ProgrammingLanguage>(initialLanguage);
-  const [editorConfig, setEditorConfig] = useState<EditorConfig>(
-    DEFAULT_EDITOR_CONFIG
-  );
+  const [language, setLanguage] = useState<ProgrammingLanguage>(initialLanguage);
+  const [editorConfig, setEditorConfig] = useState<EditorConfig>(DEFAULT_EDITOR_CONFIG);
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
-  const { executeCode, executionResult, isExecuting, clearExecutionResult } =
-    useCodeExecution();
+  const { executeCode, executionResult, isExecuting, clearExecutionResult } = useCodeExecution();
 
   // If problem changes, update the code based on the starter code or saved user code
   useEffect(() => {
     if (problem) {
       // Check if user has saved progress for this problem
-      const userProgress = problem.id
-        ? CURRENT_USER.problemsProgress[problem.id]
-        : undefined;
+      const userProgress = problem.id ? CURRENT_USER.problemsProgress[problem.id] : undefined;
 
       if (userProgress?.code && userProgress.code[language]) {
         // User has saved code for this problem and language
@@ -66,9 +56,7 @@ export function useCodeEditor({
       if (language !== newLanguage) {
         if (isDirty) {
           // Ask for confirmation if there are unsaved changes
-          const confirmChange = window.confirm(
-            "Changing language will reset your current code. Continue?"
-          );
+          const confirmChange = window.confirm("Changing language will reset your current code. Continue?");
 
           if (!confirmChange) return;
         }
@@ -77,9 +65,7 @@ export function useCodeEditor({
 
         // Update code for the new language
         if (problem) {
-          const userProgress = problem.id
-            ? CURRENT_USER.problemsProgress[problem.id]
-            : undefined;
+          const userProgress = problem.id ? CURRENT_USER.problemsProgress[problem.id] : undefined;
 
           if (userProgress?.code && userProgress.code[newLanguage]) {
             setCode(userProgress.code[newLanguage] || "");
@@ -118,9 +104,7 @@ export function useCodeEditor({
   // Reset code to starter code
   const resetCode = useCallback(() => {
     if (problem) {
-      const confirmReset = window.confirm(
-        "Are you sure you want to reset your code to the starter code?"
-      );
+      const confirmReset = window.confirm("Are you sure you want to reset your code to the starter code?");
 
       if (confirmReset) {
         setCode(problem.starterCode[language] || "");
@@ -162,11 +146,7 @@ export function useCodeEditor({
     // This is a very simple indentation-based formatter for demo purposes
 
     try {
-      if (
-        language === "javascript" ||
-        language === "java" ||
-        language === "cpp"
-      ) {
+      if (language === "javascript" || language === "java" || language === "cpp") {
         // For C-style languages, try to pretty-print the code (very basic)
         const formatted = code
           .split("\n")

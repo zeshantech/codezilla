@@ -42,5 +42,4 @@ const UserSchema = new Schema<IUser>(
 
 UserSchema.plugin(toJSON);
 
-export const User: Model<IUser> =
-  models?.User || model<IUser>("User", UserSchema);
+export const User: Model<IUser> = models?.User || model<IUser>("User", UserSchema);

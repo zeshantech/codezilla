@@ -1,6 +1,5 @@
 import { useRef, useEffect } from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { Loader2 } from "lucide-react";
 import { ProgrammingLanguage } from "@/types";
 import useEditorSettings from "@/hooks/useEditorSettings";
 import EditorToolbar from "./EditorToolbar";
@@ -19,18 +18,7 @@ interface EnhancedCodeEditorProps {
   onChangeLanguage: (language: ProgrammingLanguage) => void;
 }
 
-export function EnhancedCodeEditor({
-  code,
-  language,
-  onChange,
-  onSave,
-  onFormat,
-  onRun,
-  onReset,
-  readOnly = false,
-  autoFocus = false,
-  onChangeLanguage,
-}: EnhancedCodeEditorProps) {
+export function EnhancedCodeEditor({ code, language, onChange, onSave, onFormat, onRun, onReset, readOnly = false, autoFocus = false, onChangeLanguage }: EnhancedCodeEditorProps) {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
   const { settings } = useEditorSettings();
@@ -89,34 +77,23 @@ export function EnhancedCodeEditor({
     });
 
     // Set the theme
-    monaco.editor.setTheme(
-      settings.theme === "dark" ? "logiclab-dark" : "logiclab-light"
-    );
+    monaco.editor.setTheme(settings.theme === "dark" ? "logiclab-dark" : "logiclab-light");
 
     // Register keyboard shortcuts if enabled
     if (settings.keyboardShortcuts.format && onFormat) {
-      editor.addCommand(
-        monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF,
-        () => onFormat()
-      );
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => onFormat());
     }
 
     if (settings.keyboardShortcuts.save && onSave) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
-        onSave()
-      );
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => onSave());
     }
 
     if (settings.keyboardShortcuts.run && onRun) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
-        onRun()
-      );
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => onRun());
     }
 
     if (settings.keyboardShortcuts.reset && onReset) {
-      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () =>
-        onReset()
-      );
+      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => onReset());
     }
 
     // Focus editor if autoFocus is true
@@ -132,9 +109,7 @@ export function EnhancedCodeEditor({
       const editor = editorRef.current;
 
       // Update theme
-      monaco.editor.setTheme(
-        settings.theme === "dark" ? "logiclab-dark" : "logiclab-light"
-      );
+      monaco.editor.setTheme(settings.theme === "dark" ? "logiclab-dark" : "logiclab-light");
 
       // Update editor settings
       editor.updateOptions({
@@ -175,28 +150,19 @@ export function EnhancedCodeEditor({
 
       // Assign keyboard shortcuts
       if (settings.keyboardShortcuts.format && onFormat) {
-        editor.addCommand(
-          monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF,
-          () => onFormat()
-        );
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => onFormat());
       }
 
       if (settings.keyboardShortcuts.save && onSave) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
-          onSave()
-        );
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => onSave());
       }
 
       if (settings.keyboardShortcuts.run && onRun) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
-          onRun()
-        );
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => onRun());
       }
 
       if (settings.keyboardShortcuts.reset && onReset) {
-        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () =>
-          onReset()
-        );
+        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => onReset());
       }
     }
   }, [settings, readOnly, onFormat, onSave, onRun, onReset]);
@@ -235,15 +201,7 @@ export function EnhancedCodeEditor({
 
   return (
     <div className="h-full w-full">
-      <EditorToolbar
-        language={language}
-        isSaving={false}
-        hasChanges={false}
-        onSave={onSave}
-        onReset={onReset}
-        onFormat={onFormat}
-        onChangeLanguage={onChangeLanguage}
-      />
+      <EditorToolbar language={language} isSaving={false} hasChanges={false} onSave={onSave} onReset={onReset} onFormat={onFormat} onChangeLanguage={onChangeLanguage} />
       <Editor
         height="100%"
         language={getMonacoLanguage(language)}
