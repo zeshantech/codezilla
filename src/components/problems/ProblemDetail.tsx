@@ -1,15 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  BookOpen,
-  FileCode,
-  CopyCheck,
-  PenSquare,
-} from "lucide-react";
-import { Problem } from "@/types";
+import { ChevronDown, ChevronUp, BookOpen, FileCode, CopyCheck, PenSquare } from "lucide-react";
+import { IProblem } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -17,7 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "../ui/scroll-area";
 
 interface ProblemDetailProps {
-  problem: Problem;
+  problem: IProblem;
 }
 
 export function ProblemDetail({ problem }: ProblemDetailProps) {
@@ -45,14 +38,12 @@ export function ProblemDetail({ problem }: ProblemDetailProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-wrap">
               <CardTitle>{problem.title}</CardTitle>
-              <Badge variant={getDifficultyBadge(problem.difficulty)}>
-                {problem.difficulty}
-              </Badge>
+              <Badge variant={getDifficultyBadge(problem.difficulty)}>{problem.difficulty}</Badge>
             </div>
             <Badge variant="secondary">{problem.category}</Badge>
           </div>
           <div className="flex flex-wrap gap-1">
-            {problem.tags.map((tag) => (
+            {problem.tags.map((tag: string) => (
               <Badge key={tag} variant="secondary">
                 {tag}
               </Badge>
@@ -80,28 +71,19 @@ export function ProblemDetail({ problem }: ProblemDetailProps) {
 
       <CardContent className="space-y-4">
         {activeTab === "description" && (
-          <div className=" text-sm">
+          <div className="text-sm">
             {/* Description */}
-            <div>
-              <p className="whitespace-pre-line">{problem.description}</p>
-            </div>
+            <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: problem.description }} />
 
             {/* Constraints */}
             <div>
-              <div
-                className="flex items-center justify-between cursor-pointer mb-1"
-                onClick={() => setShowConstraints(!showConstraints)}
-              >
+              <div className="flex items-center justify-between cursor-pointer mb-1" onClick={() => setShowConstraints(!showConstraints)}>
                 <h3 className="font-semibold text-base">Constraints</h3>
-                {showConstraints ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
+                {showConstraints ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </div>
               {showConstraints && (
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  {problem.constraints.map((constraint, idx) => (
+                  {problem.constraints.map((constraint: string, idx: number) => (
                     <li key={idx}>{constraint}</li>
                   ))}
                 </ul>
@@ -114,34 +96,22 @@ export function ProblemDetail({ problem }: ProblemDetailProps) {
             <div>
               <h3 className="font-semibold text-base mb-2">Examples</h3>
               <div className="space-y-4">
-                {problem.examples.map((example, idx) => (
+                {problem.examples.map((example: any, idx: number) => (
                   <div key={idx} className="p-3 rounded-md bg-muted/30 border">
                     <p className="font-medium">Example {idx + 1}:</p>
                     <div className="mt-2 space-y-2">
                       <div className="grid grid-cols-[auto,1fr] gap-2">
-                        <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                          Input:
-                        </div>
-                        <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                          {example.input}
-                        </div>
+                        <div className="font-mono text-xs bg-background px-2 py-1 rounded">Input:</div>
+                        <div className="font-mono text-xs bg-background px-2 py-1 rounded">{example.input}</div>
                       </div>
                       <div className="grid grid-cols-[auto,1fr] gap-2">
-                        <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                          Output:
-                        </div>
-                        <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                          {example.output}
-                        </div>
+                        <div className="font-mono text-xs bg-background px-2 py-1 rounded">Output:</div>
+                        <div className="font-mono text-xs bg-background px-2 py-1 rounded">{example.output}</div>
                       </div>
                       {example.explanation && (
                         <div>
-                          <p className="text-xs text-muted-foreground mt-1 font-medium">
-                            Explanation:
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {example.explanation}
-                          </p>
+                          <p className="text-xs text-muted-foreground mt-1 font-medium">Explanation:</p>
+                          <p className="text-xs text-muted-foreground mt-1">{example.explanation}</p>
                         </div>
                       )}
                     </div>
@@ -178,12 +148,8 @@ export function ProblemDetail({ problem }: ProblemDetailProps) {
                 <div className="rounded-full bg-muted p-3 mb-4">
                   <FileCode className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-medium mb-1">
-                  No solution available
-                </h3>
-                <p className="text-muted-foreground">
-                  Solution for this problem is not available yet.
-                </p>
+                <h3 className="text-lg font-medium mb-1">No solution available</h3>
+                <p className="text-muted-foreground">Solution for this problem is not available yet.</p>
               </div>
             )}
           </div>
@@ -195,9 +161,7 @@ export function ProblemDetail({ problem }: ProblemDetailProps) {
               <PenSquare className="h-6 w-6 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-medium mb-1">Your Submissions</h3>
-            <p className="text-muted-foreground">
-              You haven't submitted any solutions yet.
-            </p>
+            <p className="text-muted-foreground">You haven't submitted any solutions yet.</p>
           </div>
         ) : null}
       </CardContent>
@@ -206,19 +170,10 @@ export function ProblemDetail({ problem }: ProblemDetailProps) {
 }
 
 // Simple Select component for the solution tab
-function Select({
-  defaultValue,
-  options,
-}: {
-  defaultValue: string;
-  options: { value: string; label: string }[];
-}) {
+function Select({ defaultValue, options }: { defaultValue: string; options: { value: string; label: string }[] }) {
   return (
     <div className="relative inline-block text-left">
-      <select
-        className="bg-muted/30 text-xs rounded-md px-2 py-1 border-border"
-        defaultValue={defaultValue}
-      >
+      <select className="bg-muted/30 text-xs rounded-md px-2 py-1 border-border" defaultValue={defaultValue}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

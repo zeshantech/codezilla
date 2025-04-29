@@ -3,28 +3,23 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import {
-  Code,
-  Lightbulb,
-  BookOpen,
-  ArrowRight,
-  Code2,
-  Brain,
-} from "lucide-react";
+import { Code, Lightbulb, BookOpen, ArrowRight, Code2, Brain } from "lucide-react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { EditorPanel } from "@/components/editor/EditorPanel";
 import { useProblems } from "@/hooks/useProblems";
 import { useCollections } from "@/hooks/useCollections";
 import ProblemCard from "@/components/problems/ProblemCard";
-import { Collection, Problem } from "@/types";
+import { ICollection, IProblem } from "@/types";
 import { CollectionCard } from "@/components/collections/CollectionCard";
+import { EmptyState, ErrorState } from "@/components/ui/emptyState";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function page() {
   const [activeTab, setActiveTab] = useState("playground");
 
-  const { featuredProblems } = useProblems();
-  const { featuredCollections } = useCollections();
+  const { featuredProblems, isFeaturedProblemsError, isFeaturedProblemsLoading } = useProblems();
+  const { featuredCollections, isFeaturedCollectionsError, isFeaturedCollectionsLoading } = useCollections();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -34,17 +29,12 @@ export default function page() {
         <section className="py-10 md:py-16 bg-gradient-to-b from-background to-muted/20">
           <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
             <div className="flex-1 space-y-6">
-              <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">
-                Your playground for coding mastery
-              </div>
+              <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">Your playground for coding mastery</div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
                 Master Coding with
                 <span className="text-primary"> LogicLab</span>
               </h1>
-              <p className="text-xl text-muted-foreground max-w-[600px]">
-                Solve coding challenges, practice algorithms, and prepare for
-                technical interviews all in one place.
-              </p>
+              <p className="text-xl text-muted-foreground max-w-[600px]">Solve coding challenges, practice algorithms, and prepare for technical interviews all in one place.</p>
               <div className="flex flex-wrap gap-4">
                 <Button size="lg" href="#editor">
                   Start Coding <ArrowRight />
@@ -67,16 +57,13 @@ export default function page() {
                   <div className="group flex">
                     <div className="w-5 text-muted-foreground">1</div>
                     <div>
-                      <span className="text-info">function</span>{" "}
-                      <span className="text-warning">solve</span>(
-                      <span className="text-secondary">problem</span>) {"{"}
+                      <span className="text-info">function</span> <span className="text-warning">solve</span>(<span className="text-secondary">problem</span>) {"{"}
                     </div>
                   </div>
                   <div className="group flex">
                     <div className="w-5 text-muted-foreground">2</div>
                     <div className="pl-4">
-                      <span className="text-info">const</span> solution ={" "}
-                      <span className="text-warning">think</span>({`{`}
+                      <span className="text-info">const</span> solution = <span className="text-warning">think</span>({`{`}
                       deeply: <span className="text-secondary">true</span>
                       {`}`});
                     </div>
@@ -103,8 +90,7 @@ export default function page() {
                   <div className="group flex">
                     <div className="w-5 text-muted-foreground">6</div>
                     <div className="pl-8">
-                      <span className="text-info">return</span>{" "}
-                      <span className="text-warning">refactor</span>
+                      <span className="text-info">return</span> <span className="text-warning">refactor</span>
                       (solution);
                     </div>
                   </div>
@@ -135,22 +121,12 @@ export default function page() {
         <section id="explore" className="py-12">
           <div className="flex flex-col gap-4 mb-8">
             <h2 className="text-3xl font-bold">Explore the Platform</h2>
-            <p className="text-muted-foreground max-w-2xl">
-              Discover coding problems, collections, and resources to improve
-              your skills.
-            </p>
+            <p className="text-muted-foreground max-w-2xl">Discover coding problems, collections, and resources to improve your skills.</p>
           </div>
 
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="space-y-6"
-          >
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid md:grid-cols-3 grid-cols-1 md:w-[400px] w-full">
-              <TabsTrigger
-                value="playground"
-                className="flex items-center gap-2"
-              >
+              <TabsTrigger value="playground" className="flex items-center gap-2">
                 <Code className="h-4 w-4" />
                 <span>Playground</span>
               </TabsTrigger>
@@ -158,10 +134,7 @@ export default function page() {
                 <BookOpen className="h-4 w-4" />
                 <span>Problems</span>
               </TabsTrigger>
-              <TabsTrigger
-                value="collections"
-                className="flex items-center gap-2"
-              >
+              <TabsTrigger value="collections" className="flex items-center gap-2">
                 <Lightbulb className="h-4 w-4" />
                 <span>Collections</span>
               </TabsTrigger>
@@ -174,30 +147,21 @@ export default function page() {
                     <Code className="size-5" />
                     <h3 className="text-xl">Code Editor</h3>
                   </div>
-                  <p className="text-muted-foreground">
-                    Full-featured code editor with syntax highlighting,
-                    auto-completion, and multi-language support.
-                  </p>
+                  <p className="text-muted-foreground">Full-featured code editor with syntax highlighting, auto-completion, and multi-language support.</p>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 font-semibold">
                     <Code2 className="size-5" />
                     <h3 className="text-xl">Run Code</h3>
                   </div>
-                  <p className="text-muted-foreground">
-                    Execute your code in the browser and see instant results
-                    with detailed output.
-                  </p>
+                  <p className="text-muted-foreground">Execute your code in the browser and see instant results with detailed output.</p>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 font-semibold">
                     <Brain className="size-5" />
                     <h3 className="text-xl">AI Assistance</h3>
                   </div>
-                  <p className="text-muted-foreground">
-                    Get AI-powered help with your code, including code
-                    explanations and optimization tips.
-                  </p>
+                  <p className="text-muted-foreground">Get AI-powered help with your code, including code explanations and optimization tips.</p>
                 </div>
               </div>
               <div className="flex justify-center">
@@ -215,10 +179,9 @@ export default function page() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {featuredProblems?.map((problem: Problem) => (
-                  <ProblemCard key={problem.id} problem={problem} />
-                ))}
+                {isFeaturedProblemsLoading ? [1, 2, 3].map((i) => <Skeleton key={i} className="h-[220px] rounded-lg"></Skeleton>) : featuredProblems?.map((problem: IProblem) => <ProblemCard key={problem.id} problem={problem} />)}
               </div>
+              {isFeaturedProblemsError ? <ErrorState title="Error loading featured problems" /> : featuredProblems?.length === 0 && <EmptyState title="No featured problems found" description="Check back soon for new problems" icon={<BookOpen />} />}
             </TabsContent>
 
             <TabsContent value="collections" className="min-h-[400px]">
@@ -228,10 +191,9 @@ export default function page() {
                 </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {featuredCollections?.map((collection: Collection) => (
-                  <CollectionCard key={collection.id} collection={collection} />
-                ))}
+                {isFeaturedCollectionsLoading ? [1, 2, 3].map((i) => <Skeleton key={i} className="h-[220px] rounded-lg"></Skeleton>) : featuredCollections?.map((collection: ICollection) => <CollectionCard key={collection.id} collection={collection} />)}
               </div>
+              {isFeaturedCollectionsError ? <ErrorState title="Error loading featured collections" /> : featuredCollections?.length === 0 && <EmptyState title="No featured collections found" description="Check back soon for new collections" icon={<Lightbulb />} />}
             </TabsContent>
           </Tabs>
         </section>

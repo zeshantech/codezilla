@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Filter, X } from "lucide-react";
-import { Difficulty } from "@/types";
+import { DifficultyEnum } from "@/types";
+import { debounce } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "../ui/search-input";
 import { Selector } from "@/components/ui/select";
@@ -19,7 +20,7 @@ import { CATEGORIES } from "@/data/mock/categories";
 
 export interface IProblemFilters {
   search?: string;
-  difficulties?: Difficulty[];
+  difficulties?: DifficultyEnum[];
   categories?: string[];
   sortBy?: "popularity" | "newest" | "title" | "difficulty" | "completion_rate";
 }
@@ -31,7 +32,7 @@ export function ProblemFilters() {
   // Initialize filters from URL params
   const [filters, setFilters] = useState<IProblemFilters>({
     search: searchParams.get("search") || "",
-    difficulties: searchParams.getAll("difficulty") as Difficulty[],
+    difficulties: searchParams.getAll("difficulty") as DifficultyEnum[],
     categories: searchParams.getAll("category"),
     sortBy:
       (searchParams.get("sortBy") as IProblemFilters["sortBy"]) || "popularity",
@@ -72,9 +73,16 @@ export function ProblemFilters() {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
+  // Debounced search handler
+  const debouncedSearch = debounce((value: string) => {
+    updateFilters({ search: value });
+  }, 800);
+
   // Handle search input
-  const handleSearch = () => {
-    updateFilters({ search: searchQuery });
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSearch(value);
   };
 
   // Handle sort change
@@ -85,7 +93,7 @@ export function ProblemFilters() {
   };
 
   // Toggle a difficulty in the filter
-  const toggleDifficulty = (difficulty: Difficulty) => {
+  const toggleDifficulty = (difficulty: DifficultyEnum) => {
     const currentDifficulties = filters.difficulties || [];
     const updatedDifficulties = currentDifficulties.includes(difficulty)
       ? currentDifficulties.filter((d) => d !== difficulty)
@@ -123,13 +131,10 @@ export function ProblemFilters() {
       <SearchInput
         placeholder="Search problems..."
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onSearch={handleSearch}
+        onChange={handleSearchChange}
         onClear={() => {
           setSearchQuery("");
-          if (filters.search) {
-            updateFilters({ search: "" });
-          }
+          updateFilters({ search: "" });
         }}
         className="flex-grow"
       />
@@ -153,7 +158,7 @@ export function ProblemFilters() {
           <DropdownMenuContent>
             <DropdownMenuLabel>Difficulty Level</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {(["Easy", "Medium", "Hard"] as Difficulty[]).map((difficulty) => (
+            {Object.values(DifficultyEnum).map((difficulty) => (
               <DropdownMenuCheckboxItem
                 key={difficulty}
                 checked={filters.difficulties?.includes(difficulty)}
@@ -162,9 +167,9 @@ export function ProblemFilters() {
                 <span
                   className={`mr-2 rounded-full size-2 inline-block
                         ${
-                          difficulty === "Easy"
+                          difficulty === DifficultyEnum.EASY
                             ? "bg-success"
-                            : difficulty === "Medium"
+                            : difficulty === DifficultyEnum.MEDIUM
                             ? "bg-warning"
                             : "bg-error"
                         }`}

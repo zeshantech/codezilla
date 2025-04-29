@@ -1,20 +1,100 @@
 import { IProblemCreateInput } from "@/types";
 import React from "react";
 
-export function aiProblemCreator(input: IProblemCreateInput) {
-  const {
-    difficulty,
-    complexity,
-    topics,
-    customPrompt,
-    exampleCount,
-    timeLimit,
-    memoryLimit,
-  } = input;
+import { openai } from "@ai-sdk/openai";
+import { streamText } from "ai";
 
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30;
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+
+  const result = streamText({
+    model: openai("gpt-4o"),
+    messages,
+  });
+
+  return result.toDataStreamResponse();
+}
+
+export async function aiProblemCreator(input: IProblemCreateInput) {
+  const { difficulty, complexity, topics, customPrompt, exampleCount, timeLimit, memoryLimit } = input;
+
+  // Construct the prompt for the AI
+  const prompt = `Create a coding problem with the following specifications:
+- Difficulty: ${difficulty || "medium"}
+- Complexity: ${complexity || "medium"}
+- Topics: ${topics?.join(", ") || "algorithms"}
+- Number of examples: ${exampleCount || 3}
+- Time limit: ${timeLimit || "standard"}
+- Memory limit: ${memoryLimit || "standard"}
+${customPrompt ? `\nAdditional requirements: ${customPrompt}` : ""}
+
+Format the response as a JSON object with the following structure:
+{
+  "title": "Problem title",
+  "category": "Main category",
+  "description": "Full markdown description with problem statement, input/output format, and constraints",
+  "constraints": ["constraint1", "constraint2"],
+  "examples": [
+    {"input": "example input", "output": "example output", "explanation": "explanation"}
+  ],
+  "testCases": [
+    {"input": "test input", "expectedOutput": "expected output", "isHidden": false}
+  ],
+  "starterCode": {
+    "javascript": "code here",
+    "python": "code here",
+    "java": "code here",
+    "cpp": "code here"
+  },
+  "solution": {
+    "javascript": "solution code",
+    "python": "solution code",
+    "java": "solution code",
+    "cpp": "solution code"
+  },
+  "tags": ["tag1", "tag2"]
+}`;
+
+  try {
+    // Call OpenAI API
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Parse the AI response
+    try {
+      const problemData = JSON.parse(data.content);
+      return problemData as any;
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", parseError);
+      return getFallbackProblem(topics?.[0]);
+    }
+  } catch (error) {
+    console.error("Error generating problem with AI:", error);
+    return getFallbackProblem(topics?.[0]);
+  }
+}
+
+// Fallback problem in case AI generation fails
+function getFallbackProblem(topic?: string) {
   return {
     title: "Sum Two Numbers",
-    category: topics?.[0] || "Basic Algorithms",
+    category: topic || "Basic Algorithms",
     description: `
 ## Sum Two Numbers
 

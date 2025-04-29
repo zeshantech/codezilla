@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "./db/connection";
+import { ApiException, ValidationException } from "./exceptions";
 
-export function apiHandler(
-  handler: (
-    req: NextRequest,
-    params: { id: string }
-  ) => Promise<{ data: any; status: number }>
-) {
-  return async (req: NextRequest, { params }: { params: { id: string } }) => {
+export function apiHandler(handler: (req: NextRequest, params: any) => Promise<{ data: any; status: number }>) {
+  return async (req: NextRequest, { params }: { params: any }) => {
     try {
       await dbConnect();
 
@@ -15,10 +11,14 @@ export function apiHandler(
 
       return NextResponse.json(data, { status });
     } catch (error) {
-      console.error(error);
+      console.error("******************************************************", JSON.stringify(error), "******************************************************");
       return NextResponse.json(
-        { error: "Internal Server Error" },
-        { status: 500 }
+        {
+          error: error instanceof ApiException ? error.message : "Internal Server Error",
+          statusCode: error instanceof ApiException ? error.statusCode : 500,
+          errors: error instanceof ValidationException ? error.errors : [],
+        },
+        { status: error instanceof ApiException ? error.statusCode : 500 }
       );
     }
   };

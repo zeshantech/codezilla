@@ -94,8 +94,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function CreateProblemDialog() {
   const [open, setOpen] = useState(false);
   const [advancedOptions, setAdvancedOptions] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { createProblem } = useProblems();
+  const { createProblem, isCreatingProblem } = useProblems();
 
   // Initialize form with react-hook-form and zod validation
   const {
@@ -148,33 +147,20 @@ export function CreateProblemDialog() {
 
   // Handle form submission
   const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
+    const problemData = {
+      difficulty: data.difficulty,
+      complexity: data.complexity,
+      topics: data.topics,
+      customPrompt: data.customPrompt,
+      exampleCount: data.exampleCount,
+      timeLimit: data.timeLimit,
+      memoryLimit: data.memoryLimit,
+    };
 
-    try {
-      console.log("data", data);
+    await createProblem(problemData);
 
-      // Create problem data object
-      const problemData = {
-        difficulty: data.difficulty,
-        complexity: data.complexity,
-        topics: data.topics,
-        customPrompt: data.customPrompt,
-        exampleCount: data.exampleCount,
-        timeLimit: data.timeLimit,
-        memoryLimit: data.memoryLimit,
-      };
-
-      // Call the API to create the problem
-      await createProblem(problemData);
-
-      // Reset form and close dialog on success
-      reset();
-      setOpen(false);
-    } catch (error) {
-      console.error("Failed to create problem:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    reset();
+    setOpen(false);
   };
 
   return (
@@ -217,18 +203,7 @@ export function CreateProblemDialog() {
                       key={diff.value}
                       variant={
                         getValues("difficulty") === diff.value
-                          ? (diff.color as
-                              | "success"
-                              | "warning"
-                              | "error"
-                              | "default"
-                              | "outline"
-                              | "secondary"
-                              | "info"
-                              | "muted"
-                              | "bronze"
-                              | null
-                              | undefined)
+                          ? (diff.color as any)
                           : "muted"
                       }
                       className="py-1 px-3 cursor-pointer"
@@ -402,15 +377,12 @@ export function CreateProblemDialog() {
           </Collapsible>
 
           <DialogFooter>
-            <DialogClose asChild>
+            <DialogClose>
               <Button variant="outline" type="button">
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+            <Button type="submit" loading={isCreatingProblem}>
               Generate Problem
             </Button>
           </DialogFooter>

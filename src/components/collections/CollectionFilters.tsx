@@ -6,14 +6,8 @@ import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "../ui/search-input";
 import { Selector } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { debounce } from "@/lib/utils";
 
 export interface ICollectionFilters {
   search?: string;
@@ -26,14 +20,11 @@ export function CollectionFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Initialize filters from URL params
   const [filters, setFilters] = useState<ICollectionFilters>({
     search: searchParams.get("search") || "",
     tags: searchParams.getAll("tag"),
     featured: searchParams.get("featured") === "true",
-    sortBy:
-      (searchParams.get("sortBy") as ICollectionFilters["sortBy"]) ||
-      "popularity",
+    sortBy: (searchParams.get("sortBy") as ICollectionFilters["sortBy"]) || "popularity",
   });
 
   const [searchQuery, setSearchQuery] = useState<string>(filters.search || "");
@@ -69,9 +60,16 @@ export function CollectionFilters() {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
+  // Debounced search handler
+  const debouncedSearch = debounce((value: string) => {
+    updateFilters({ search: value });
+  }, 800);
+
   // Handle search input
-  const handleSearch = () => {
-    updateFilters({ search: searchQuery });
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    debouncedSearch(value);
   };
 
   // Handle sort change
@@ -97,13 +95,10 @@ export function CollectionFilters() {
       <SearchInput
         placeholder="Search problems..."
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onSearch={handleSearch}
+        onChange={handleSearchChange}
         onClear={() => {
           setSearchQuery("");
-          if (filters.search) {
-            updateFilters({ search: "" });
-          }
+          updateFilters({ search: "" });
         }}
         className="flex-grow"
       />
@@ -129,10 +124,7 @@ export function CollectionFilters() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuCheckboxItem
-              checked={filters.featured}
-              onCheckedChange={handleFeaturedToggle}
-            >
+            <DropdownMenuCheckboxItem checked={filters.featured} onCheckedChange={handleFeaturedToggle}>
               Featured Only
             </DropdownMenuCheckboxItem>
           </DropdownMenuContent>

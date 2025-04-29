@@ -1,9 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ICollection, ICollectionFilters } from "@/types";
+import { ICollectionCreateInput, ICollectionFilters } from "@/types";
 import { toast } from "sonner";
 import * as collectionsAPI from "@/lib/api/collections";
-
-const CURRENT_USER_ID = "user123";
 
 export function useCollections() {
   const queryClient = useQueryClient();
@@ -16,11 +14,11 @@ export function useCollections() {
     });
   };
 
-  const useCollection = (id: string | undefined) => {
+  const useCollection = (slug: string | undefined) => {
     return useQuery({
-      queryKey: ["collection", id],
-      queryFn: () => collectionsAPI.fetchCollectionById(id || ""),
-      enabled: !!id,
+      queryKey: ["collection", slug],
+      queryFn: () => collectionsAPI.fetchCollectionBySlug(slug || ""),
+      enabled: !!slug,
       staleTime: 1000 * 60 * 5,
     });
   };
@@ -35,18 +33,10 @@ export function useCollections() {
 
   const useCreateCollection = () => {
     return useMutation({
-      mutationFn: (
-        collection: Omit<
-          ICollection,
-          "id" | "createdAt" | "updatedAt" | "completionCount"
-        >
-      ) => {
-        return collectionsAPI.createCollection({
-          ...collection,
-          createdBy: CURRENT_USER_ID,
-        });
+      mutationFn: (collection: ICollectionCreateInput) => {
+        return collectionsAPI.createCollection(collection);
       },
-      onSuccess: (newCollection) => {
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["collections"] });
         toast.success("Collection created successfully!");
       },
@@ -59,7 +49,9 @@ export function useCollections() {
 
   const useUpdateCollection = () => {
     return useMutation({
-      mutationFn: collectionsAPI.updateCollection,
+      mutationFn: ({ id, ...collection }: { id: string } & Partial<ICollectionCreateInput>) => {
+        return collectionsAPI.updateCollection(id, collection);
+      },
       onSuccess: (updatedCollection) => {
         queryClient.invalidateQueries({
           queryKey: ["collection", updatedCollection.id],
@@ -90,6 +82,16 @@ export function useCollections() {
     updateCollection: updateCollectionMutation.mutateAsync,
     isCreatingCollection: createCollectionMutation.isPending,
     isUpdatingCollection: updateCollectionMutation.isPending,
+
+    allCollectionsError: allCollectionsQuery.error,
+    featuredCollectionsError: featuredCollectionsQuery.error,
+    createCollectionError: createCollectionMutation.error,
+    updateCollectionError: updateCollectionMutation.error,
+
+    isAllCollectionsError: allCollectionsQuery.error,
+    isFeaturedCollectionsError: featuredCollectionsQuery.error,
+    isCreateCollectionError: createCollectionMutation.error,
+    isUpdateCollectionError: updateCollectionMutation.error,
 
     allCollections: allCollectionsQuery.data,
     isAllCollectionsLoading: allCollectionsQuery.isLoading,

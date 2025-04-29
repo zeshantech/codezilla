@@ -4,6 +4,7 @@ export enum DifficultyEnum {
   EASY = "easy",
   MEDIUM = "medium",
   HARD = "hard",
+  MIXED = "mixed",
 }
 
 export type ProgrammingLanguage = "javascript" | "python" | "java" | "cpp";
@@ -125,18 +126,14 @@ export interface IEditorConfig {
   formatOnSave: boolean;
 }
 
-export type SortOption =
-  | "popularity"
-  | "newest"
-  | "title"
-  | "difficulty"
-  | "completion_rate";
+export type SortOption = "popularity" | "newest" | "title" | "difficulty" | "completion_rate";
 
 export interface IProblemFilters {
   search?: string;
   categories?: string[];
   difficulties?: DifficultyEnum[];
   tags?: string[];
+  collectionSlug?: string;
   status?: ("attempted" | "solved" | "not_started")[];
   sortBy?: SortOption;
 }
@@ -144,9 +141,9 @@ export interface IProblemFilters {
 export interface ICollectionFilters {
   search?: string;
   tags?: string[];
-  createdBy?: string;
   featured?: boolean;
   sortBy?: SortOption;
+  myCollections?: boolean;
 }
 
 // User profile/settings types
@@ -207,4 +204,32 @@ export interface IProblemCreateInput {
   exampleCount: number;
   timeLimit: number;
   memoryLimit: number;
+}
+
+export interface IProblemSaveInput {
+  title: string;
+  difficulty: DifficultyEnum;
+  category: string;
+  description: string;
+  constraints: string[];
+  examples: IExample[];
+  testCases: ITestCase[];
+  starterCode: Record<ProgrammingLanguage, string>;
+  solution: Record<ProgrammingLanguage, string>;
+  tags: string[];
+}
+
+export interface ICollectionCreateInput {
+  title: string;
+  description?: string;
+  problems: string[];
+  isPublic: boolean;
+  difficulty?: DifficultyEnum;
+  tags: string[];
+}
+
+export interface IError {
+  message: string;
+  statusCode: number;
+  errors: string[];
 }

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { StatusCodes } from "@/constants/statusCodes";
+import { ValidationException } from "./exceptions";
 
 type ValidationTarget = "query" | "body" | "params" | "headers";
 
@@ -9,18 +10,7 @@ export interface ValidationErrorDetail {
   path: (string | number)[];
 }
 
-export class ValidationError extends Error {
-  constructor(public errors: ValidationErrorDetail[]) {
-    super("Validation failed");
-    this.name = "ValidationError";
-  }
-}
-
-export async function validateRequest<T extends z.ZodType>(
-  request: NextRequest,
-  schema: T,
-  target: ValidationTarget
-): Promise<z.infer<T>> {
+export async function validateRequest<T extends z.ZodType>(request: NextRequest, schema: T, target: ValidationTarget): Promise<z.infer<T>> {
   try {
     let data: unknown;
 
@@ -47,20 +37,17 @@ export async function validateRequest<T extends z.ZodType>(
     return schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const validationErrors = error.errors.map((err) => ({
-        message: err.message,
-        path: err.path,
-      }));
-      throw new ValidationError(validationErrors);
+      const validationErrors = error.errors.map((err) => {
+        const path = err.path[0]?.toString() || "";
+        return path + " " + err.message;
+      });
+      throw new ValidationException(validationErrors);
     }
     throw error;
   }
 }
 
-export function createValidator<T extends z.ZodType>(
-  schema: T,
-  target: ValidationTarget
-) {
+export function createValidator<T extends z.ZodType>(schema: T, target: ValidationTarget) {
   return async (request: NextRequest) => {
     return validateRequest(request, schema, target);
   };

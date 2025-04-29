@@ -35,19 +35,12 @@ const loaderVariants = cva("animate-spin text-primary", {
   },
 });
 
-interface SpinnerContentProps
-  extends VariantProps<typeof spinnerVariants>,
-    VariantProps<typeof loaderVariants> {
+interface SpinnerContentProps extends VariantProps<typeof spinnerVariants>, VariantProps<typeof loaderVariants> {
   className?: string;
   children?: React.ReactNode;
 }
 
-export function Spinner({
-  size,
-  show,
-  children,
-  className,
-}: SpinnerContentProps) {
+export function Spinner({ size, show, children, className }: SpinnerContentProps) {
   return (
     <span className={cn(spinnerVariants({ show, size }))}>
       <Loader2 className={cn(loaderVariants({ size }), className)} />
@@ -60,21 +53,9 @@ interface SpinnerBackdropProps extends SpinnerContentProps {
   fullScreen?: boolean;
 }
 
-export function SpinnerBackdrop({
-  size,
-  show,
-  children,
-  className,
-  fullScreen = false,
-}: SpinnerBackdropProps) {
+export function SpinnerBackdrop({ size, show, children, className, fullScreen = false }: SpinnerBackdropProps) {
   return (
-    <div
-      className={cn(
-        "flex items-center justify-center bg-background/80 backdrop-blur-sm",
-        fullScreen ? "fixed inset-0 z-50" : "absolute inset-0 z-10 rounded-md",
-        show ? "flex" : "hidden"
-      )}
-    >
+    <div className={cn("flex items-center justify-center bg-background/80 backdrop-blur-sm", fullScreen ? "fixed inset-0" : "absolute inset-0 rounded-md", show ? "flex" : "hidden")}>
       <Spinner size={size} show={show} className={className}>
         {children}
       </Spinner>

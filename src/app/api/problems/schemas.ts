@@ -1,3 +1,4 @@
+import { stbConverter } from "@/lib/utils";
 import { DifficultyEnum } from "@/types";
 import { z } from "zod";
 
@@ -6,14 +7,16 @@ export const getProblemsQuerySchema = z.object({
   categories: z.array(z.string()).optional(),
   difficulties: z.array(z.nativeEnum(DifficultyEnum)).optional(),
   tags: z.array(z.string()).optional(),
-  sortBy: z
-    .enum(["popularity", "newest", "title", "difficulty", "completion_rate"])
-    .optional(),
+  featured: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((val) => stbConverter(val)),
+  sortBy: z.enum(["popularity", "newest", "title", "difficulty", "completion_rate"]).optional(),
+  myProblems: z.boolean().optional(),
 });
 
 export const createProblemSchema = z.object({
   title: z.string(),
-  slug: z.string(),
   difficulty: z.nativeEnum(DifficultyEnum),
   category: z.string(),
   description: z.string(),
@@ -34,9 +37,5 @@ export const createProblemSchema = z.object({
   ),
   starterCode: z.record(z.string(), z.string()),
   solution: z.record(z.string(), z.string()).optional(),
-  popularity: z.number(),
-  completionCount: z.number(),
-  createdBy: z.string().optional(),
-  isFeatured: z.boolean().optional(),
   tags: z.array(z.string()),
 });

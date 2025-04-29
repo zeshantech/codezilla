@@ -1,89 +1,31 @@
 "use server";
 
-import dbConnect from "../db/connection";
 import { Problem } from "../db/models/problem.model";
-import { IProblem, IProblemFilters, ProgrammingLanguage } from "@/types";
+import { IProblem, IProblemFilters, IProblemSaveInput, ProgrammingLanguage } from "@/types";
+import api from "./api";
 
-export async function fetchProblems(
-  filters?: IProblemFilters
-): Promise<IProblem[]> {
-  try {
-    await dbConnect();
-
-    let query = Problem.find();
-
-    if (filters?.search) {
-      const searchTerm = filters.search.toLowerCase();
-      query = query.or([
-        { title: { $regex: searchTerm, $options: "i" } },
-        { description: { $regex: searchTerm, $options: "i" } },
-        { tags: { $in: [new RegExp(searchTerm, "i")] } },
-      ]);
-    }
-
-    if (filters?.categories && filters.categories.length > 0) {
-      query = query.where("category").in(filters.categories);
-    }
-
-    if (filters?.difficulties && filters.difficulties.length > 0) {
-      query = query.where("difficulty").in(filters.difficulties);
-    }
-
-    if (filters?.tags && filters.tags.length > 0) {
-      query = query.where("tags").in(filters.tags);
-    }
-
-    if (filters?.sortBy) {
-      switch (filters.sortBy) {
-        case "popularity":
-          query = query.sort({ popularity: -1 });
-          break;
-        case "newest":
-          query = query.sort({ createdAt: -1 });
-          break;
-        case "title":
-          query = query.sort({ title: 1 });
-          break;
-        case "difficulty":
-          query = query.sort({ difficulty: 1 });
-          break;
-        case "completion_rate":
-          query = query.sort({ completionCount: -1 });
-          break;
-        default:
-          break;
-      }
-    }
-
-    const problems = await query.exec();
-    return problems;
-  } catch (error) {
-    console.error("Error fetching problems:", error);
-    throw new Error("Failed to fetch problems");
-  }
+export async function fetchProblems(filters?: IProblemFilters): Promise<IProblem[]> {
+  const response = await api.get("/problems", { params: filters });
+  return response.data;
 }
 
 export async function fetchProblemById(id: string): Promise<IProblem | null> {
-  await dbConnect();
+  const response = await api.get(`/problems/${id}`);
+  return response.data;
+}
 
-  try {
-    const problem = await Problem.findById(id);
-    return problem;
-  } catch (error) {
-    console.error("Error fetching problem:", error);
-    return null;
-  }
+export async function fetchProblemBySlug(slug: string): Promise<IProblem | null> {
+  const response = await api.get(`/problems/slug/${slug}`);
+  return response.data;
 }
 
 export async function fetchFeaturedProblems(): Promise<IProblem[]> {
-  await dbConnect();
-
-  const problems = await Problem.find({ isFeatured: true });
-  return problems;
+  const response = await api.get("/problems", { params: { featured: true } });
+  return response.data;
 }
 
 export async function fetchRandomProblem(): Promise<IProblem> {
-  await dbConnect();
+  // await dbConnect();
 
   const count = await Problem.countDocuments();
   const random = Math.floor(Math.random() * count);
@@ -96,33 +38,13 @@ export async function fetchRandomProblem(): Promise<IProblem> {
   return problem;
 }
 
-export async function createProblem(
-  problem: Omit<IProblem, "id" | "createdAt" | "updatedAt">
-): Promise<IProblem> {
-  try {
-    await dbConnect();
-
-    const newProblem = await Problem.create({
-      ...problem,
-      popularity: 0,
-      completionCount: 0,
-      isFeatured: false,
-    });
-
-    return newProblem;
-  } catch (error) {
-    console.error("Error creating problem:", error);
-    throw new Error("Failed to create problem");
-  }
+export async function createProblem(input: IProblemSaveInput): Promise<IProblem> {
+  const response = await api.post("/problems", input);
+  return response.data;
 }
 
-export async function updateProblemCode(
-  userId: string,
-  problemId: string,
-  code: string,
-  language: ProgrammingLanguage
-): Promise<boolean> {
-  await dbConnect();
+export async function updateProblemCode(userId: string, problemId: string, code: string, language: ProgrammingLanguage): Promise<boolean> {
+  // await dbConnect();
 
   try {
     const { User } = await import("../db/models/user.model");

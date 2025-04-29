@@ -1,11 +1,6 @@
 import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  IProblem,
-  IProblemFilters,
-  ProgrammingLanguage,
-  IProblemCreateInput,
-} from "@/types";
+import { IProblem, IProblemFilters, ProgrammingLanguage, IProblemCreateInput } from "@/types";
 import { toast } from "sonner";
 import * as problemsAPI from "@/lib/api/problems";
 import * as usersAPI from "@/lib/api/users";
@@ -22,21 +17,19 @@ export function useProblems() {
       queryKey: ["problems", filters],
       queryFn: async () => {
         const problems = await problemsAPI.fetchProblems(filters);
-        console.log(problems, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-
         return problems;
       },
       staleTime: 1000 * 60 * 5, // 5 minutes
     });
   };
 
-  // Fetch a single problem by ID
-  const useProblem = (id: string | undefined) => {
+  // Fetch a single problem by SLUG
+  const useProblem = (slug: string | undefined) => {
     return useQuery({
-      queryKey: ["problem", id],
-      queryFn: () => problemsAPI.fetchProblemById(id || ""),
-      enabled: !!id,
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      queryKey: ["problem", slug],
+      queryFn: () => problemsAPI.fetchProblemBySlug(slug!),
+      enabled: !!slug,
+      staleTime: 1000 * 60 * 5,
     });
   };
 
@@ -45,7 +38,7 @@ export function useProblems() {
     return useQuery({
       queryKey: ["problems", "featured"],
       queryFn: problemsAPI.fetchFeaturedProblems,
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
     });
   };
 
@@ -64,18 +57,13 @@ export function useProblems() {
   const useCreateProblem = () => {
     return useMutation({
       mutationFn: async (input: IProblemCreateInput) => {
-        const problem = aiProblemCreator(input);
+        const problem = await aiProblemCreator(input);
         return problemsAPI.createProblem({
           ...problem,
-          createdBy: CURRENT_USER_ID,
-          completionCount: 0,
-          popularity: 0,
           difficulty: input.difficulty,
-          slug: problem.title.toLowerCase().replace(/ /g, "-"),
         });
       },
-      onSuccess: (newProblem: IProblem) => {
-        // Invalidate the problems list query to include the new problem
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["problems"] });
         toast.success("Problem created successfully!");
       },
@@ -89,21 +77,7 @@ export function useProblems() {
   // Update a problem's user code
   const useUpdateProblemCode = () => {
     return useMutation({
-      mutationFn: ({
-        problemId,
-        code,
-        language,
-      }: {
-        problemId: string;
-        code: string;
-        language: ProgrammingLanguage;
-      }) =>
-        problemsAPI.updateProblemCode(
-          CURRENT_USER_ID,
-          problemId,
-          code,
-          language
-        ),
+      mutationFn: ({ problemId, code, language }: { problemId: string; code: string; language: ProgrammingLanguage }) => problemsAPI.updateProblemCode(CURRENT_USER_ID, problemId, code, language),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["user", "progress"] });
         toast.success("Code saved successfully!");
@@ -118,10 +92,7 @@ export function useProblems() {
   // Get user progress for a specific problem
   const getUserProblemProgress = useCallback(async (problemId: string) => {
     try {
-      const progress = await usersAPI.getUserProblemProgress(
-        CURRENT_USER_ID,
-        problemId
-      );
+      const progress = await usersAPI.getUserProblemProgress(CURRENT_USER_ID, problemId);
       return progress;
     } catch (error) {
       console.error("Error getting problem progress:", error);
@@ -148,6 +119,18 @@ export function useProblems() {
     updateProblemCode: updateProblemCodeMutation.mutateAsync,
     isCreatingProblem: createProblemMutation.isPending,
     isUpdatingProblemCode: updateProblemCodeMutation.isPending,
+
+    allProblemsError: allProblemsQuery.error,
+    featuredProblemsError: featuredProblemsQuery.error,
+    randomProblemError: randomProblemQuery.error,
+    createProblemError: createProblemMutation.error,
+    updateProblemCodeError: updateProblemCodeMutation.error,
+
+    isAllProblemsError: allProblemsQuery.error,
+    isFeaturedProblemsError: featuredProblemsQuery.error,
+    isRandomProblemError: randomProblemQuery.error,
+    isCreateProblemError: createProblemMutation.error,
+    isUpdateProblemCodeError: updateProblemCodeMutation.error,
 
     allProblems: allProblemsQuery.data,
     isAllProblemsLoading: allProblemsQuery.isLoading,
