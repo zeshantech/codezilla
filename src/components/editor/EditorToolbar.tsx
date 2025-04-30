@@ -1,31 +1,9 @@
 "use client";
 
-import {
-  Play,
-  Save,
-  RotateCcw,
-  Settings,
-  Code2,
-  FileCode,
-  Loader2,
-  Download,
-  Copy,
-  Sparkles,
-} from "lucide-react";
+import { Play, Save, RotateCcw, Settings, Code2, FileCode, Loader2, Download, Copy, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { ProgrammingLanguage } from "@/types";
 
@@ -42,18 +20,7 @@ interface EditorToolbarProps {
   showAiAssist?: boolean;
 }
 
-export function EditorToolbar({
-  language,
-  onLanguageChange,
-  onRun,
-  onSave,
-  onReset,
-  onFormat,
-  onAiAssist,
-  isRunning,
-  isSaving,
-  showAiAssist = false,
-}: EditorToolbarProps) {
+export function EditorToolbar({ language, onLanguageChange, onRun, onSave, onReset, onFormat, onAiAssist, isRunning, isSaving, showAiAssist = false }: EditorToolbarProps) {
   const handleLanguageChange = (value: string) => {
     onLanguageChange(value as ProgrammingLanguage);
   };
@@ -98,17 +65,8 @@ export function EditorToolbar({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onRun}
-                disabled={isRunning}
-              >
-                {isRunning ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                ) : (
-                  <Play className="h-4 w-4 text-green-500" />
-                )}
+              <Button variant="ghost" size="icon" onClick={onRun} disabled={isRunning}>
+                {isRunning ? <Loader2 className="h-4 w-4 animate-spin text-primary" /> : <Play className="h-4 w-4 text-green-500" />}
               </Button>
             </TooltipTrigger>
             <TooltipContent>Run code</TooltipContent>
@@ -118,17 +76,8 @@ export function EditorToolbar({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onSave}
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}
+              <Button variant="ghost" size="icon" onClick={onSave} disabled={isSaving}>
+                {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               </Button>
             </TooltipTrigger>
             <TooltipContent>Save code</TooltipContent>

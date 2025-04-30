@@ -1,28 +1,14 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Code,
-  Play,
-  Save,
-  Undo2,
-  FileCode,
-  Settings as SettingsIcon,
-  DownloadCloud,
-  Share2,
-} from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Code, Play, Save, Undo2, FileCode, Settings as SettingsIcon, DownloadCloud, Share2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ProblemSelector } from "./ProblemSelector";
 import { SettingsDialog } from "./SettingsDialog";
-import { ProgrammingLanguage } from "@/types";
+import { ISubmission, ProgrammingLanguage } from "@/types";
 import useEditorSettings, { EditorSettings } from "@/hooks/useEditorSettings";
 import { toast } from "sonner";
+import SubmissionHistoryDrawer from "./SubmissionHistoryDrawer";
 
 interface EditorToolbarProps {
   language: ProgrammingLanguage;
@@ -33,18 +19,10 @@ interface EditorToolbarProps {
   onFormat: () => void;
   onDownload?: () => void;
   onChangeLanguage: (language: ProgrammingLanguage) => void;
+  onLoadSubmission: (submission: ISubmission) => void;
 }
 
-export default function EditorToolbar({
-  language,
-  isSaving,
-  hasChanges,
-  onSave,
-  onReset,
-  onFormat,
-  onDownload,
-  onChangeLanguage,
-}: EditorToolbarProps) {
+export default function EditorToolbar({ language, isSaving, hasChanges, onSave, onReset, onFormat, onDownload, onChangeLanguage, onLoadSubmission }: EditorToolbarProps) {
   const handleLanguageChange = (value: string) => {
     onChangeLanguage(value as ProgrammingLanguage);
   };
@@ -66,14 +44,10 @@ export default function EditorToolbar({
       </Select>
 
       <div className="ml-auto" />
+      <SubmissionHistoryDrawer onLoadSubmission={onLoadSubmission} />
+
       {/* Save button */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onSave}
-        loading={isSaving}
-        disabled={!hasChanges}
-      >
+      <Button variant="outline" size="sm" onClick={onSave} loading={isSaving} disabled={!hasChanges}>
         <Save />
         Save
       </Button>

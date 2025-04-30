@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ICodeExecutionResult } from "@/types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +49,7 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
     if (!result) return null;
 
     return (
-      <div className="font-mono text-sm p-4 overflow-auto max-h-full">
+      <div className="font-mono text-sm p-4 overflow-auto h-full">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Badge variant={result.status === "running" ? "outline" : result.status} className="capitalize">
@@ -107,7 +107,7 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Badge variant={passedTests === totalTests ? "success" : "warning"}>
-              {passedTests === totalTests ? <Check className="mr-1 h-3 w-3" /> : <AlertTriangle className="mr-1 h-3 w-3" />}
+              {passedTests === totalTests ? <Check /> : <AlertTriangle />}
               {passedTests} / {totalTests} Tests Passed
             </Badge>
           </div>
@@ -115,10 +115,10 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
 
         <div className="space-y-4">
           {result.testResults.map((test, index) => (
-            <div key={index} className={`border rounded-md p-3 ${test.passed ? "border-green-200 bg-green-50 dark:bg-green-950/10" : "border-red-200 bg-red-50 dark:bg-red-950/10"}`}>
+            <div key={index} className={`border rounded-md p-3 ${test.passed ? "border-success/30" : "border-error/30"}`}>
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant={test.passed ? "success" : "error"}>
-                  {test.passed ? <Check className="mr-1 h-3 w-3" /> : <X className="mr-1 h-3 w-3" />}
+                  {test.passed ? <Check /> : <X />}
                   Test Case {index + 1}
                 </Badge>
               </div>
@@ -162,19 +162,15 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
           </TabsTrigger>
         </TabsList>
 
-        <div className="flex-1 border rounded-md overflow-hidden">
+        <div className="flex-1 border rounded-md overflow-auto">
           {isExecuting ? (
             <SpinnerBox>Executing code, please wait...</SpinnerBox>
           ) : !result ? (
             <EmptyState icon={<AlertTriangle />} title="No output to display" description="Run your code to see the output here." />
           ) : (
             <>
-              <TabsContent value="output" className="h-full m-0 outline-none overflow-auto">
-                {renderConsoleOutput()}
-              </TabsContent>
-              <TabsContent value="tests" className="h-full m-0 outline-none overflow-auto">
-                {renderTestResults()}
-              </TabsContent>
+              {activeTab === "output" && renderConsoleOutput()}
+              {activeTab === "tests" && renderTestResults()}
             </>
           )}
         </div>

@@ -20,15 +20,13 @@ interface EnhancedPlaygroundProps {
   slug?: string;
 }
 
-export function EnhancedPlayground({ problem, slug }: EnhancedPlaygroundProps) {
-  const { code, language, executionResult, isExecuting, updateCode, runCode, resetCode, saveCode, formatCode, clearExecutionResult, changeLanguage } = useCodeEditor({
+export function EnhancedPlayground({ problem }: EnhancedPlaygroundProps) {
+  const { initializeChat } = useAiAssistant(problem);
+  const { currentLayout, updatePanelPosition, togglePanelVisibility } = useEditorLayoutContext();
+  const { code, language, executionResult, isExecuting, updateCode, runCode, runTestCases, resetCode, saveCode, formatCode, clearExecutionResult, changeLanguage } = useCodeEditor({
     problem,
     initialLanguage: "javascript",
   });
-
-  const { initializeChat } = useAiAssistant(problem);
-
-  const { currentLayout, updatePanelPosition, togglePanelVisibility } = useEditorLayoutContext();
 
   useEffect(() => {
     if (problem) {
@@ -36,28 +34,16 @@ export function EnhancedPlayground({ problem, slug }: EnhancedPlaygroundProps) {
     }
   }, [problem, initializeChat]);
 
-  const handleShare = useCallback(() => {
-    navigator.clipboard.writeText(`${window.location.origin}/playground/${slug}?shared=true`);
-    toast.success("Link copied to clipboard");
-  }, [slug]);
-
-  // Helper to conditionally render panels based on visibility
-  const renderPanel = (panelType: PanelType, content: React.ReactNode) => {
-    return currentLayout.panels[panelType].visible ? content : null;
-  };
-
-  // Handle position change for floating panels
   const handlePositionChange = (panelType: PanelType, x: number, y: number) => {
     updatePanelPosition(panelType, x, y);
   };
 
   return (
     <div className="flex h-screen flex-col">
-      <EnhancedToolbar isRunning={isExecuting} onRun={runCode} onShare={handleShare} />
+      <EnhancedToolbar isRunning={isExecuting} onRun={runCode} onRunTests={runTestCases} />
 
       <div className="flex-1 relative overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Left panel group - Problem and Notes (non-floating) */}
           {(currentLayout.panels[PanelType.Problem].visible || (currentLayout.panels[PanelType.Notes].visible && !currentLayout.panels[PanelType.Notes].isFloating)) && (
             <>
               <ResizablePanel defaultSize={40} minSize={30} className={!currentLayout.panels[PanelType.Problem].visible && (!currentLayout.panels[PanelType.Notes].visible || currentLayout.panels[PanelType.Notes].isFloating) ? "hidden" : ""}>
@@ -73,7 +59,6 @@ export function EnhancedPlayground({ problem, slug }: EnhancedPlaygroundProps) {
                     </>
                   )}
 
-                  {/* Notes Panel (when not floating) */}
                   {currentLayout.panels[PanelType.Notes].visible && !currentLayout.panels[PanelType.Notes].isFloating && (
                     <ResizablePanel defaultSize={currentLayout.panels[PanelType.Notes].size} minSize={currentLayout.panels[PanelType.Notes].minSize} className="p-2">
                       <Card className="h-full py-0 overflow-hidden">
@@ -87,13 +72,12 @@ export function EnhancedPlayground({ problem, slug }: EnhancedPlaygroundProps) {
             </>
           )}
 
-          {/* Right panel group - Editor and Console */}
           <ResizablePanel defaultSize={60} minSize={40}>
             <ResizablePanelGroup direction="vertical">
               {currentLayout.panels[PanelType.Editor].visible && (
                 <>
                   <ResizablePanel defaultSize={currentLayout.panels[PanelType.Editor].size} minSize={currentLayout.panels[PanelType.Editor].minSize} className="p-2">
-                    <Card className="h-full py-0 overflow-hidden">
+                    <Card className="h-full py-0 overflow-hidden relative">
                       <EnhancedCodeEditor code={code} language={language} onChange={updateCode} onSave={saveCode} onFormat={formatCode} onRun={runCode} onReset={resetCode} autoFocus onChangeLanguage={changeLanguage} />
                     </Card>
                   </ResizablePanel>
@@ -102,7 +86,6 @@ export function EnhancedPlayground({ problem, slug }: EnhancedPlaygroundProps) {
                 </>
               )}
 
-              {/* Console and AI Help Panels */}
               {(currentLayout.panels[PanelType.Console].visible || (currentLayout.panels[PanelType.AiHelp].visible && !currentLayout.panels[PanelType.AiHelp].isFloating)) && (
                 <ResizablePanel defaultSize={40} minSize={20}>
                   <ResizablePanelGroup direction="horizontal">

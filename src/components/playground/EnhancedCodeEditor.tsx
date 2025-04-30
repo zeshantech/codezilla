@@ -1,9 +1,10 @@
 import { useRef, useEffect } from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { ProgrammingLanguage } from "@/types";
+import { ISubmission, ProgrammingLanguage } from "@/types";
 import useEditorSettings from "@/hooks/useEditorSettings";
 import EditorToolbar from "./EditorToolbar";
 import { Spinner } from "../ui/spinner";
+import { toast } from "sonner";
 
 interface EnhancedCodeEditorProps {
   code: string;
@@ -199,9 +200,18 @@ export function EnhancedCodeEditor({ code, language, onChange, onSave, onFormat,
     }
   }, [settings.formatOnSave, onSave]);
 
+  // Handle loading a submission from history
+  const handleOnLoadSubmission = (submission: ISubmission) => {
+    if (submission.language !== language) {
+      onChangeLanguage(submission.language);
+    }
+    onChange(submission.code);
+    toast.success("Submission loaded");
+  };
+
   return (
     <div className="h-full w-full">
-      <EditorToolbar language={language} isSaving={false} hasChanges={false} onSave={onSave} onReset={onReset} onFormat={onFormat} onChangeLanguage={onChangeLanguage} />
+      <EditorToolbar onLoadSubmission={handleOnLoadSubmission} language={language} isSaving={false} hasChanges={false} onSave={onSave} onReset={onReset} onFormat={onFormat} onChangeLanguage={onChangeLanguage} />
       <Editor
         height="100%"
         language={getMonacoLanguage(language)}

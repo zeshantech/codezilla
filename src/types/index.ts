@@ -7,7 +7,18 @@ export enum DifficultyEnum {
   MIXED = "mixed",
 }
 
-export type ProgrammingLanguage = "javascript" | "python" | "java" | "cpp";
+export enum ProgrammingLanguageEnum {
+  JAVASCRIPT = "javascript",
+  PYTHON = "python",
+  JAVA = "java",
+  CPP = "cpp",
+}
+
+export enum SubmissionStatusEnum {
+  ATTEMPTED = "attempted",
+  SOLVED = "solved",
+  FAILED = "failed",
+}
 
 export interface ISchema {
   id: string;
@@ -36,8 +47,8 @@ export interface IProblem extends ISchema {
   constraints: string[];
   examples: IExample[];
   testCases: ITestCase[];
-  starterCode: Record<ProgrammingLanguage, string>;
-  solution?: Record<ProgrammingLanguage, string>;
+  starterCode: Record<ProgrammingLanguageEnum, string>;
+  solution?: Record<ProgrammingLanguageEnum, string>;
   popularity: number;
   completionCount: number;
   createdBy?: string;
@@ -80,7 +91,7 @@ export interface IUserProblemProgress {
   submissions: number;
   lastSubmissionDate?: string;
   timeTaken?: number;
-  code?: Record<ProgrammingLanguage, string>;
+  code?: Record<ProgrammingLanguageEnum, string>;
 }
 
 export interface IUser extends ISchema {
@@ -95,7 +106,7 @@ export interface IUser extends ISchema {
 
 export interface ICodeExecutionRequest {
   code: string;
-  language: ProgrammingLanguage;
+  language: ProgrammingLanguageEnum;
   problemId?: string;
 }
 
@@ -159,7 +170,7 @@ export interface IUserSettings {
     fontSize: number;
   };
   preferences: {
-    defaultLanguage: ProgrammingLanguage;
+    defaultLanguage: ProgrammingLanguageEnum;
     defaultTabSize: number;
     autosave: boolean;
   };
@@ -214,8 +225,8 @@ export interface IProblemSaveInput {
   constraints: string[];
   examples: IExample[];
   testCases: ITestCase[];
-  starterCode: Record<ProgrammingLanguage, string>;
-  solution: Record<ProgrammingLanguage, string>;
+  starterCode: Record<ProgrammingLanguageEnum, string>;
+  solution: Record<ProgrammingLanguageEnum, string>;
   tags: string[];
 }
 
@@ -232,4 +243,25 @@ export interface IError {
   message: string;
   statusCode: number;
   errors: string[];
+}
+
+export interface ISubmission extends ISchema {
+  user: string;
+  problem: string;
+  code: string;
+  language: ProgrammingLanguageEnum;
+  status: SubmissionStatusEnum;
+  executionTime?: number;
+  memoryUsed?: number;
+  testResults?: ITestResult[];
+  logs: string[];
+  error?: string;
+}
+
+export interface ITestResult {
+  passed: boolean;
+  input: string;
+  expectedOutput: string;
+  actualOutput: string;
+  testCaseId: number;
 }

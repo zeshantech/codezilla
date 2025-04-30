@@ -2,24 +2,23 @@
 
 import { useRef, useEffect } from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { ProgrammingLanguage, IEditorConfig } from "@/types";
+import { ProgrammingLanguageEnum, IEditorConfig } from "@/types";
 import { Loader2 } from "lucide-react";
 
 interface CodeEditorProps {
   code: string;
-  language: ProgrammingLanguage;
+  language: ProgrammingLanguageEnum;
   onChange: (value: string) => void;
-  config?: Partial<IEditorConfig>;
   height?: string;
   readOnly?: boolean;
   autoFocus?: boolean;
 }
 
-export function CodeEditor({ code, language, onChange, config = {}, height = "100%", readOnly = false, autoFocus = false }: CodeEditorProps) {
+export function CodeEditor({ code, language, onChange, height = "100%", readOnly = false, autoFocus = false }: CodeEditorProps) {
   const editorRef = useRef<any>(null);
 
   // Convert language codes to Monaco-compatible values
-  const getMonacoLanguage = (lang: ProgrammingLanguage) => {
+  const getMonacoLanguage = (lang: ProgrammingLanguageEnum) => {
     switch (lang) {
       case "javascript":
         return "javascript";
@@ -69,22 +68,22 @@ export function CodeEditor({ code, language, onChange, config = {}, height = "10
       },
     });
 
-    monaco.editor.setTheme(config.theme === "dark" ? "logiclab-dark" : "logiclab-light");
+    monaco.editor.setTheme(DEFAULT_EDITOR_CONFIG.theme === "dark" ? "logiclab-dark" : "logiclab-light");
 
     // Configure editor settings
     editor.updateOptions({
       readOnly,
-      fontSize: config.fontSize ?? 14,
-      tabSize: config.tabSize ?? 2,
-      minimap: { enabled: config.showMinimap ?? false },
-      lineNumbers: config.showLineNumbers ? "on" : "off",
-      wordWrap: config.wordWrap ? "on" : "off",
+      fontSize: DEFAULT_EDITOR_CONFIG.fontSize ?? 14,
+      tabSize: DEFAULT_EDITOR_CONFIG.tabSize ?? 2,
+      minimap: { enabled: DEFAULT_EDITOR_CONFIG.showMinimap ?? false },
+      lineNumbers: DEFAULT_EDITOR_CONFIG.showLineNumbers ? "on" : "off",
+      wordWrap: DEFAULT_EDITOR_CONFIG.wordWrap ? "on" : "off",
       scrollBeyondLastLine: false,
       automaticLayout: true,
-      snippetSuggestions: config.autoComplete ? "on" : "off",
-      suggest: { showKeywords: config.autoComplete ?? true },
-      quickSuggestions: config.autoComplete ?? true,
-      parameterHints: { enabled: config.autoComplete ?? true },
+      snippetSuggestions: DEFAULT_EDITOR_CONFIG.autoComplete ? "on" : "off",
+      suggest: { showKeywords: DEFAULT_EDITOR_CONFIG.autoComplete ?? true },
+      quickSuggestions: DEFAULT_EDITOR_CONFIG.autoComplete ?? true,
+      parameterHints: { enabled: DEFAULT_EDITOR_CONFIG.autoComplete ?? true },
     });
 
     // Auto-focus if specified
@@ -109,7 +108,7 @@ export function CodeEditor({ code, language, onChange, config = {}, height = "10
 
   // Format on save if enabled
   useEffect(() => {
-    if (config.formatOnSave) {
+    if (DEFAULT_EDITOR_CONFIG.formatOnSave) {
       const interval = setInterval(() => {
         if (editorRef.current) {
           formatCode();
@@ -119,7 +118,7 @@ export function CodeEditor({ code, language, onChange, config = {}, height = "10
 
       return () => clearInterval(interval);
     }
-  }, [config.formatOnSave]);
+  }, [DEFAULT_EDITOR_CONFIG.formatOnSave]);
 
   return (
     <div className="h-full w-full">
@@ -129,7 +128,7 @@ export function CodeEditor({ code, language, onChange, config = {}, height = "10
         value={code}
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}
-        theme={config.theme === "dark" ? "logiclab-dark" : "logiclab-light"}
+        theme={DEFAULT_EDITOR_CONFIG.theme === "dark" ? "logiclab-dark" : "logiclab-light"}
         loading={
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -160,3 +159,14 @@ export function CodeEditor({ code, language, onChange, config = {}, height = "10
 }
 
 export default CodeEditor;
+
+const DEFAULT_EDITOR_CONFIG: IEditorConfig = {
+  theme: "dark",
+  fontSize: 14,
+  tabSize: 2,
+  wordWrap: true,
+  showLineNumbers: true,
+  showMinimap: false,
+  autoComplete: true,
+  formatOnSave: true,
+};
