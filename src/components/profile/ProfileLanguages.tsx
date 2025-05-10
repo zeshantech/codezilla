@@ -1,7 +1,7 @@
 "use client";
 
 import { LanguageStat } from "@/types/profile";
-import { ProgrammingLanguage } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types";
 import {
   Card,
   CardContent,
@@ -10,12 +10,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CodeIcon, CheckIcon, BarChart3 } from "lucide-react";
 import { useMemo } from "react";
 
 // Language icons and colors
-const languageIcons: Record<ProgrammingLanguage, React.ReactNode> = {
+const languageIcons: Record<ProgrammingLanguageEnum, React.ReactNode> = {
   javascript: (
     <svg
       className="h-5 w-5"
@@ -64,7 +62,7 @@ const languageIcons: Record<ProgrammingLanguage, React.ReactNode> = {
   ),
 };
 
-const languageColors: Record<ProgrammingLanguage, string> = {
+const languageColors: Record<ProgrammingLanguageEnum, string> = {
   javascript: "bg-yellow-400 text-black",
   python: "bg-blue-500 text-white",
   java: "bg-orange-500 text-white",
@@ -72,7 +70,7 @@ const languageColors: Record<ProgrammingLanguage, string> = {
 };
 
 interface ProfileLanguagesProps {
-  languageStats: Record<ProgrammingLanguage, LanguageStat>;
+  languageStats: Record<ProgrammingLanguageEnum, LanguageStat>;
 }
 
 export function ProfileLanguages({ languageStats }: ProfileLanguagesProps) {
@@ -103,10 +101,10 @@ export function ProfileLanguages({ languageStats }: ProfileLanguagesProps) {
                   <div className="flex items-center gap-2">
                     <div
                       className={`p-1.5 rounded-md ${
-                        languageColors[language.language]
+                        languageColors[language.language as ProgrammingLanguageEnum]
                       }`}
                     >
-                      {languageIcons[language.language]}
+                      {languageIcons[language.language as ProgrammingLanguageEnum]}
                     </div>
                     <div>
                       <div className="font-medium capitalize">
@@ -227,7 +225,7 @@ export function ProfileLanguages({ languageStats }: ProfileLanguagesProps) {
 }
 
 // Helper to get language color
-function getLanguageColor(language: ProgrammingLanguage): string {
+function getLanguageColor(language: ProgrammingLanguageEnum): string {
   switch (language) {
     case "javascript":
       return "#F7DF1E";

@@ -104,28 +104,6 @@ export interface IUser extends ISchema {
   points: number;
 }
 
-export interface ICodeExecutionRequest {
-  code: string;
-  language: ProgrammingLanguageEnum;
-  problemId?: string;
-}
-
-export interface ICodeExecutionResult {
-  status: "success" | "error" | "running";
-  output: string[];
-  error?: string;
-  testResults?: {
-    passed: boolean;
-    input: string;
-    expectedOutput: string;
-    actualOutput: string;
-    testCaseId: number;
-  }[];
-  executionTime?: number;
-  memoryUsed?: number;
-  allTestsPassed?: boolean;
-}
-
 export interface IEditorConfig {
   theme: "light" | "dark";
   fontSize: number;
@@ -264,4 +242,27 @@ export interface ITestResult {
   expectedOutput: string;
   actualOutput: string;
   testCaseId: number;
+}
+
+export interface ICodeExecutionRequest {
+  code: string;
+  language: ProgrammingLanguageEnum;
+}
+
+export interface IRunTestRequest extends ICodeExecutionRequest {
+  problemId: string;
+  testCaseIdz?: number[];
+}
+
+export interface ICodeExecutionResult {
+  status: "success" | "error" | "running";
+  output: string[];
+  error?: string;
+  executionTime?: number;
+  memoryUsed?: number;
+}
+
+export interface IRunTestsResult extends ICodeExecutionResult {
+  testResults?: ITestResult[];
+  allTestsPassed?: boolean;
 }

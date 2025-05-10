@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { apiHandler } from "@/lib/errorHandler";
 import { StatusCodes } from "@/constants/statusCodes";
 import dbConnect from "@/lib/db/connection";
 import { EditorSettings } from "@/lib/db/models/editorSettings.model";
 import { EditorSettings as DefaultEditorSettings } from "@/hooks/useEditorSettings";
+import { ProgrammingLanguageEnum } from "@/types";
 
 // Default editor settings - must match the defaults in the hook
 const DEFAULT_SETTINGS: DefaultEditorSettings = {
@@ -27,7 +28,7 @@ const DEFAULT_SETTINGS: DefaultEditorSettings = {
   showInvisibles: false,
   enableLigatures: true,
   enableSnippets: true,
-  language: "javascript",
+  language: ProgrammingLanguageEnum.JAVASCRIPT
 };
 
 // GET /api/editor-settings/[userId]

@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import "mongoose";
 
 declare global {
-  var mongoose: {
+  let mongoose: {
     conn: typeof mongoose | null;
     promise: Promise<typeof mongoose> | null;
   };

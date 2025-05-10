@@ -21,8 +21,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
 } from "recharts";
 import { useMemo } from "react";
 

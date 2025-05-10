@@ -14,6 +14,6 @@ export async function initializeDatabase() {
 }
 
 // Export a flag to check if seeding has already been attempted
-let seedingAttempted = false;
+const seedingAttempted = false;
 
 export { seedingAttempted };

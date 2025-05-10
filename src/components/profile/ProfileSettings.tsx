@@ -16,18 +16,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  Selector,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Selector } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckIcon, SaveIcon } from "lucide-react";
+import useUser from "@/hooks/useUser";
+import { useAuth } from "@/contexts/AuthContext";
+import { CURRENT_USER } from "@/data/mock/users";
 
 // Profile form schema
 const profileFormSchema = z.object({
@@ -84,24 +80,23 @@ export function ProfileSettings({
   onUpdateProfile,
   onUpdateSettings,
 }: ProfileSettingsProps) {
+  const { profile } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [isSaving, setIsSaving] = useState(false);
-  const [profileUpdateSuccess, setProfileUpdateSuccess] = useState(false);
-  const [appearanceUpdateSuccess, setAppearanceUpdateSuccess] = useState(false);
-  const [preferencesUpdateSuccess, setPreferencesUpdateSuccess] =
-    useState(false);
-  const [notificationsUpdateSuccess, setNotificationsUpdateSuccess] =
-    useState(false);
+  const [, setProfileUpdateSuccess] = useState(false);
+  const [, setAppearanceUpdateSuccess] = useState(false);
+  const [, setPreferencesUpdateSuccess] = useState(false);
+  const [, setNotificationsUpdateSuccess] = useState(false);
   const [privacyUpdateSuccess, setPrivacyUpdateSuccess] = useState(false);
 
   // Initialize forms with current data
   const profileForm = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: user.name,
-      email: user.email,
-      bio: user.bio || "",
-      avatarUrl: user.avatarUrl || "",
+      name: profile?.firstName || "",
+      email: profile?.email ?? "",
+      bio: CURRENT_USER.bio,
+      avatarUrl: CURRENT_USER.avatarUrl,
     },
   });
 
@@ -147,7 +142,7 @@ export function ProfileSettings({
     setProfileUpdateSuccess(false);
 
     try {
-      const success = await onUpdateProfile(data);
+      const success = await onUpdateProfile(data as any);
       if (success) {
         setProfileUpdateSuccess(true);
         setTimeout(() => setProfileUpdateSuccess(false), 3000);
@@ -189,7 +184,7 @@ export function ProfileSettings({
 
     try {
       const success = await onUpdateSettings({
-        preferences: data,
+        preferences: data as any,
       });
 
       if (success) {

@@ -7,8 +7,8 @@ import { NotFoundException } from "@/lib/exceptions";
 const CURRENT_USER_ID = "666666666666666666666666";
 const ADMIN_USER_ID = "666666666666666666666666";
 
-export const GET = apiHandler(async (_, params: { slug: string }) => {
-  const { slug } = params;
+export const GET = apiHandler(async (_, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
   const problem = await Problem.findOne({
     slug,
     $or: [{ createdBy: ADMIN_USER_ID }, { createdBy: CURRENT_USER_ID }],

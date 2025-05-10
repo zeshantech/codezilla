@@ -1,19 +1,13 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { DifficultyEnum, IProblem } from "@/types";
+import { DifficultyEnum } from "@/types";
 import { useProblems } from "@/hooks/useProblems";
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { SearchInput } from "../ui/search-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-interface ProblemSelectorProps {
-  currentProblemSlug?: string;
-}
 
 export function ProblemSelector() {
   const router = useRouter();

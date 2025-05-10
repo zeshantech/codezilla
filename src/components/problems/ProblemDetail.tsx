@@ -2,18 +2,17 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, BookOpen, FileCode, CopyCheck, PenSquare } from "lucide-react";
-import { IProblem } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "../ui/scroll-area";
+import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
+import { SpinnerBox } from "../ui/spinner";
+import { EmptyState } from "../ui/emptyState";
 
-interface ProblemDetailProps {
-  problem: IProblem;
-}
+export function ProblemDetail() {
+  const { problem, isLoadingProblem } = useCodeEditorContext();
 
-export function ProblemDetail({ problem }: ProblemDetailProps) {
   const [showConstraints, setShowConstraints] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>("description");
 
@@ -30,6 +29,14 @@ export function ProblemDetail({ problem }: ProblemDetailProps) {
         return "muted";
     }
   };
+
+  if (isLoadingProblem) {
+    return <SpinnerBox />;
+  }
+
+  if (!problem) {
+    return <EmptyState title="Problem not found" description="The problem you're looking for doesn't exist or has been removed." icon={<FileCode />} />;
+  }
 
   return (
     <Card className="h-full overflow-auto">

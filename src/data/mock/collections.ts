@@ -1,13 +1,13 @@
-import { Collection } from "@/types";
+import { DifficultyEnum, ICollection } from "@/types";
 
-export const COLLECTIONS: Collection[] = [
+export const COLLECTIONS: ICollection[] = [
   {
     id: "top-interview-questions",
     title: "Top Interview Questions",
     slug: "top-interview-questions",
     description:
       "The most frequently asked coding interview questions from top tech companies.",
-    problemIds: [
+    problems: [
       "two-sum",
       "valid-parentheses",
       "longest-substring",
@@ -16,8 +16,8 @@ export const COLLECTIONS: Collection[] = [
       "binary-search",
     ],
     createdBy: "admin",
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z",
+    createdAt: new Date(new Date("2023-01-01T00:00:00Z")),
+    updatedAt: new Date(new Date("2023-01-01T00:00:00Z")),
     isPublic: true,
     isFeatured: true,
     completionCount: 2345,
@@ -28,19 +28,19 @@ export const COLLECTIONS: Collection[] = [
     title: "Data Structures 101",
     slug: "data-structures-101",
     description: "Essential problems to master fundamental data structures.",
-    problemIds: [
+    problems: [
       "two-sum",
       "valid-parentheses",
       "merge-sorted-arrays",
       "binary-search",
     ],
     createdBy: "admin",
-    createdAt: "2023-02-15T00:00:00Z",
-    updatedAt: "2023-02-15T00:00:00Z",
+    createdAt: new Date("2023-02-15T00:00:00Z"),
+    updatedAt: new Date("2023-02-15T00:00:00Z"),
     isPublic: true,
     isFeatured: true,
     completionCount: 1872,
-    difficulty: "Easy",
+    difficulty: DifficultyEnum.EASY,
     tags: ["fundamentals", "data-structures", "beginner"],
   },
   {
@@ -49,14 +49,14 @@ export const COLLECTIONS: Collection[] = [
     slug: "dynamic-programming-challenges",
     description:
       "Improve your DP skills with these carefully selected problems.",
-    problemIds: ["best-time-to-buy-sell-stock"],
+    problems: ["best-time-to-buy-sell-stock"],
     createdBy: "admin",
-    createdAt: "2023-03-10T00:00:00Z",
-    updatedAt: "2023-03-10T00:00:00Z",
+    createdAt: new Date("2023-03-10T00:00:00Z"),
+    updatedAt: new Date("2023-03-10T00:00:00Z"),
     isPublic: true,
     isFeatured: true,
     completionCount: 987,
-    difficulty: "Medium",
+    difficulty: DifficultyEnum.MEDIUM,
     tags: ["dynamic-programming", "intermediate", "optimization"],
   },
   {
@@ -64,7 +64,7 @@ export const COLLECTIONS: Collection[] = [
     title: "FAANG Interview Prep",
     slug: "faang-interview-prep",
     description: "Essential problems frequently asked at top tech companies.",
-    problemIds: [
+    problems: [
       "two-sum",
       "valid-parentheses",
       "longest-substring",
@@ -73,8 +73,8 @@ export const COLLECTIONS: Collection[] = [
       "best-time-to-buy-sell-stock",
     ],
     createdBy: "admin",
-    createdAt: "2023-04-05T00:00:00Z",
-    updatedAt: "2023-04-05T00:00:00Z",
+    createdAt: new Date("2023-04-05T00:00:00Z"),
+    updatedAt: new Date("2023-04-05T00:00:00Z"),
     isPublic: true,
     isFeatured: true,
     completionCount: 3124,
@@ -85,14 +85,14 @@ export const COLLECTIONS: Collection[] = [
     title: "Array Manipulation",
     slug: "array-manipulation",
     description: "Master array manipulation techniques with these problems.",
-    problemIds: ["two-sum", "merge-sorted-arrays"],
+    problems: ["two-sum", "merge-sorted-arrays"],
     createdBy: "admin",
-    createdAt: "2023-05-20T00:00:00Z",
-    updatedAt: "2023-05-20T00:00:00Z",
+    createdAt: new Date("2023-05-20T00:00:00Z"),
+    updatedAt: new Date("2023-05-20T00:00:00Z"),
     isPublic: true,
     isFeatured: false,
     completionCount: 1540,
-    difficulty: "Easy",
+    difficulty: DifficultyEnum.EASY,
     tags: ["arrays", "beginner", "fundamentals"],
   },
   {
@@ -100,14 +100,14 @@ export const COLLECTIONS: Collection[] = [
     title: "String Algorithms",
     slug: "string-algorithms",
     description: "Enhance your string manipulation skills with these problems.",
-    problemIds: ["valid-parentheses", "longest-substring"],
+    problems: ["valid-parentheses", "longest-substring"],
     createdBy: "admin",
-    createdAt: "2023-06-12T00:00:00Z",
-    updatedAt: "2023-06-12T00:00:00Z",
+    createdAt: new Date("2023-06-12T00:00:00Z"),
+    updatedAt: new Date("2023-06-12T00:00:00Z"),
     isPublic: true,
     isFeatured: false,
     completionCount: 1235,
-    difficulty: "Medium",
+    difficulty:DifficultyEnum.MEDIUM,
     tags: ["strings", "algorithms", "intermediate"],
   },
 ];

@@ -1,172 +1,43 @@
 import { useState, useEffect, useCallback } from "react";
-import { IProblem, IEditorConfig, ICodeExecutionResult, ISubmission } from "@/types";
+import { IRunTestsResult, IError, ISubmission } from "@/types";
 import { toast } from "sonner";
-import useCodeExecution from "./useCodeExecution";
+import { useCodeExecution } from "./useCodeExecution";
 import { CURRENT_USER } from "@/data/mock/users";
 import { ProgrammingLanguageEnum } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api/api";
+import useProblems from "./useProblems";
 
 interface UseCodeEditorProps {
-  problem?: IProblem | null;
+  problemSlug: string;
   initialLanguage?: ProgrammingLanguageEnum;
   initialCode?: string;
 }
 
-export function useCodeEditor({ problem, initialLanguage = ProgrammingLanguageEnum.JAVASCRIPT, initialCode }: UseCodeEditorProps = {}) {
+export function useCodeEditor({ problemSlug, initialLanguage = ProgrammingLanguageEnum.JAVASCRIPT, initialCode }: UseCodeEditorProps) {
   const queryClient = useQueryClient();
 
   const [code, setCode] = useState<string>(initialCode || "");
   const [language, setLanguage] = useState<ProgrammingLanguageEnum>(initialLanguage);
-  const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [executionResult, setExecutionResult] = useState<IRunTestsResult | null>(null);
 
-  const [localExecutionResult, setLocalExecutionResult] = useState<ICodeExecutionResult | null>(null);
-  const [localIsExecuting, setLocalIsExecuting] = useState(false);
-
-  const { executeCode, executionResult, isExecuting, clearExecutionResult } = useCodeExecution();
+  const { executeCodeAsync, isExecutingCode } = useCodeExecution();
+  const { data: problem, isLoading: isLoadingProblem } = useProblems().useProblem(problemSlug);
 
   // Initialially we check if the user has Progress for the problem
   useEffect(() => {
     if (!problem) return;
-    const userProgress = problem.id ? CURRENT_USER.problemsProgress[problem.id] : undefined;
+    const userProgress = problem.id ? CURRENT_USER.problemsProgress['two-sum'] : undefined;
     if (userProgress?.code?.[language]) {
       setCode(userProgress.code[language] || "");
     } else {
       setCode(problem.starterCode[language] || "");
     }
 
-    clearExecutionResult();
-    setLocalExecutionResult(null);
+    setExecutionResult(null);
     setIsDirty(false);
-  }, [problem, language, clearExecutionResult]);
-
-  const changeLanguage = useCallback(
-    (newLanguage: ProgrammingLanguageEnum) => {
-      if (language !== newLanguage) {
-        if (isDirty) {
-          const confirmChange = window.confirm("Changing language will reset your current code. Continue?");
-          if (!confirmChange) return;
-        }
-
-        setLanguage(newLanguage);
-
-        // Update code for the new language
-        if (problem) {
-          const userProgress = problem.id ? CURRENT_USER.problemsProgress[problem.id] : undefined;
-
-          if (userProgress?.code && userProgress.code[newLanguage]) {
-            setCode(userProgress.code[newLanguage] || "");
-          } else {
-            setCode(problem.starterCode[newLanguage] || "");
-          }
-        }
-
-        setIsDirty(false);
-        clearExecutionResult();
-        setLocalExecutionResult(null);
-      }
-    },
-    [language, isDirty, problem, clearExecutionResult]
-  );
-
-  // Handle code change
-  const updateCode = useCallback((newCode: string) => {
-    setCode(newCode);
-    setIsDirty(true);
-  }, []);
-
-  // Run code with test cases
-  const runTestCases = useCallback(
-    async (testCaseIds?: number[]) => {
-      if (!code.trim() || !problem?.id) {
-        toast.error("Code cannot be empty or problem not found!");
-        return;
-      }
-
-      clearExecutionResult();
-      setLocalExecutionResult({ status: "running", output: ["Running test cases..."] });
-      setLocalIsExecuting(true);
-
-      try {
-        const response = await fetch("/api/run-tests", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            code,
-            language,
-            problemId: problem.id,
-            testCaseIds,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-
-        const result = await response.json();
-        setLocalExecutionResult(result);
-
-        // Show toast notification based on result
-        if (result.status === "error") {
-          toast.error("Test execution failed. Check the error message.");
-        } else if (result.allTestsPassed) {
-          toast.success("All tests passed! 🎉");
-        } else {
-          const passedCount = result.testResults.filter((t: any) => t.passed).length;
-          const totalCount = result.testResults.length;
-          toast.info(`Passed ${passedCount}/${totalCount} tests.`);
-        }
-
-        // Save the submission
-        await saveSubmission(result);
-
-        return result;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        const failedResult = {
-          status: "error" as const,
-          output: ["Test execution failed"],
-          error: errorMessage,
-        };
-
-        setLocalExecutionResult(failedResult);
-        toast.error("Test execution failed. Check the console for details.");
-
-        return failedResult;
-      } finally {
-        setLocalIsExecuting(false);
-      }
-    },
-    [code, language, problem, clearExecutionResult]
-  );
-
-  const saveCode = useCallback(async () => {
-    if (!problem) return;
-
-    setIsSaving(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // In a real app, this would update the user's saved code on the server
-      setIsDirty(false);
-      toast.success("Code saved successfully!");
-    } catch (error) {
-      toast.error("Failed to save code");
-    } finally {
-      setIsSaving(false);
-    }
-  }, [problem]);
-
-  // Local variant of clearExecutionResult
-  const localClearExecutionResult = useCallback(() => {
-    clearExecutionResult();
-    setLocalExecutionResult(null);
-  }, [clearExecutionResult]);
+  }, [problem, language]);
 
   const useGetSubmissions = (problemId: string) => {
     return useQuery({
@@ -182,7 +53,7 @@ export function useCodeEditor({ problem, initialLanguage = ProgrammingLanguageEn
 
   const useSaveSubmission = () => {
     return useMutation({
-      mutationFn: async (executionResult: ICodeExecutionResult) => {
+      mutationFn: async (executionResult: IRunTestsResult) => {
         const response = await api.post("/submissions", {
           problemId: problem?.id,
           code,
@@ -195,14 +66,79 @@ export function useCodeEditor({ problem, initialLanguage = ProgrammingLanguageEn
       onSuccess: (submission: ISubmission) => {
         queryClient.invalidateQueries({ queryKey: ["submissions", submission.problem] });
       },
-      onError: (error) => {
-        toast.error("Error saving submission");
+      onError: (error: string) => {
+        console.log(error);
+        toast.error(error || "Error saving submission");
       },
     });
   };
 
-  const submissions = useGetSubmissions(problem?.id!);
+  const useSaveCode = () => {
+    return useMutation({
+      mutationFn: async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      },
+      onSuccess: () => {
+        setIsDirty(false);
+        toast.success("Code saved successfully!");
+      },
+      onError: () => {
+        toast.error("Failed to save code");
+      },
+    });
+  };
+
+  const useRunTestCases = () => {
+    return useMutation({
+      mutationFn: async (testCaseIdz?: number[]) => {
+        setExecutionResult({ status: "running", output: ["Running test cases..."] });
+
+        const response = await api.post<IRunTestsResult>("/run/test", {
+          code,
+          language,
+          problemId: problem?.id,
+          testCaseIdz,
+        });
+
+        return response.data;
+      },
+      onSuccess: (result) => {
+        setExecutionResult(result);
+
+        if (result.status === "error") {
+          toast.error("Test execution failed. Check the error message.");
+        } else if (result.allTestsPassed) {
+          toast.success("All tests passed! 🎉");
+        } else {
+          const passedCount = result.testResults?.filter((t) => t.passed).length || 0;
+          const totalCount = result.testResults?.length || 0;
+          toast.info(`Passed ${passedCount}/${totalCount} tests.`);
+        }
+
+        saveSubmission.mutate(result);
+
+        return result;
+      },
+      onError: (error: IError) => {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const failedResult = {
+          status: "error" as const,
+          output: ["Test execution failed"],
+          error: errorMessage,
+        };
+
+        setExecutionResult(failedResult);
+        toast.error("Test execution failed. Check the console for details.");
+
+        return failedResult;
+      },
+    });
+  };
+
+  const submissions = useGetSubmissions(problem?.id || '');
   const saveSubmission = useSaveSubmission();
+  const saveCode = useSaveCode();
+  const runTestCases = useRunTestCases();
 
   const resetCode = useCallback(() => {
     if (problem) {
@@ -211,12 +147,11 @@ export function useCodeEditor({ problem, initialLanguage = ProgrammingLanguageEn
       if (confirmReset) {
         setCode(problem.starterCode[language] || "");
         setIsDirty(false);
-        clearExecutionResult();
-        setLocalExecutionResult(null);
+        setExecutionResult(null);
         toast.info("Code has been reset to starter code");
       }
     }
-  }, [problem, language, clearExecutionResult]);
+  }, [problem, language]);
 
   const formatCode = useCallback(() => {
     toast.success("Code formatted");
@@ -228,45 +163,87 @@ export function useCodeEditor({ problem, initialLanguage = ProgrammingLanguageEn
       return;
     }
 
-    const result = await executeCode({
+    const result = await executeCodeAsync({
       code,
       language,
-      problemId: problem?.id,
     });
 
-    setLocalExecutionResult(result);
+    setExecutionResult(result);
 
-    // Save the submission if we have a problem ID
-    if (problem?.id) {
-      saveSubmission.mutate(result);
-    }
+    // TODO: will save execution logs
 
     return result;
-  }, [code, language, problem, executeCode]);
+  }, [code, language, problem]);
+
+  const changeLanguage = useCallback(
+    (newLanguage: ProgrammingLanguageEnum) => {
+      if (language !== newLanguage) {
+        if (isDirty) {
+          const confirmChange = window.confirm("Changing language will reset your current code. Continue?");
+          if (!confirmChange) return;
+        }
+
+        setLanguage(newLanguage);
+
+        if (problem) {
+          const userProgress = problem.id ? CURRENT_USER.problemsProgress['two-sum'] : undefined;
+
+          if (userProgress?.code && userProgress.code[newLanguage]) {
+            setCode(userProgress.code[newLanguage] || "");
+          } else {
+            setCode(problem.starterCode[newLanguage] || "");
+          }
+        }
+
+        setIsDirty(false);
+        setExecutionResult(null);
+      }
+    },
+    [language, isDirty, problem]
+  );
+
+  const updateCode = useCallback((newCode: string) => {
+    setCode(newCode);
+    setIsDirty(true);
+  }, []);
 
   return {
     code,
     language,
-    isSaving,
     isDirty,
-    executionResult: localExecutionResult || executionResult,
-    isExecuting: localIsExecuting || isExecuting,
-
+    executionResult,
+    isExecutingCode,
+    isLoadingProblem,
+    problem: problem || null,
+    problemSlug,
     submissions: submissions.data,
     isLoadingSubmissions: submissions.isLoading,
     isErrorSubmissions: submissions.isError,
     errorSubmissions: submissions.error,
 
-    updateCode,
+    saveSubmission: saveSubmission.mutate,
+    isSavingSubmission: saveSubmission.isPending,
+    isSuccessSavingSubmission: saveSubmission.isSuccess,
+    isErrorSavingSubmission: saveSubmission.isError,
+    errorSavingSubmission: saveSubmission.error,
 
+    saveCode: saveCode.mutate,
+    isSavingCode: saveCode.isPending,
+    isSuccessSavingCode: saveCode.isSuccess,
+    isErrorSavingCode: saveCode.isError,
+    errorSavingCode: saveCode.error,
+
+    runTestCases: runTestCases.mutate,
+    isRunningTestCases: runTestCases.isPending,
+    isSuccessRunningTestCases: runTestCases.isSuccess,
+    isErrorRunningTestCases: runTestCases.isError,
+    errorRunningTestCases: runTestCases.error,
+
+    updateCode,
     changeLanguage,
     runCode,
-    runTestCases,
     resetCode,
-    saveCode,
     formatCode,
-    clearExecutionResult: localClearExecutionResult,
+    clearExecutionResult: () => setExecutionResult(null),
   };
 }
-
-export default useCodeEditor;

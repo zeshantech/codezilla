@@ -1,10 +1,17 @@
 "use server";
 
 import { Problem } from "../db/models/problem.model";
-import { IProblem, IProblemFilters, IProblemSaveInput, ProgrammingLanguage } from "@/types";
+import {
+  IProblem,
+  IProblemFilters,
+  IProblemSaveInput,
+  ProgrammingLanguageEnum,
+} from "@/types";
 import api from "./api";
 
-export async function fetchProblems(filters?: IProblemFilters): Promise<IProblem[]> {
+export async function fetchProblems(
+  filters?: IProblemFilters
+): Promise<IProblem[]> {
   const response = await api.get("/problems", { params: filters });
   return response.data;
 }
@@ -14,7 +21,9 @@ export async function fetchProblemById(id: string): Promise<IProblem | null> {
   return response.data;
 }
 
-export async function fetchProblemBySlug(slug: string): Promise<IProblem | null> {
+export async function fetchProblemBySlug(
+  slug: string
+): Promise<IProblem | null> {
   const response = await api.get(`/problems/slug/${slug}`);
   return response.data;
 }
@@ -38,12 +47,19 @@ export async function fetchRandomProblem(): Promise<IProblem> {
   return problem;
 }
 
-export async function createProblem(input: IProblemSaveInput): Promise<IProblem> {
+export async function createProblem(
+  input: IProblemSaveInput
+): Promise<IProblem> {
   const response = await api.post("/problems", input);
   return response.data;
 }
 
-export async function updateProblemCode(userId: string, problemId: string, code: string, language: ProgrammingLanguage): Promise<boolean> {
+export async function updateProblemCode(
+  userId: string,
+  problemId: string,
+  code: string,
+  language: ProgrammingLanguageEnum
+): Promise<boolean> {
   // await dbConnect();
 
   try {
@@ -52,25 +68,26 @@ export async function updateProblemCode(userId: string, problemId: string, code:
     const user = await User.findById(userId);
     if (!user) return false;
 
-    let problemProgress = user.problemsProgress.get(problemId);
+    let problemProgress = user.problemsProgress[problemId];
 
     if (!problemProgress) {
       problemProgress = {
-        problemId,
+        problem: problemId,
+
         status: "attempted",
         submissions: 0,
         lastSubmissionDate: new Date().toISOString(),
-        code: new Map<ProgrammingLanguage, string>(),
+        code: {} as Record<ProgrammingLanguageEnum, string>,
       };
     }
 
     if (!problemProgress.code) {
-      problemProgress.code = new Map<ProgrammingLanguage, string>();
+      problemProgress.code = {} as Record<ProgrammingLanguageEnum, string>;
     }
 
-    problemProgress.code.set(language, code);
+    problemProgress.code[language] = code;
 
-    user.problemsProgress.set(problemId, problemProgress);
+    // TODO: user.problemsProgress.set(problemId, problemProgress);
 
     await user.save();
     return true;

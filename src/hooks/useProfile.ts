@@ -11,14 +11,11 @@ import {
   ProblemsByCategory,
   ProblemStatusCount,
   ActivityRecord,
-  LanguageStat,
-  UserBadge,
-  UserCertificate,
 } from "@/types/profile";
-import { ProgrammingLanguage, Problem, Category } from "@/types";
+import { ICategory, IProblem, ProgrammingLanguageEnum } from "@/types";
 
 // Mock data for user profile
-const MOCK_PROFILE: UserProfile = {
+const MOCK_PROFILE = {
   ...CURRENT_USER,
   settings: {
     notifications: {
@@ -32,7 +29,7 @@ const MOCK_PROFILE: UserProfile = {
       fontSize: 14,
     },
     preferences: {
-      defaultLanguage: "javascript",
+      defaultLanguage: ProgrammingLanguageEnum.JAVASCRIPT,
       defaultTabSize: 2,
       autosave: true,
     },
@@ -84,25 +81,25 @@ const MOCK_PROFILE: UserProfile = {
   ],
   languageStats: {
     javascript: {
-      language: "javascript",
+      language:ProgrammingLanguageEnum.JAVASCRIPT,
       problemsSolved: 8,
       percentage: 70,
       experienceLevel: "Intermediate",
     },
     python: {
-      language: "python",
+      language: ProgrammingLanguageEnum.PYTHON,
       problemsSolved: 3,
       percentage: 20,
       experienceLevel: "Beginner",
     },
     java: {
-      language: "java",
+      language:ProgrammingLanguageEnum.JAVA,
       problemsSolved: 1,
       percentage: 5,
       experienceLevel: "Beginner",
     },
     cpp: {
-      language: "cpp",
+      language: ProgrammingLanguageEnum.CPP,
       problemsSolved: 0,
       percentage: 0,
       experienceLevel: "Beginner",
@@ -171,13 +168,11 @@ function generateYearOfActivityData(): ActivityRecord[] {
 const fetchUserProfile = async (): Promise<UserProfile> => {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 500));
-  return MOCK_PROFILE;
+  return MOCK_PROFILE as any;
 };
 
 // Update user profile
-const updateUserProfile = async (
-  data: Partial<UserProfile>
-): Promise<boolean> => {
+const updateUserProfile = async (_: Partial<UserProfile>): Promise<boolean> => {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 800));
   // In a real app, this would call an API endpoint to update the user profile
@@ -186,7 +181,7 @@ const updateUserProfile = async (
 
 // Update user settings
 const updateUserSettings = async (
-  settings: Partial<UserProfileSettings>
+  _: Partial<UserProfileSettings>
 ): Promise<boolean> => {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 600));
@@ -196,9 +191,9 @@ const updateUserSettings = async (
 
 // Calculate skills stats based on categories and problems
 const calculateSkillStats = (
-  problems: Problem[],
-  categories: Category[],
-  userProgress: UserProfile["problemsProgress"]
+  problems: IProblem[],
+  categories: ICategory[],
+  userProgress: any // TODO: UserProfile["problemsProgress"]
 ): SkillStat[] => {
   const stats: SkillStat[] = [];
 
@@ -228,9 +223,9 @@ const calculateSkillStats = (
 
 // Get problems grouped by category with status counts
 const getProblemsByCategory = (
-  problems: Problem[],
-  categories: Category[],
-  userProgress: UserProfile["problemsProgress"]
+  problems: IProblem[],
+  categories: ICategory[],
+  userProgress: any // TODO: UserProfile["problemsProgress"]
 ): ProblemsByCategory[] => {
   return categories.map((category) => {
     const categoryProblems = problems.filter(
@@ -311,18 +306,14 @@ export function useProfile() {
     const stats = calculateSkillStats(
       PROBLEMS,
       CATEGORIES,
-      MOCK_PROFILE.problemsProgress
+      MOCK_PROFILE.badges
     );
     return limit ? stats.slice(0, limit) : stats;
   }, []);
 
   // Get problems by category with status
   const getProblemsByCategoryWithStatus = useCallback(() => {
-    return getProblemsByCategory(
-      PROBLEMS,
-      CATEGORIES,
-      MOCK_PROFILE.problemsProgress
-    );
+    return getProblemsByCategory(PROBLEMS, CATEGORIES, MOCK_PROFILE.badges);
   }, []);
 
   // Get activity history for the last N days

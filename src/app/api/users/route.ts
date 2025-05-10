@@ -3,7 +3,7 @@ import { fetchCurrentUser, createUser } from "@/lib/api/users";
 import dbConnect from "@/lib/db/connection";
 
 // Mock auth - in a real app, this would come from auth logic
-const CURRENT_USER_ID = "user123";
+const CURRENT_USER_ID = "666666666666666666666666";
 
 // GET /api/users/me - Get the current user
 export async function GET() {

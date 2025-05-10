@@ -1,10 +1,10 @@
-import { ProgrammingLanguage } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types";
 
 export const getStarterCode = (
   problemId: string
-): Record<ProgrammingLanguage, string> => {
+): Record<ProgrammingLanguageEnum, string> => {
   // Default starter code if the problem specific one is not found
-  const defaultCode: Record<ProgrammingLanguage, string> = {
+  const defaultCode: Record<ProgrammingLanguageEnum, string> = {
     javascript: `/**
  * Your solution here
  */
@@ -32,7 +32,7 @@ public:
   };
 
   // Problem-specific starter code
-  const codeTemplates: Record<string, Record<ProgrammingLanguage, string>> = {
+  const codeTemplates: Record<string, Record<ProgrammingLanguageEnum, string>> = {
     "two-sum": {
       javascript: `/**
  * @param {number[]} nums

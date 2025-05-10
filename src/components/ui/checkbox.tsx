@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useId } from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon } from "lucide-react";
 
@@ -20,7 +20,8 @@ function Checkbox({
   id,
   ...props
 }: CheckboxProps) {
-  const checkboxId = id || React.useId();
+  const generatedId = useId();
+  const checkboxId = id || generatedId;
 
   return (
     <div className="flex items-center gap-2">

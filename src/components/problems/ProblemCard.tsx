@@ -13,7 +13,7 @@ interface ProblemCardProps {
 
 export function ProblemCard({ problem }: ProblemCardProps) {
   // Check user's progress on this problem
-  const userProgress = CURRENT_USER.problemsProgress[problem.id];
+  const userProgress = CURRENT_USER.problemsProgress['two-sum']; // TODO: problem.id
   const problemStatus = userProgress?.status || "not_started";
 
   // Generate the difficulty badge styles

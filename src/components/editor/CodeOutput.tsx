@@ -8,12 +8,12 @@ import {
   AlertTriangle,
   Cpu,
 } from "lucide-react";
-import { CodeExecutionResult } from "@/types";
+import { IRunTestsResult } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 interface CodeOutputProps {
-  result: CodeExecutionResult | null;
+  result: IRunTestsResult | null;
   isExecuting: boolean;
 }
 

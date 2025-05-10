@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { User, UserProfileUpdate, UserProblemProgress } from "@/types";
+import { IUserProfileUpdate, IUserProblemProgress } from "@/types";
 import * as userAPI from "@/lib/api/users";
 import { toast } from "sonner";
 
@@ -21,7 +21,7 @@ export function useUser() {
   // Update user profile
   const useUpdateProfile = () => {
     return useMutation({
-      mutationFn: (profileUpdate: UserProfileUpdate) =>
+      mutationFn: (profileUpdate: IUserProfileUpdate) =>
         userAPI.updateUserProfile(CURRENT_USER_ID, profileUpdate),
       onSuccess: () => {
         // Invalidate the current user query to reflect changes
@@ -53,7 +53,7 @@ export function useUser() {
         progress,
       }: {
         problemId: string;
-        progress: Partial<UserProblemProgress>;
+        progress: Partial<IUserProblemProgress>;
       }) =>
         userAPI.updateUserProblemProgress(CURRENT_USER_ID, problemId, progress),
       onSuccess: (_, variables) => {

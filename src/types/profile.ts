@@ -1,10 +1,10 @@
-import { Problem, User, ProgrammingLanguage } from "./index";
+import { IProblem, IUser, ProgrammingLanguageEnum } from "./index";
 
-export interface UserProfile extends User {
+export interface UserProfile extends IUser {
   settings: UserProfileSettings;
   badges: UserBadge[];
   certificates: UserCertificate[];
-  languageStats: Record<ProgrammingLanguage, LanguageStat>;
+  languageStats: Record<ProgrammingLanguageEnum, LanguageStat>;
   activityHistory: ActivityRecord[];
 }
 
@@ -20,7 +20,7 @@ export interface UserProfileSettings {
     fontSize: number;
   };
   preferences: {
-    defaultLanguage: ProgrammingLanguage;
+    defaultLanguage: ProgrammingLanguageEnum;
     defaultTabSize: number;
     autosave: boolean;
   };
@@ -40,7 +40,7 @@ export interface SkillStat {
 }
 
 export interface LanguageStat {
-  language: ProgrammingLanguage;
+  language: ProgrammingLanguageEnum;
   problemsSolved: number;
   percentage: number;
   experienceLevel: "Beginner" | "Intermediate" | "Advanced" | "Expert";
@@ -82,7 +82,7 @@ export interface ProblemStatusCount {
 export interface ProblemsByCategory {
   categoryId: string;
   categoryName: string;
-  problems: Problem[];
+  problems: IProblem[];
   problemStatusCount: ProblemStatusCount;
 }
 

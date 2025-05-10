@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { IEditorConfig, ProgrammingLanguage } from "@/types";
+import { IEditorConfig, ProgrammingLanguageEnum } from "@/types";
 import * as editorSettingsAPI from "@/lib/api/editorSettings/index";
 import { toast } from "sonner";
 
@@ -13,7 +13,7 @@ export interface EditorSettings extends IEditorConfig {
   showInvisibles: boolean;
   enableLigatures: boolean;
   enableSnippets: boolean;
-  language: ProgrammingLanguage;
+  language: ProgrammingLanguageEnum;
 }
 
 // Use a default user ID for now
@@ -40,7 +40,7 @@ const DEFAULT_SETTINGS: EditorSettings = {
   showInvisibles: false,
   enableLigatures: true,
   enableSnippets: true,
-  language: "javascript",
+  language: ProgrammingLanguageEnum.JAVASCRIPT,
 };
 
 export function useEditorSettings(userId = DEFAULT_USER_ID) {

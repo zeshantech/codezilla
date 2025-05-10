@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
-import { ProgrammingLanguage } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types";
 
 interface EditorToolbarProps {
-  language: ProgrammingLanguage;
-  onLanguageChange: (language: ProgrammingLanguage) => void;
+  language: ProgrammingLanguageEnum;
+  onLanguageChange: (language: ProgrammingLanguageEnum) => void;
   onRun: () => void;
   onSave: () => void;
   onReset: () => void;
@@ -22,7 +22,7 @@ interface EditorToolbarProps {
 
 export function EditorToolbar({ language, onLanguageChange, onRun, onSave, onReset, onFormat, onAiAssist, isRunning, isSaving, showAiAssist = false }: EditorToolbarProps) {
   const handleLanguageChange = (value: string) => {
-    onLanguageChange(value as ProgrammingLanguage);
+    onLanguageChange(value as ProgrammingLanguageEnum);
   };
 
   const handleCopyCode = () => {

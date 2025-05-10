@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { IProblem } from "@/types";
+import { IProblem, ProgrammingLanguageEnum } from "@/types";
 import { CodeEditor } from "./CodeEditor";
 import { EditorToolbar } from "./EditorToolbar";
 import { CodeOutput } from "./CodeOutput";
@@ -17,9 +17,9 @@ interface EditorPanelProps {
 export function EditorPanel({ problem, initialHeight = "600px", showAiAssist = false }: EditorPanelProps) {
   const [activeTab, setActiveTab] = useState<string>("editor");
 
-  const { code, language, isSaving, executionResult, isExecuting, updateCode, changeLanguage, runCode, resetCode, saveCode, formatCode } = useCodeEditor({
-    problem,
-    initialLanguage: "javascript",
+  const { code, language, isSavingCode, executionResult, isExecutingCode, updateCode, changeLanguage, runCode, resetCode, saveCode, formatCode } = useCodeEditor({
+    problemSlug: problem?.slug ?? '',
+    initialLanguage: ProgrammingLanguageEnum.JAVASCRIPT,
   });
 
   // Toggle between editor and output tabs
@@ -34,7 +34,7 @@ export function EditorPanel({ problem, initialHeight = "600px", showAiAssist = f
 
   return (
     <div className="border rounded-md overflow-hidden flex flex-col" style={{ height: initialHeight }}>
-      <EditorToolbar language={language} onLanguageChange={changeLanguage} onRun={runCode} onSave={saveCode} onReset={resetCode} onFormat={formatCode} onAiAssist={showAiAssist ? handleAiAssist : undefined} isRunning={isExecuting} isSaving={isSaving} showAiAssist={showAiAssist} />
+      <EditorToolbar language={language} onLanguageChange={changeLanguage} onRun={runCode} onSave={saveCode} onReset={resetCode} onFormat={formatCode} onAiAssist={showAiAssist ? handleAiAssist : undefined} isRunning={isExecutingCode} isSaving={isSavingCode} showAiAssist={showAiAssist} />
 
       <div className="flex-grow flex flex-col">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col h-full">
@@ -55,7 +55,7 @@ export function EditorPanel({ problem, initialHeight = "600px", showAiAssist = f
           </TabsContent>
 
           <TabsContent value="output" className="flex-grow outline-none mt-0 p-0">
-            <CodeOutput result={executionResult} isExecuting={isExecuting} />
+            <CodeOutput result={executionResult} isExecuting={isExecutingCode} />
           </TabsContent>
         </Tabs>
       </div>

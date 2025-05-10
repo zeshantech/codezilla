@@ -5,18 +5,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Send, RefreshCw, Trash2, Copy, Bot, User, Code } from "lucide-react";
 import { useAiAssistant } from "@/hooks/useAiAssistant";
-import { Problem, ProgrammingLanguage } from "@/types";
 import { toast } from "sonner";
+import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
 
-interface AiHelpPanelProps {
-  problem?: Problem | null;
-  code?: string;
-  language?: ProgrammingLanguage;
-}
-
-export function AiHelpPanel({ problem, code, language }: AiHelpPanelProps) {
-  const { messages, isLoading, error, initializeChat, sendMessage, clearChat } =
-    useAiAssistant(problem);
+export function AiHelpPanel() {
+  const { code, language, problem } = useCodeEditorContext();
+  const { messages, isLoading, error, initializeChat, sendMessage, clearChat } = useAiAssistant(problem);
 
   const [prompt, setPrompt] = useState("");
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
@@ -79,12 +73,7 @@ export function AiHelpPanel({ problem, code, language }: AiHelpPanelProps) {
                 <pre className="bg-muted/50 p-2 rounded-md overflow-x-auto">
                   <code className="text-xs">{part.trim()}</code>
                 </pre>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => copyToClipboard(part.trim())}
-                >
+                <Button size="icon" variant="ghost" className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => copyToClipboard(part.trim())}>
                   <Copy className="h-3 w-3" />
                 </Button>
               </div>
@@ -119,12 +108,7 @@ export function AiHelpPanel({ problem, code, language }: AiHelpPanelProps) {
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center p-2 border-b">
         <h3 className="text-sm font-medium">AI Assistant</h3>
-        <Button
-          variant="ghost"
-          size="icon"
-          title="Clear conversation"
-          onClick={clearChat}
-        >
+        <Button variant="ghost" size="icon" title="Clear conversation" onClick={clearChat}>
           <Trash2 />
         </Button>
       </div>
@@ -134,12 +118,8 @@ export function AiHelpPanel({ problem, code, language }: AiHelpPanelProps) {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 text-center">
               <Bot className="h-8 w-8 text-muted-foreground mb-3" />
-              <h3 className="text-md font-medium mb-1">
-                AI Programming Assistant
-              </h3>
-              <p className="text-sm text-muted-foreground max-w-64">
-                Ask questions about the problem or get help with your code
-              </p>
+              <h3 className="text-md font-medium mb-1">AI Programming Assistant</h3>
+              <p className="text-sm text-muted-foreground max-w-64">Ask questions about the problem or get help with your code</p>
             </div>
           ) : (
             messages
@@ -158,12 +138,8 @@ export function AiHelpPanel({ problem, code, language }: AiHelpPanelProps) {
                     )}
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm font-medium mb-1">
-                      {message.role === "user" ? "You" : "AI Assistant"}
-                    </div>
-                    <div className="text-sm prose prose-sm dark:prose-invert max-w-full">
-                      {renderMessageContent(message.content)}
-                    </div>
+                    <div className="text-sm font-medium mb-1">{message.role === "user" ? "You" : "AI Assistant"}</div>
+                    <div className="text-sm prose prose-sm dark:prose-invert max-w-full">{renderMessageContent(message.content)}</div>
                   </div>
                 </div>
               ))
@@ -171,12 +147,7 @@ export function AiHelpPanel({ problem, code, language }: AiHelpPanelProps) {
           {error && (
             <div className="bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 p-3 rounded-md text-sm">
               {error}
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2"
-                onClick={initializeChat}
-              >
+              <Button variant="outline" size="sm" className="mt-2" onClick={initializeChat}>
                 Retry
               </Button>
             </div>
@@ -189,46 +160,17 @@ export function AiHelpPanel({ problem, code, language }: AiHelpPanelProps) {
 
       <div className="p-3">
         <div className="relative">
-          <Textarea
-            ref={textareaRef}
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask about the problem or your code..."
-            className="min-h-[80px] pr-10"
-            disabled={isLoading}
-          />
+          <Textarea ref={textareaRef} value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={handleKeyDown} placeholder="Ask about the problem or your code..." className="min-h-[80px] pr-10" disabled={isLoading} />
           <div className="absolute bottom-2 right-2">
-            <Button
-              size="icon"
-              type="submit"
-              disabled={isLoading || !prompt.trim()}
-              onClick={handleSendMessage}
-              className="h-8 w-8"
-            >
-              {isLoading ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
+            <Button size="icon" type="submit" disabled={isLoading || !prompt.trim()} onClick={handleSendMessage} className="h-8 w-8">
+              {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
         </div>
         <div className="flex justify-between text-xs text-muted-foreground mt-2">
           <span>Shift + Enter for new line</span>
           {code && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 text-xs gap-1"
-              onClick={() =>
-                sendMessage(
-                  "Help me understand and improve this code",
-                  code,
-                  language
-                )
-              }
-            >
+            <Button variant="ghost" size="sm" className="h-6 text-xs gap-1" onClick={() => sendMessage("Help me understand and improve this code", code, language)}>
               <Code className="h-3 w-3" />
               Get help with my code
             </Button>

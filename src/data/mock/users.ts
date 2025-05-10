@@ -1,6 +1,4 @@
-import { User } from "@/types";
-
-export const CURRENT_USER: User = {
+export const CURRENT_USER = {
   id: "user-1",
   name: "John Doe",
   email: "john.doe@example.com",

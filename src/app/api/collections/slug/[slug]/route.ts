@@ -5,8 +5,8 @@ import { StatusCodes } from "@/constants/statusCodes";
 
 const CURRENT_USER_ID = "666666666666666666666666";
 
-export const GET = apiHandler(async (_, params: { slug: string }) => {
-  const { slug } = params;
+export const GET = apiHandler(async (_, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
   const collection = await Collection.findOne({
     slug,
     $or: [{ isPublic: true }, { createdBy: CURRENT_USER_ID }],

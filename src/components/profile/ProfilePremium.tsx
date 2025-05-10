@@ -17,7 +17,7 @@ interface ProfilePremiumProps {
   user: UserProfile;
 }
 
-export function ProfilePremium({ user }: ProfilePremiumProps) {
+export function ProfilePremium({}: ProfilePremiumProps) {
   // Mock data for premium plans
   const plans = [
     {

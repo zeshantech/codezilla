@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use as useReact } from "react";
 import { ArrowLeft, BookOpen, Users, Layout, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,8 +18,8 @@ interface CollectionDetailPageProps {
   }>;
 }
 
-export default function page({ params }: CollectionDetailPageProps) {
-  const { slug } = use(params);
+export default function Page({ params }: CollectionDetailPageProps) {
+  const { slug } = useReact(params);
   const router = useRouter();
 
   const { useCollection } = useCollections();
@@ -109,15 +109,15 @@ export default function page({ params }: CollectionDetailPageProps) {
       <div>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Problems in this Collection</h2>
-          <Button variant="outline" href={`/playground/${collection.problems?.[0]?.slug || ""}`}>
+          <Button variant="outline" href={`/playground/${(collection.problems as IProblem[])?.[0]?.slug || ""}`}>
             <BookOpen />
             Start Collection
           </Button>
         </div>
 
-        {collection.problems && collection.problems.length > 0 ? (
+        {Array.isArray(collection.problems) && collection.problems.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {collection.problems.map((problem: IProblem) => (
+            {(collection.problems as IProblem[]).map((problem) => (
               <ProblemCard key={problem.id} problem={problem} />
             ))}
           </div>

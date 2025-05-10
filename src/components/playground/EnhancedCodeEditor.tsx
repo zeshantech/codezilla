@@ -1,30 +1,23 @@
 import { useRef, useEffect } from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { ISubmission, ProgrammingLanguage } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types";
 import useEditorSettings from "@/hooks/useEditorSettings";
 import EditorToolbar from "./EditorToolbar";
 import { Spinner } from "../ui/spinner";
-import { toast } from "sonner";
+import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
 
 interface EnhancedCodeEditorProps {
-  code: string;
-  language: ProgrammingLanguage;
-  onChange: (value: string) => void;
-  onSave: () => void;
-  onFormat: () => void;
-  onRun: () => void;
-  onReset: () => void;
   readOnly?: boolean;
   autoFocus?: boolean;
-  onChangeLanguage: (language: ProgrammingLanguage) => void;
 }
 
-export function EnhancedCodeEditor({ code, language, onChange, onSave, onFormat, onRun, onReset, readOnly = false, autoFocus = false, onChangeLanguage }: EnhancedCodeEditorProps) {
+export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: EnhancedCodeEditorProps) {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
   const { settings } = useEditorSettings();
+  const { code, language, updateCode, formatCode: onFormat, runCode, resetCode, saveCode } = useCodeEditorContext();
 
-  const getMonacoLanguage = (lang: ProgrammingLanguage) => {
+  const getMonacoLanguage = (lang: ProgrammingLanguageEnum) => {
     switch (lang) {
       case "javascript":
         return "javascript";
@@ -85,16 +78,16 @@ export function EnhancedCodeEditor({ code, language, onChange, onSave, onFormat,
       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => onFormat());
     }
 
-    if (settings.keyboardShortcuts.save && onSave) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => onSave());
+    if (settings.keyboardShortcuts.save && saveCode) {
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => saveCode());
     }
 
-    if (settings.keyboardShortcuts.run && onRun) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => onRun());
+    if (settings.keyboardShortcuts.run && runCode) {
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runCode());
     }
 
-    if (settings.keyboardShortcuts.reset && onReset) {
-      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => onReset());
+    if (settings.keyboardShortcuts.reset && resetCode) {
+      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => resetCode());
     }
 
     // Focus editor if autoFocus is true
@@ -154,24 +147,24 @@ export function EnhancedCodeEditor({ code, language, onChange, onSave, onFormat,
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => onFormat());
       }
 
-      if (settings.keyboardShortcuts.save && onSave) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => onSave());
+      if (settings.keyboardShortcuts.save && saveCode) {
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => saveCode());
       }
 
-      if (settings.keyboardShortcuts.run && onRun) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => onRun());
+      if (settings.keyboardShortcuts.run && runCode) {
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runCode());
       }
 
-      if (settings.keyboardShortcuts.reset && onReset) {
-        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => onReset());
+      if (settings.keyboardShortcuts.reset && resetCode) {
+        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => resetCode());
       }
     }
-  }, [settings, readOnly, onFormat, onSave, onRun, onReset]);
+  }, [settings, readOnly, onFormat, saveCode, runCode, resetCode]);
 
   // Handle code changes
   const handleEditorChange: OnChange = (value) => {
     if (value !== undefined) {
-      onChange(value);
+      updateCode(value);
     }
   };
 
@@ -184,12 +177,12 @@ export function EnhancedCodeEditor({ code, language, onChange, onSave, onFormat,
 
   // Format on save if enabled
   useEffect(() => {
-    if (settings.formatOnSave && onSave) {
+    if (settings.formatOnSave && saveCode) {
       const handleSave = (e: KeyboardEvent) => {
         if ((e.ctrlKey || e.metaKey) && e.key === "s") {
           e.preventDefault();
           formatCode();
-          onSave();
+          saveCode();
         }
       };
 
@@ -198,20 +191,13 @@ export function EnhancedCodeEditor({ code, language, onChange, onSave, onFormat,
         window.removeEventListener("keydown", handleSave);
       };
     }
-  }, [settings.formatOnSave, onSave]);
+  }, [settings.formatOnSave, saveCode]);
 
   // Handle loading a submission from history
-  const handleOnLoadSubmission = (submission: ISubmission) => {
-    if (submission.language !== language) {
-      onChangeLanguage(submission.language);
-    }
-    onChange(submission.code);
-    toast.success("Submission loaded");
-  };
 
   return (
     <div className="h-full w-full">
-      <EditorToolbar onLoadSubmission={handleOnLoadSubmission} language={language} isSaving={false} hasChanges={false} onSave={onSave} onReset={onReset} onFormat={onFormat} onChangeLanguage={onChangeLanguage} />
+      <EditorToolbar />
       <Editor
         height="100%"
         language={getMonacoLanguage(language)}

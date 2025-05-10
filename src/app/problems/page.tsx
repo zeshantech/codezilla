@@ -4,6 +4,7 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { ProblemList } from "@/components/problems/ProblemList";
 import CreateProblemDialog from "@/components/dialogs/CreateProblemDialog";
+import { Suspense } from "react";
 
 // Wrap the page with the query client provider
 export default function page() {
@@ -25,7 +26,9 @@ export default function page() {
               <CreateProblemDialog />
             </div>
 
-            <ProblemList />
+            <Suspense fallback={<div>Loading collections...</div>}>
+              <ProblemList />
+            </Suspense>
           </div>
         </div>
       </main>

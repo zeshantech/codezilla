@@ -1,5 +1,5 @@
 import { Schema, Document, Model, models, model } from "mongoose";
-import { ProgrammingLanguage } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types";
 import toJSON from "@/lib/plugins/toJSON";
 
 export interface EditorSettingsDocument extends Document {
@@ -20,7 +20,7 @@ export interface EditorSettingsDocument extends Document {
     showInvisibles: boolean;
     enableLigatures: boolean;
     enableSnippets: boolean;
-    language: ProgrammingLanguage;
+    language: ProgrammingLanguageEnum;
   };
 }
 

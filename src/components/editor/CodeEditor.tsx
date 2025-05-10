@@ -14,7 +14,25 @@ interface CodeEditorProps {
   autoFocus?: boolean;
 }
 
-export function CodeEditor({ code, language, onChange, height = "100%", readOnly = false, autoFocus = false }: CodeEditorProps) {
+const DEFAULT_EDITOR_CONFIG: IEditorConfig = {
+  theme: "dark",
+  fontSize: 14,
+  tabSize: 2,
+  wordWrap: true,
+  showLineNumbers: true,
+  showMinimap: false,
+  autoComplete: true,
+  formatOnSave: true,
+};
+
+export function CodeEditor({
+  code,
+  language,
+  onChange,
+  height = "100%",
+  readOnly = false,
+  autoFocus = false,
+}: CodeEditorProps) {
   const editorRef = useRef<any>(null);
 
   // Convert language codes to Monaco-compatible values
@@ -68,7 +86,11 @@ export function CodeEditor({ code, language, onChange, height = "100%", readOnly
       },
     });
 
-    monaco.editor.setTheme(DEFAULT_EDITOR_CONFIG.theme === "dark" ? "logiclab-dark" : "logiclab-light");
+    monaco.editor.setTheme(
+      DEFAULT_EDITOR_CONFIG.theme === "dark"
+        ? "logiclab-dark"
+        : "logiclab-light"
+    );
 
     // Configure editor settings
     editor.updateOptions({
@@ -128,7 +150,11 @@ export function CodeEditor({ code, language, onChange, height = "100%", readOnly
         value={code}
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}
-        theme={DEFAULT_EDITOR_CONFIG.theme === "dark" ? "logiclab-dark" : "logiclab-light"}
+        theme={
+          DEFAULT_EDITOR_CONFIG.theme === "dark"
+            ? "logiclab-dark"
+            : "logiclab-light"
+        }
         loading={
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -159,14 +185,3 @@ export function CodeEditor({ code, language, onChange, height = "100%", readOnly
 }
 
 export default CodeEditor;
-
-const DEFAULT_EDITOR_CONFIG: IEditorConfig = {
-  theme: "dark",
-  fontSize: 14,
-  tabSize: 2,
-  wordWrap: true,
-  showLineNumbers: true,
-  showMinimap: false,
-  autoComplete: true,
-  formatOnSave: true,
-};

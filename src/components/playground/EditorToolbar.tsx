@@ -1,30 +1,18 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Code, Play, Save, Undo2, FileCode, Settings as SettingsIcon, DownloadCloud, Share2 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { ProblemSelector } from "./ProblemSelector";
+import { Code, Save, Undo2, FileCode, DownloadCloud } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
-import { ISubmission, ProgrammingLanguage } from "@/types";
-import useEditorSettings, { EditorSettings } from "@/hooks/useEditorSettings";
-import { toast } from "sonner";
+import { ProgrammingLanguageEnum } from "@/types";
 import SubmissionHistoryDrawer from "./SubmissionHistoryDrawer";
+import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
+import { noop } from "@/lib/utils";
 
-interface EditorToolbarProps {
-  language: ProgrammingLanguage;
-  isSaving: boolean;
-  hasChanges: boolean;
-  onSave: () => void;
-  onReset: () => void;
-  onFormat: () => void;
-  onDownload?: () => void;
-  onChangeLanguage: (language: ProgrammingLanguage) => void;
-  onLoadSubmission: (submission: ISubmission) => void;
-}
+export default function EditorToolbar() {
+  const { changeLanguage, language, saveCode, isDirty, resetCode, formatCode } = useCodeEditorContext();
 
-export default function EditorToolbar({ language, isSaving, hasChanges, onSave, onReset, onFormat, onDownload, onChangeLanguage, onLoadSubmission }: EditorToolbarProps) {
   const handleLanguageChange = (value: string) => {
-    onChangeLanguage(value as ProgrammingLanguage);
+    changeLanguage(value as ProgrammingLanguageEnum);
   };
 
   return (
@@ -44,28 +32,28 @@ export default function EditorToolbar({ language, isSaving, hasChanges, onSave, 
       </Select>
 
       <div className="ml-auto" />
-      <SubmissionHistoryDrawer onLoadSubmission={onLoadSubmission} />
+      <SubmissionHistoryDrawer />
 
       {/* Save button */}
-      <Button variant="outline" size="sm" onClick={onSave} loading={isSaving} disabled={!hasChanges}>
+      <Button variant="outline" size="sm" onClick={saveCode} disabled={!isDirty}>
         <Save />
         Save
       </Button>
 
       {/* Reset button */}
-      <Button variant="outline" size="sm" onClick={onReset}>
+      <Button variant="outline" size="sm" onClick={resetCode}>
         <Undo2 />
         Reset
       </Button>
 
       {/* Format button */}
-      <Button variant="outline" size="sm" onClick={onFormat}>
+      <Button variant="outline" size="sm" onClick={formatCode}>
         <FileCode />
         Format
       </Button>
 
       {/* Download button */}
-      <Button variant="outline" size="icon-sm" onClick={onDownload}>
+      <Button variant="outline" size="icon-sm" onClick={noop}>
         <DownloadCloud />
       </Button>
 

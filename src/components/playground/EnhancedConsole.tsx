@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ICodeExecutionResult } from "@/types";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -8,14 +7,11 @@ import { Check, X, Clock, Trash2, Download, Clipboard, AlertTriangle } from "luc
 import { toast } from "sonner";
 import { EmptyState } from "../ui/emptyState";
 import { SpinnerBox } from "../ui/spinner";
+import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
 
-interface EnhancedConsoleProps {
-  result: ICodeExecutionResult | null;
-  isExecuting: boolean;
-  onClear: () => void;
-}
+export function EnhancedConsole() {
+  const { executionResult, isExecutingCode, clearExecutionResult, isRunningTestCases } = useCodeEditorContext();
 
-export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsoleProps) {
   const [activeTab, setActiveTab] = useState("output");
 
   // Copy output to clipboard
@@ -46,32 +42,32 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
   };
 
   const renderConsoleOutput = () => {
-    if (!result) return null;
+    if (!executionResult) return null;
 
     return (
       <div className="font-mono text-sm p-4 overflow-auto h-full">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Badge variant={result.status === "running" ? "outline" : result.status} className="capitalize">
-              {result.status === "success" ? <Check /> : result.status === "error" ? <X /> : <Clock />}
-              {result.status}
+            <Badge variant={executionResult.status === "running" ? "outline" : executionResult.status} className="capitalize">
+              {executionResult.status === "success" ? <Check /> : executionResult.status === "error" ? <X /> : <Clock />}
+              {executionResult.status}
             </Badge>
-            {result.executionTime !== undefined && (
+            {executionResult.executionTime !== undefined && (
               <Badge variant="outline">
                 <Clock />
-                {result.executionTime} ms
+                {executionResult.executionTime} ms
               </Badge>
             )}
-            {result.memoryUsed !== undefined && <Badge variant="outline">{result.memoryUsed} KB</Badge>}
+            {executionResult.memoryUsed !== undefined && <Badge variant="outline">{executionResult.memoryUsed} KB</Badge>}
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon-sm" title="Copy Output" onClick={() => copyToClipboard(result.output.join("\n"))}>
+            <Button variant="ghost" size="icon-sm" title="Copy Output" onClick={() => copyToClipboard(executionResult.output.join("\n"))}>
               <Clipboard />
             </Button>
-            <Button variant="ghost" size="icon-sm" title="Save Output" onClick={() => saveAsFile(result.output.join("\n"), "txt")}>
+            <Button variant="ghost" size="icon-sm" title="Save Output" onClick={() => saveAsFile(executionResult.output.join("\n"), "txt")}>
               <Download />
             </Button>
-            <Button variant="ghost" size="icon-sm" title="Clear Console" onClick={onClear}>
+            <Button variant="ghost" size="icon-sm" title="Clear Console" onClick={clearExecutionResult}>
               <Trash2 />
             </Button>
           </div>
@@ -79,17 +75,17 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
 
         <Separator className="my-2" />
 
-        {result.error ? (
-          <div className="text-error whitespace-pre-wrap overflow-x-auto">{result.error}</div>
+        {executionResult.error ? (
+          <div className="text-error whitespace-pre-wrap overflow-x-auto">{executionResult.error}</div>
         ) : (
-          <div className="whitespace-pre-wrap overflow-x-auto">{result.output.length > 0 ? result.output.map((line, idx) => <div key={idx}>{line}</div>) : <div className="text-muted-foreground italic">No output generated</div>}</div>
+          <div className="whitespace-pre-wrap overflow-x-auto">{executionResult.output.length > 0 ? executionResult.output.map((line, idx) => <div key={idx}>{line}</div>) : <div className="text-muted-foreground italic">No output generated</div>}</div>
         )}
       </div>
     );
   };
 
   const renderTestResults = () => {
-    if (!result || !result.testResults || result.testResults.length === 0) {
+    if (!executionResult || !executionResult.testResults || executionResult.testResults.length === 0) {
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
@@ -99,8 +95,8 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
       );
     }
 
-    const passedTests = result.testResults.filter((test) => test.passed).length;
-    const totalTests = result.testResults.length;
+    const passedTests = executionResult.testResults.filter((test) => test.passed).length;
+    const totalTests = executionResult.testResults.length;
 
     return (
       <div className="p-4 overflow-auto max-h-full">
@@ -114,7 +110,7 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
         </div>
 
         <div className="space-y-4">
-          {result.testResults.map((test, index) => (
+          {executionResult.testResults.map((test, index) => (
             <div key={index} className={`border rounded-md p-3 ${test.passed ? "border-success/30" : "border-error/30"}`}>
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant={test.passed ? "success" : "error"}>
@@ -154,18 +150,18 @@ export function EnhancedConsole({ result, isExecuting, onClear }: EnhancedConsol
           <TabsTrigger value="output">Console Output</TabsTrigger>
           <TabsTrigger value="tests">
             Test Results
-            {result?.testResults && (
-              <Badge variant={result.allTestsPassed ? "success" : "error"} className="ml-2">
-                {result.testResults.filter((t) => t.passed).length}/{result.testResults.length}
+            {executionResult?.testResults && (
+              <Badge variant={executionResult.allTestsPassed ? "success" : "error"} className="ml-2">
+                {executionResult.testResults.filter((t) => t.passed).length}/{executionResult.testResults.length}
               </Badge>
             )}
           </TabsTrigger>
         </TabsList>
 
         <div className="flex-1 border rounded-md overflow-auto">
-          {isExecuting ? (
+          {isExecutingCode || isRunningTestCases ? (
             <SpinnerBox>Executing code, please wait...</SpinnerBox>
-          ) : !result ? (
+          ) : !executionResult ? (
             <EmptyState icon={<AlertTriangle />} title="No output to display" description="Run your code to see the output here." />
           ) : (
             <>

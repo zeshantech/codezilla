@@ -1,24 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Play, Wand2, Share2, Sun, Moon, CheckSquare, ChevronDown } from "lucide-react";
+import { Play, Wand2, Share2, Sun, Moon, TestTube2, UploadCloud } from "lucide-react";
 import { ProblemSelector } from "./ProblemSelector";
 import { LayoutSelector } from "./LayoutSelector";
 import { useTheme } from "next-themes";
 import { PanelType } from "@/hooks/useEditorLayout";
 import { useEditorLayoutContext } from "@/providers/EditorLayoutProvider";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
+import { ButtonGroup } from "../ui/button-group";
+import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
 
-interface EnhancedToolbarProps {
-  isRunning: boolean;
-  onRun: () => void;
-  onRunTests?: (testIds?: number[]) => void;
-}
-
-export function EnhancedToolbar({ isRunning, onRun, onRunTests }: EnhancedToolbarProps) {
+export function EnhancedToolbar() {
   const { slug } = useParams();
   const { theme, setTheme } = useTheme();
+  const { isExecutingCode, isRunningTestCases, runCode, runTestCases } = useCodeEditorContext();
   const { togglePanelVisibility, currentLayout } = useEditorLayoutContext();
 
   const handleShare = useCallback(() => {
@@ -34,30 +30,22 @@ export function EnhancedToolbar({ isRunning, onRun, onRunTests }: EnhancedToolba
     <div className="flex items-center justify-between p-1 px-2 bg-background border-b">
       <ProblemSelector />
 
-      <div className="flex items-center gap-2">
-        <Button variant="default" size="sm" onClick={onRun} loading={isRunning}>
+      <ButtonGroup size={"sm"} variant={"outline"}>
+        <Button onClick={runCode} loading={isExecutingCode}>
           <Play />
-          Run
+          Run Code
         </Button>
 
-        {onRunTests && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <CheckSquare />
-                Run Tests
-                <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onRunTests()}>Run All Tests</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onRunTests([0, 1])}>Run First 2 Tests</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onRunTests([0])}>Run Test #1</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onRunTests([1])}>Run Test #2</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
+        <Button onClick={() => runTestCases([1, 2])} loading={isRunningTestCases}>
+          <TestTube2 />
+          Run Tests
+        </Button>
+
+        <Button onClick={() => runTestCases()} loading={isRunningTestCases} className="!bg-success-background text-success">
+          <UploadCloud />
+          Submit
+        </Button>
+      </ButtonGroup>
 
       <div className="flex items-center gap-2">
         <Button variant="outline" size="icon-sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>

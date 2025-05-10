@@ -1,6 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
-import { fetchProblems, createProblem } from "@/lib/api/problems";
-import dbConnect from "@/lib/db/connection";
+import { NextRequest } from "next/server";
 import { createProblemSchema, getProblemsQuerySchema } from "./schemas";
 import { createValidator } from "@/lib/validator";
 import { apiHandler } from "@/lib/errorHandler";

@@ -4,22 +4,26 @@ import Playground from "./client";
 export async function generateMetadata({
   params,
 }: {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }): Promise<Metadata> {
+  const { slug } = await params;
+
   return {
-    title: `Playground - ${params.slug}`,
+    title: `Playground - ${slug}`,
     description: "Coding playground to solve programming problems",
   };
 }
 
-export default function PlaygroundPage({
+export default async function page({
   params,
 }: {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }) {
-  return <Playground slug={params.slug} />;
+  const { slug } = await params;
+
+  return <Playground slug={slug} />;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Sparkles, X, Info, ChevronDown } from "lucide-react";
+import { Sparkles, Info, ChevronDown } from "lucide-react";
 import {
   Dialog,
   DialogContent,

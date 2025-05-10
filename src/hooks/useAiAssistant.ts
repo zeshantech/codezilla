@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { ProgrammingLanguage, Problem } from "@/types";
+import { ProgrammingLanguageEnum, IProblem } from "@/types";
 
 interface Message {
   id: string;
@@ -15,7 +15,7 @@ interface AiAssistantState {
 }
 
 // Mock implementation for the AI assistant
-export function useAiAssistant(problem?: Problem | null) {
+export function useAiAssistant(problem?: IProblem | null) {
   const [state, setState] = useState<AiAssistantState>({
     messages: [],
     isLoading: false,
@@ -44,7 +44,7 @@ export function useAiAssistant(problem?: Problem | null) {
 
   // Send a message to the AI assistant
   const sendMessage = useCallback(
-    async (content: string, code?: string, language?: ProgrammingLanguage) => {
+    async (content: string, code?: string, language?: ProgrammingLanguageEnum) => {
       // Create the user message
       const userMessage: Message = {
         id: Date.now().toString(),
@@ -111,7 +111,7 @@ export function useAiAssistant(problem?: Problem | null) {
         }));
 
         return assistantMessage;
-      } catch (error) {
+      } catch (_) {
         // Handle errors
         setState((prev) => ({
           ...prev,

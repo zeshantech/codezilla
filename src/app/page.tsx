@@ -15,7 +15,7 @@ import { CollectionCard } from "@/components/collections/CollectionCard";
 import { EmptyState, ErrorState } from "@/components/ui/emptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function page() {
+export default function Page() {
   const [activeTab, setActiveTab] = useState("playground");
 
   const { featuredProblems, isFeaturedProblemsError, isFeaturedProblemsLoading } = useProblems();

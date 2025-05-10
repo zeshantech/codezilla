@@ -16,11 +16,18 @@ export async function fetchCurrentUser(userId: string): Promise<IUser | null> {
 }
 
 // Update user profile
-export async function updateUserProfile(userId: string, profileUpdate: IUserProfileUpdate): Promise<IUser | null> {
+export async function updateUserProfile(
+  userId: string,
+  profileUpdate: IUserProfileUpdate
+): Promise<IUser | null> {
   await dbConnect();
 
   try {
-    const user = await User.findByIdAndUpdate(userId, { ...profileUpdate }, { new: true, runValidators: true });
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { ...profileUpdate },
+      { new: true, runValidators: true }
+    );
 
     return user;
   } catch (error) {
@@ -30,14 +37,17 @@ export async function updateUserProfile(userId: string, profileUpdate: IUserProf
 }
 
 // Get user's problem progress
-export async function getUserProblemProgress(userId: string, problemId: string): Promise<IUserProblemProgress | null> {
+export async function getUserProblemProgress(
+  userId: string,
+  problemId: string
+): Promise<IUserProblemProgress | null> {
   await dbConnect();
 
   try {
     const user = await User.findById(userId);
     if (!user) return null;
 
-    const progress = user.problemsProgress.get(problemId);
+    const progress = user.problemsProgress[problemId];
     return progress || null;
   } catch (error) {
     console.error("Error fetching user problem progress:", error);
@@ -46,7 +56,11 @@ export async function getUserProblemProgress(userId: string, problemId: string):
 }
 
 // Update user's problem progress
-export async function updateUserProblemProgress(userId: string, problemId: string, progress: Partial<IUserProblemProgress>): Promise<boolean> {
+export async function updateUserProblemProgress(
+  userId: string,
+  problemId: string,
+  progress: Partial<IUserProblemProgress>
+): Promise<boolean> {
   await dbConnect();
 
   try {
@@ -54,7 +68,7 @@ export async function updateUserProblemProgress(userId: string, problemId: strin
     if (!user) return false;
 
     // Get current progress or create new one
-    const currentProgress = user.problemsProgress.get(problemId) || {
+    const currentProgress = user.problemsProgress[problemId] || {
       problemId,
       status: "not_started",
       submissions: 0,
@@ -65,11 +79,14 @@ export async function updateUserProblemProgress(userId: string, problemId: strin
       ...currentProgress,
       ...progress,
       // Always update lastSubmissionDate if submissions change
-      lastSubmissionDate: progress.submissions !== currentProgress.submissions ? new Date().toISOString() : currentProgress.lastSubmissionDate || new Date().toISOString(),
+      lastSubmissionDate:
+        progress.submissions !== currentProgress.submissions
+          ? new Date().toISOString()
+          : currentProgress.lastSubmissionDate || new Date().toISOString(),
     };
 
     // Set the updated progress
-    user.problemsProgress.set(problemId, updatedProgress);
+    user.problemsProgress[problemId] = updatedProgress;
 
     // If problem is solved, increment completedProblems count if not already counted
     if (progress.status === "solved" && currentProgress.status !== "solved") {

@@ -22,7 +22,7 @@ export function formatCurrency(amount: number): string {
  * @param args - Any arguments passed to the function (which will be ignored).
  * @returns Nothing.
  */
-export function noop(...args: any[]): void {
+export function noop(..._: any[]): void {
   // This function intentionally does nothing
   return;
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import EnhancedPlayground from "@/components/playground/EnhancedPlayground";
-import { Spinner } from "@/components/ui/spinner";
 import { SpinnerBackdrop } from "@/components/ui/spinner";
+import { CodeEditorProvider } from "@/contexts/CodeEditorContext";
 import { useProblems } from "@/hooks/useProblems";
+import { ProgrammingLanguageEnum } from "@/types";
 
 export default function Playground({ slug }: { slug: string }) {
   const { useProblem } = useProblems();
@@ -22,12 +23,14 @@ export default function Playground({ slug }: { slug: string }) {
     return (
       <div className="flex flex-col items-center justify-center h-screen   text-center">
         <h1 className="text-2xl font-bold mb-2">Problem Not Found</h1>
-        <p className="text-muted-foreground ">
-          The problem you're looking for doesn't exist or has been removed.
-        </p>
+        <p className="text-muted-foreground ">The problem you're looking for doesn't exist or has been removed.</p>
       </div>
     );
   }
 
-  return <EnhancedPlayground problem={problem} slug={slug} />;
+  return (
+    <CodeEditorProvider problemSlug={slug} initialLanguage={ProgrammingLanguageEnum.JAVASCRIPT}>
+      <EnhancedPlayground />
+    </CodeEditorProvider>
+  );
 }

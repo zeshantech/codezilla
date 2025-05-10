@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -23,13 +22,14 @@ import { CURRENT_USER } from "@/data/mock/users";
 
 // Create a client
 interface ProblemDetailPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
-function ProblemView({ params }: ProblemDetailPageProps) {
-  const { slug } = params;
+export default function ProblemView({ params }: ProblemDetailPageProps) {
+  const { slug } = use(params);
+
   const { useProblem } = useProblems();
   const [activeTab, setActiveTab] = useState("description");
 
@@ -38,7 +38,7 @@ function ProblemView({ params }: ProblemDetailPageProps) {
 
   // Get user's progress on this problem
   const userProgress = problem
-    ? CURRENT_USER.problemsProgress[problem.id]
+    ? CURRENT_USER.problemsProgress["two-sum"] // TODO: problem.slug
     : undefined;
   const problemStatus = userProgress?.status || "not_started";
 
@@ -199,7 +199,7 @@ function ProblemView({ params }: ProblemDetailPageProps) {
             </TabsList>
 
             <TabsContent value="description" className="mt-0">
-              <ProblemDetail problem={problem} />
+              <ProblemDetail />
             </TabsContent>
 
             <TabsContent value="hints" className="mt-0">
@@ -258,8 +258,4 @@ function ProblemView({ params }: ProblemDetailPageProps) {
       <AppFooter />
     </div>
   );
-}
-
-export default function ProblemDetailPage({ params }: ProblemDetailPageProps) {
-  return <ProblemView params={params} />;
 }

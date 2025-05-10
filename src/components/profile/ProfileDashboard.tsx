@@ -65,7 +65,7 @@ export function ProfileDashboard() {
     } else if (!tabParam) {
       setActiveTab("overview");
     }
-  }, [tabParam]);
+  }, []);
 
   if (isProfileLoading || !profile) {
     return <ProfileSkeleton />;
@@ -109,11 +109,11 @@ export function ProfileDashboard() {
         </TabsContent>
 
         <TabsContent value="languages">
-          <ProfileLanguages languageStats={getLanguageStats()} />
+          <ProfileLanguages languageStats={getLanguageStats() as any} />
         </TabsContent>
 
         <TabsContent value="badges">
-          <ProfileBadges badges={getBadges()} />
+          <ProfileBadges badges={getBadges() as any} />
         </TabsContent>
 
         <TabsContent value="activity">

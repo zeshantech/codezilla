@@ -59,13 +59,13 @@ export function ProfileHeader() {
             </span>
           </div>
           <div className="text-sm bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-            {tempProfile?.completedProblems} problems solved
+            {100} problems solved
           </div>
           <div className="text-sm bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-            {tempProfile?.streak} day streak
+            {10} day streak
           </div>
           <div className="text-sm bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-            {tempProfile?.points} points
+            {12} points
           </div>
         </div>
       </div>

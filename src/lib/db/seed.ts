@@ -72,7 +72,7 @@ export async function seedDatabase() {
           Object.entries(progress.code).forEach(([lang, code]) => {
             codeMap.set(lang, code);
           });
-          progress.code = codeMap;
+          progress.code = codeMap as any;
         }
 
         progressMap.set(problemId, progress);
@@ -91,7 +91,7 @@ export async function seedDatabase() {
     const collectionDocs = COLLECTIONS.map((collection) => ({
       ...collection,
       // Use the IDs of the inserted problems
-      problemIds: collection.problemIds,
+      problemIds: collection.problems,
     }));
 
     const insertedCollections = await Collection.insertMany(collectionDocs);

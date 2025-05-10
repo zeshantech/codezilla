@@ -22,11 +22,9 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-  ResponsiveContainer,
-  Tooltip,
 } from "recharts";
 import { useMemo } from "react";
-import { ChevronRight, BarChart2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 interface ProfileSkillsProps {
   skillStats: SkillStat[];

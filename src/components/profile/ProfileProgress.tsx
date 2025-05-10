@@ -35,14 +35,14 @@ export function ProfileProgress({
 
   // Count problems by difficulty
   problemsByCategory.forEach((category) => {
-    category.problems.forEach((problem) => {
-      totalByDifficulty[problem.difficulty]++;
+    category.problems.forEach((problem: any) => {
+      // totalByDifficulty[problem.difficulty]++;
 
-      // Check if the user has solved this problem
-      const progress = user.problemsProgress[problem.id];
-      if (progress && progress.status === "solved") {
-        solvedByDifficulty[problem.difficulty]++;
-      }
+      // // Check if the user has solved this problem
+      // const progress = user.problemsProgress[problem.id];
+      // if (progress && progress.status === "solved") {
+      //   solvedByDifficulty[problem.difficulty]++;
+      // }
     });
   });
 
@@ -161,21 +161,21 @@ export function ProfileProgress({
               <span className="text-muted-foreground flex items-center gap-1">
                 <Code className="h-4 w-4" /> Problems Completed
               </span>
-              <span className="font-medium">{user.completedProblems}</span>
+              <span className="font-medium">{10}</span>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground flex items-center gap-1">
                 <ListFilter className="h-4 w-4" /> Collections Completed
               </span>
-              <span className="font-medium">{user.completedCollections}</span>
+              <span className="font-medium">{100}</span>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground flex items-center gap-1">
                 <Clock className="h-4 w-4" /> Current Streak
               </span>
-              <span className="font-medium">{user.streak} days</span>
+              <span className="font-medium">{10} days</span>
             </div>
           </div>
         </CardContent>

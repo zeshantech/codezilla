@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { IProblem, IProblemFilters, ProgrammingLanguage, IProblemCreateInput } from "@/types";
+import { IProblemFilters, ProgrammingLanguageEnum, IProblemCreateInput } from "@/types";
 import { toast } from "sonner";
 import * as problemsAPI from "@/lib/api/problems";
 import * as usersAPI from "@/lib/api/users";
@@ -77,7 +77,7 @@ export function useProblems() {
   // Update a problem's user code
   const useUpdateProblemCode = () => {
     return useMutation({
-      mutationFn: ({ problemId, code, language }: { problemId: string; code: string; language: ProgrammingLanguage }) => problemsAPI.updateProblemCode(CURRENT_USER_ID, problemId, code, language),
+      mutationFn: ({ problemId, code, language }: { problemId: string; code: string; language: ProgrammingLanguageEnum }) => problemsAPI.updateProblemCode(CURRENT_USER_ID, problemId, code, language),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["user", "progress"] });
         toast.success("Code saved successfully!");

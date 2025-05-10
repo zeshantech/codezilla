@@ -1,24 +1,27 @@
-import { ISubmission } from "@/lib/db/models/submission.model";
+import { ISubmission } from "@/types";
 import React from "react";
-import { Drawer, DrawerHeader, DrawerTitle } from "../ui/drawer";
-import { DrawerContent } from "../ui/drawer";
-import { DrawerTrigger } from "../ui/drawer";
+import { Drawer, DrawerHeader, DrawerTitle, DrawerContent, DrawerTrigger } from "../ui/drawer";
 import { Button } from "../ui/button";
 import { formatDistanceToNow } from "date-fns";
-import { useCodeEditor } from "@/hooks/useCodeEditor";
+import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
+import { toast } from "sonner";
 
-interface SubmissionHistoryDrawerProps {
-  onLoadSubmission: (submission: ISubmission) => void;
-}
+export default function SubmissionHistoryDrawer() {
+  const { submissions, language, updateCode, changeLanguage } = useCodeEditorContext();
 
-export default function SubmissionHistoryDrawer({ onLoadSubmission }: SubmissionHistoryDrawerProps) {
-  const { submissionHistory } = useCodeEditor();
+  const handleOnLoadSubmission = (submission: ISubmission) => {
+    if (submission.language !== language) {
+      changeLanguage(submission.language);
+    }
+    updateCode(submission.code);
+    toast.success("Submission loaded");
+  };
 
   return (
     <Drawer>
       <DrawerTrigger asChild>
         <Button variant="outline" size="sm">
-          Submissions ({submissionHistory.length})
+          Submissions ({submissions?.length})
         </Button>
       </DrawerTrigger>
       <DrawerContent className="max-h-[90vh]">
@@ -27,17 +30,17 @@ export default function SubmissionHistoryDrawer({ onLoadSubmission }: Submission
         </DrawerHeader>
         <div className="px-4 pb-4">
           <div className="space-y-2 max-h-[70vh] overflow-y-auto">
-            {submissionHistory.map((submission: ISubmission, index) => (
+            {submissions?.map((submission: ISubmission, index: number) => (
               <div
                 key={submission.id}
                 className={`border rounded-md p-3 cursor-pointer hover:bg-muted/50 transition-colors ${
                   submission.status === "solved" ? "border-green-200 bg-green-50/30 dark:bg-green-950/10" : submission.status === "failed" ? "border-red-200 bg-red-50/30 dark:bg-red-950/10" : "border-yellow-200 bg-yellow-50/30 dark:bg-yellow-950/10"
                 }`}
-                onClick={() => onLoadSubmission(submission)}
+                onClick={() => handleOnLoadSubmission(submission)}
               >
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <span className="font-semibold">Submission #{submissionHistory.length - index}</span>
+                    <span className="font-semibold">Submission #{submissions?.length - index}</span>
                     <div className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(submission.createdAt), { addSuffix: true })}</div>
                   </div>
                   <div

@@ -1,4 +1,4 @@
-import { Category } from "@/types";
+import { ICategory } from "@/types";
 import {
   Brain,
   Code,
@@ -14,7 +14,7 @@ import {
   Hash,
 } from "lucide-react";
 
-export const CATEGORIES: Category[] = [
+export const CATEGORIES: ICategory[] = [
   {
     id: "arrays",
     name: "Arrays",

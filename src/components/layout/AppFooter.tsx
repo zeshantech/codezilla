@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Github, Twitter, Linkedin, Sun, Moon, Laptop } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "next-themes";
-import { Button } from "../ui/button";
 
 export function AppFooter() {
   const { theme, setTheme } = useTheme();

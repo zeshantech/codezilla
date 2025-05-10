@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { CollectionList } from "@/components/collections/CollectionList";
 import CreateCollectionDialog from "@/components/dialogs/CreateCollectionDialog";
 
@@ -16,7 +17,9 @@ export default function page() {
           <CreateCollectionDialog />
         </div>
 
-        <CollectionList />
+        <Suspense fallback={<div>Loading collections...</div>}>
+          <CollectionList />
+        </Suspense>
       </div>
     </div>
   );
