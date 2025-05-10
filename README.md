@@ -1,4 +1,4 @@
-# LogicLab
+# CodeZilla
 
 A comprehensive platform for practicing programming problems with real-time coding and testing.
 
@@ -31,7 +31,7 @@ The application uses MongoDB for data persistence, with the following models:
 2. Set up your MongoDB connection string in the `.env.local` file:
 
 ```
-MONGODB_URI=mongodb://localhost:27017/logiclab
+MONGODB_URI=mongodb://localhost:27017/codezilla
 NODE_ENV=development
 ```
 
@@ -58,7 +58,7 @@ npm install
 3. Set up environment variables in `.env.local`:
 
 ```
-MONGODB_URI=mongodb://localhost:27017/logiclab
+MONGODB_URI=mongodb://localhost:27017/codezilla
 NODE_ENV=development
 ```
 

@@ -20,7 +20,7 @@ export function AppHeader() {
       <div className="container mx-auto flex h-14 items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 mr-6">
-          <span className="font-bold text-xl">LogicLab</span>
+          <span className="font-bold text-xl">CodeZilla</span>
         </Link>
 
         {/* Main navbar - desktop */}

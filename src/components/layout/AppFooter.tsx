@@ -13,14 +13,14 @@ export function AppFooter() {
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 md:h-16">
         <div className="flex flex-col md:flex-row items-center gap-4 text-sm">
           <Link href="/" className="font-bold text-lg">
-            LogicLab
+            CodeZilla
           </Link>
           <Separator
             orientation="vertical"
             className="hidden md:inline-flex h-4"
           />
           <div className="text-center md:text-left text-muted-foreground">
-            &copy; {new Date().getFullYear()} LogicLab. All rights reserved.
+            &copy; {new Date().getFullYear()} CodeZilla. All rights reserved.
           </div>
         </div>
 

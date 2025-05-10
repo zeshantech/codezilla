@@ -6,7 +6,7 @@ import Providers from "@/app/provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LogicLab",
+  title: "CodeZilla",
   description: "Practice programming problems",
 };
 

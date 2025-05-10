@@ -54,7 +54,7 @@ export function CodeEditor({
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
-    monaco.editor.defineTheme("logiclab-dark", {
+    monaco.editor.defineTheme("codezilla-dark", {
       base: "vs-dark",
       inherit: true,
       rules: [],
@@ -70,7 +70,7 @@ export function CodeEditor({
       },
     });
 
-    monaco.editor.defineTheme("logiclab-light", {
+    monaco.editor.defineTheme("codezilla-light", {
       base: "vs",
       inherit: true,
       rules: [],
@@ -88,8 +88,8 @@ export function CodeEditor({
 
     monaco.editor.setTheme(
       DEFAULT_EDITOR_CONFIG.theme === "dark"
-        ? "logiclab-dark"
-        : "logiclab-light"
+        ? "codezilla-dark"
+        : "codezilla-light"
     );
 
     // Configure editor settings
@@ -152,8 +152,8 @@ export function CodeEditor({
         onMount={handleEditorDidMount}
         theme={
           DEFAULT_EDITOR_CONFIG.theme === "dark"
-            ? "logiclab-dark"
-            : "logiclab-light"
+            ? "codezilla-dark"
+            : "codezilla-light"
         }
         loading={
           <div className="flex items-center justify-center h-full">

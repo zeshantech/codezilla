@@ -32,7 +32,7 @@ export default function Page() {
               <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">Your playground for coding mastery</div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
                 Master Coding with
-                <span className="text-primary"> LogicLab</span>
+                <span className="text-primary"> CodeZilla</span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-[600px]">Solve coding challenges, practice algorithms, and prepare for technical interviews all in one place.</p>
               <div className="flex flex-wrap gap-4">
@@ -51,7 +51,7 @@ export default function Page() {
                   <div className="size-3 rounded-full bg-error"></div>
                   <div className="size-3 rounded-full bg-warning"></div>
                   <div className="size-3 rounded-full bg-success"></div>
-                  <div className="mx-auto text-sm font-medium">logiclab.js</div>
+                  <div className="mx-auto text-sm font-medium">codezilla.js</div>
                 </div>
                 <div className="p-4 font-mono text-sm">
                   <div className="group flex">

@@ -38,7 +38,7 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
     monacoRef.current = monaco;
 
     // Define editor themes
-    monaco.editor.defineTheme("logiclab-dark", {
+    monaco.editor.defineTheme("codezilla-dark", {
       base: "vs-dark",
       inherit: true,
       rules: [],
@@ -54,7 +54,7 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
       },
     });
 
-    monaco.editor.defineTheme("logiclab-light", {
+    monaco.editor.defineTheme("codezilla-light", {
       base: "vs",
       inherit: true,
       rules: [],
@@ -71,7 +71,7 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
     });
 
     // Set the theme
-    monaco.editor.setTheme(settings.theme === "dark" ? "logiclab-dark" : "logiclab-light");
+    monaco.editor.setTheme(settings.theme === "dark" ? "codezilla-dark" : "codezilla-light");
 
     // Register keyboard shortcuts if enabled
     if (settings.keyboardShortcuts.format && onFormat) {
@@ -103,7 +103,7 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
       const editor = editorRef.current;
 
       // Update theme
-      monaco.editor.setTheme(settings.theme === "dark" ? "logiclab-dark" : "logiclab-light");
+      monaco.editor.setTheme(settings.theme === "dark" ? "codezilla-dark" : "codezilla-light");
 
       // Update editor settings
       editor.updateOptions({
@@ -204,7 +204,7 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
         value={code}
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}
-        theme={settings.theme === "dark" ? "logiclab-dark" : "logiclab-light"}
+        theme={settings.theme === "dark" ? "codezilla-dark" : "codezilla-light"}
         loading={
           <div className="flex items-center justify-center h-full">
             <Spinner>Loading editor...</Spinner>

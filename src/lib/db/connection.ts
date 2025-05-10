@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/logiclab";
+  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/codezilla";
 
 if (!MONGODB_URI) {
   throw new Error(

@@ -1,6 +1,6 @@
 # Database Setup (MongoDB)
 
-This directory contains the necessary files for setting up and interacting with MongoDB for LogicLab.
+This directory contains the necessary files for setting up and interacting with MongoDB for CodeZilla.
 
 ## Structure
 
@@ -16,7 +16,7 @@ This directory contains the necessary files for setting up and interacting with 
 2. Set the MongoDB URI in your .env.local file:
 
 ```
-MONGODB_URI=mongodb://localhost:27017/logiclab
+MONGODB_URI=mongodb://localhost:27017/codezilla
 ```
 
 3. The database will be automatically initialized and seeded when the application starts in development mode
