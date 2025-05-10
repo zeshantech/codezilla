@@ -5,7 +5,7 @@ import { Problem } from "@/lib/db/models/problem.model";
 import { NotFoundException } from "@/lib/exceptions";
 
 const CURRENT_USER_ID = "666666666666666666666666";
-const ADMIN_USER_ID = "666666666666666666666666";
+const ADMIN_USER_ID = "user123";
 
 export const GET = apiHandler(async (_, params: Promise<{ slug: string }>) => {
   const { slug } = await params;
