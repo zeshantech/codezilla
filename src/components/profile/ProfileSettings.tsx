@@ -21,9 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CheckIcon, SaveIcon } from "lucide-react";
-import useUser from "@/hooks/useUser";
 import { useAuth } from "@/contexts/AuthContext";
-import { CURRENT_USER } from "@/data/mock/users";
 
 // Profile form schema
 const profileFormSchema = z.object({
@@ -95,8 +93,8 @@ export function ProfileSettings({
     defaultValues: {
       name: profile?.firstName || "",
       email: profile?.email ?? "",
-      bio: CURRENT_USER.bio,
-      avatarUrl: CURRENT_USER.avatarUrl,
+      bio: profile?.attributes?.bio ?? "",
+      avatarUrl: profile?.attributes?.avatar ?? "",
     },
   });
 

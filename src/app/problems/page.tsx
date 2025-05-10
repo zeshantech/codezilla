@@ -27,7 +27,7 @@ export default function page() {
             </div>
 
             <Suspense fallback={<div>Loading collections...</div>}>
-              <ProblemList />
+            <ProblemList />
             </Suspense>
           </div>
         </div>

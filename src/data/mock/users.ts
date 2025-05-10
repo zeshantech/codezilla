@@ -4,7 +4,7 @@ export const CURRENT_USER = {
   email: "john.doe@example.com",
   bio: "Passionate programmer and algorithm enthusiast",
   avatarUrl:
-    "https://image.tensorartassets.com/cdn-cgi/image/w=600/posts/images/632376953277678653/b400ab7a-67ab-4ce2-907c-d9168e8cd98a.jpg",
+    "https://st3.depositphotos.com/3431221/13621/v/450/depositphotos_136216036-stock-illustration-man-avatar-icon-hipster-character.jpg",
   joinedDate: "2023-01-10T00:00:00Z",
   problemsProgress: {
     "two-sum": {
