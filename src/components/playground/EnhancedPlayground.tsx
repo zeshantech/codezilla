@@ -7,16 +7,21 @@ import { EnhancedConsole } from "./EnhancedConsole";
 import { NotesPanel } from "./NotesPanel";
 import { AiHelpPanel } from "./AiHelpPanel";
 import { FloatingPanel } from "./FloatingPanel";
-import { ProblemDetail } from "@/components/problems/ProblemDetail";
+import { ProblemViewer } from "@/components/playground/ProblemViewer";
 import EnhancedToolbar from "./EnhancedToolbar";
-import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/components/ui/resizable";
+import {
+  ResizablePanel,
+  ResizablePanelGroup,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 import { Card } from "@/components/ui/card";
 import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
 
 export function EnhancedPlayground() {
   const { problem } = useCodeEditorContext();
   const { initializeChat } = useAiAssistant(problem);
-  const { currentLayout, updatePanelPosition, togglePanelVisibility } = useEditorLayoutContext();
+  const { currentLayout, updatePanelPosition, togglePanelVisibility } =
+    useEditorLayoutContext();
 
   useEffect(() => {
     if (problem) {
@@ -34,76 +39,54 @@ export function EnhancedPlayground() {
 
       <div className="flex-1 relative overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          {(currentLayout.panels[PanelType.Problem].visible || (currentLayout.panels[PanelType.Notes].visible && !currentLayout.panels[PanelType.Notes].isFloating)) && (
+          {currentLayout.panels[PanelType.Problem].visible ? (
             <>
-              <ResizablePanel defaultSize={40} minSize={30} className={!currentLayout.panels[PanelType.Problem].visible && (!currentLayout.panels[PanelType.Notes].visible || currentLayout.panels[PanelType.Notes].isFloating) ? "hidden" : ""}>
-                <ResizablePanelGroup direction="vertical">
-                  {currentLayout.panels[PanelType.Problem].visible && (
-                    <>
-                      <ResizablePanel defaultSize={currentLayout.panels[PanelType.Problem].size} minSize={currentLayout.panels[PanelType.Problem].minSize} className="p-2">
-                        <Card className="h-full py-0 overflow-hidden">
-                          <ProblemDetail />
-                        </Card>
-                      </ResizablePanel>
-                      {currentLayout.panels[PanelType.Notes].visible && !currentLayout.panels[PanelType.Notes].isFloating && <ResizableHandle />}
-                    </>
-                  )}
-
-                  {currentLayout.panels[PanelType.Notes].visible && !currentLayout.panels[PanelType.Notes].isFloating && (
-                    <ResizablePanel defaultSize={currentLayout.panels[PanelType.Notes].size} minSize={currentLayout.panels[PanelType.Notes].minSize} className="p-2">
-                      <Card className="h-full py-0 overflow-hidden">
-                        <NotesPanel problemId={problem?.id || "draft"} />
-                      </Card>
-                    </ResizablePanel>
-                  )}
-                </ResizablePanelGroup>
+              <ResizablePanel defaultSize={40} minSize={30} className="p-2">
+                {currentLayout.panels[PanelType.Problem].visible && (
+                  <Card className="h-full py-0 overflow-hidden">
+                    <ProblemViewer />
+                  </Card>
+                )}
               </ResizablePanel>
               <ResizableHandle />
             </>
-          )}
+          ) : null}
 
           <ResizablePanel defaultSize={60} minSize={40}>
             <ResizablePanelGroup direction="vertical">
               {currentLayout.panels[PanelType.Editor].visible && (
                 <>
-                  <ResizablePanel defaultSize={currentLayout.panels[PanelType.Editor].size} minSize={currentLayout.panels[PanelType.Editor].minSize} className="p-2">
+                  <ResizablePanel
+                    defaultSize={currentLayout.panels[PanelType.Editor].size}
+                    minSize={currentLayout.panels[PanelType.Editor].minSize}
+                    className="p-2"
+                  >
                     <Card className="h-full py-0 overflow-hidden relative">
                       <EnhancedCodeEditor autoFocus />
                     </Card>
                   </ResizablePanel>
 
-                  {(currentLayout.panels[PanelType.Console].visible || (currentLayout.panels[PanelType.AiHelp].visible && !currentLayout.panels[PanelType.AiHelp].isFloating)) && <ResizableHandle />}
-                </>
-              )}
-
-              {(currentLayout.panels[PanelType.Console].visible || (currentLayout.panels[PanelType.AiHelp].visible && !currentLayout.panels[PanelType.AiHelp].isFloating)) && (
-                <ResizablePanel defaultSize={40} minSize={20}>
-                  <ResizablePanelGroup direction="horizontal">
-                    {currentLayout.panels[PanelType.Console].visible && (
-                      <ResizablePanel defaultSize={50} minSize={20} className="p-2">
+                  {currentLayout.panels[PanelType.Console].visible && (
+                    <>
+                      <ResizableHandle />
+                      <ResizablePanel
+                        defaultSize={40}
+                        minSize={20}
+                        className="p-2"
+                      >
                         <Card className="h-full py-0 overflow-hidden">
                           <EnhancedConsole />
                         </Card>
                       </ResizablePanel>
-                    )}
-
-                    {currentLayout.panels[PanelType.Console].visible && currentLayout.panels[PanelType.AiHelp].visible && !currentLayout.panels[PanelType.AiHelp].isFloating && <ResizableHandle />}
-
-                    {currentLayout.panels[PanelType.AiHelp].visible && !currentLayout.panels[PanelType.AiHelp].isFloating && (
-                      <ResizablePanel defaultSize={50} minSize={20} className="p-2">
-                        <Card className="h-full py-0 overflow-hidden">
-                          <AiHelpPanel />
-                        </Card>
-                      </ResizablePanel>
-                    )}
-                  </ResizablePanelGroup>
-                </ResizablePanel>
+                    </>
+                  )}
+                </>
               )}
             </ResizablePanelGroup>
           </ResizablePanel>
         </ResizablePanelGroup>
 
-        {currentLayout.panels[PanelType.AiHelp].visible && currentLayout.panels[PanelType.AiHelp].isFloating && (
+        {/* {currentLayout.panels[PanelType.AiHelp].visible && currentLayout.panels[PanelType.AiHelp].isFloating && (
           <FloatingPanel
             title="AI Help"
             initialPosition={
@@ -139,7 +122,7 @@ export function EnhancedPlayground() {
           >
             <NotesPanel problemId={problem?.id || "draft"} />
           </FloatingPanel>
-        )}
+        )} */}
       </div>
     </div>
   );
