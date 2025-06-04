@@ -52,7 +52,7 @@ export function EnhancedToolbar() {
           {theme === "dark" ? <Sun /> : <Moon />}
         </Button>
 
-        <Button variant="outline" size="sm" onClick={handleAiToggle} className={currentLayout.panels[PanelType.AiHelp].visible ? "bg-primary/10" : ""}>
+        <Button variant="outline" size="sm" onClick={handleAiToggle} className={currentLayout.panels[PanelType.AiHelp]?.visible ? "bg-primary/10" : ""}>
           <Wand2 />
           AI Assist
         </Button>

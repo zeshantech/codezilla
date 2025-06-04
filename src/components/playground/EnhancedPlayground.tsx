@@ -1,12 +1,8 @@
-import { useEffect } from "react";
-import { useAiAssistant } from "@/hooks/useAiAssistant";
+import { useCallback } from "react";
 import { PanelType } from "@/hooks/useEditorLayout";
 import { useEditorLayoutContext } from "@/providers/EditorLayoutProvider";
 import { EnhancedCodeEditor } from "./EnhancedCodeEditor";
 import { EnhancedConsole } from "./EnhancedConsole";
-import { NotesPanel } from "./NotesPanel";
-import { AiHelpPanel } from "./AiHelpPanel";
-import { FloatingPanel } from "./FloatingPanel";
 import { ProblemViewer } from "@/components/playground/ProblemViewer";
 import EnhancedToolbar from "./EnhancedToolbar";
 import {
@@ -15,23 +11,18 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 import { Card } from "@/components/ui/card";
-import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
+import { debounce } from "@/lib/utils";
 
 export function EnhancedPlayground() {
-  const { problem } = useCodeEditorContext();
-  const { initializeChat } = useAiAssistant(problem);
-  const { currentLayout, updatePanelPosition, togglePanelVisibility } =
-    useEditorLayoutContext();
+  const { currentLayout, updatePanelSize } = useEditorLayoutContext();
 
-  useEffect(() => {
-    if (problem) {
-      initializeChat();
-    }
-  }, [problem, initializeChat]);
-
-  const handlePositionChange = (panelType: PanelType, x: number, y: number) => {
-    updatePanelPosition(panelType, x, y);
-  };
+  // Debounced resize handler to prevent excessive updates
+  const handlePanelResize = useCallback(
+    debounce((panelType: PanelType, size: number) => {
+      updatePanelSize(panelType, size);
+    }, 3000),
+    [updatePanelSize]
+  );
 
   return (
     <div className="flex h-screen flex-col">
@@ -41,18 +32,25 @@ export function EnhancedPlayground() {
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {currentLayout.panels[PanelType.Problem].visible ? (
             <>
-              <ResizablePanel defaultSize={40} minSize={30} className="p-2">
-                {currentLayout.panels[PanelType.Problem].visible && (
-                  <Card className="h-full py-0 overflow-hidden">
-                    <ProblemViewer />
-                  </Card>
-                )}
+              <ResizablePanel 
+                defaultSize={currentLayout.panels[PanelType.Problem].size} 
+                minSize={currentLayout.panels[PanelType.Problem].minSize} 
+                className="p-2"
+                onResize={(size) => handlePanelResize(PanelType.Problem, size)}
+              >
+                <Card className="h-full py-0 overflow-hidden">
+                  <ProblemViewer />
+                </Card>
               </ResizablePanel>
               <ResizableHandle />
             </>
           ) : null}
 
-          <ResizablePanel defaultSize={60} minSize={40}>
+          <ResizablePanel 
+            defaultSize={currentLayout.panels[PanelType.Problem].visible ? 
+              100 - currentLayout.panels[PanelType.Problem].size : 100}
+            minSize={40}
+          >
             <ResizablePanelGroup direction="vertical">
               {currentLayout.panels[PanelType.Editor].visible && (
                 <>
@@ -60,6 +58,7 @@ export function EnhancedPlayground() {
                     defaultSize={currentLayout.panels[PanelType.Editor].size}
                     minSize={currentLayout.panels[PanelType.Editor].minSize}
                     className="p-2"
+                    onResize={(size) => handlePanelResize(PanelType.Editor, size)}
                   >
                     <Card className="h-full py-0 overflow-hidden relative">
                       <EnhancedCodeEditor autoFocus />
@@ -70,9 +69,10 @@ export function EnhancedPlayground() {
                     <>
                       <ResizableHandle />
                       <ResizablePanel
-                        defaultSize={40}
-                        minSize={20}
+                        defaultSize={currentLayout.panels[PanelType.Console].size}
+                        minSize={currentLayout.panels[PanelType.Console].minSize}
                         className="p-2"
+                        onResize={(size) => handlePanelResize(PanelType.Console, size)}
                       >
                         <Card className="h-full py-0 overflow-hidden">
                           <EnhancedConsole />
@@ -85,44 +85,6 @@ export function EnhancedPlayground() {
             </ResizablePanelGroup>
           </ResizablePanel>
         </ResizablePanelGroup>
-
-        {/* {currentLayout.panels[PanelType.AiHelp].visible && currentLayout.panels[PanelType.AiHelp].isFloating && (
-          <FloatingPanel
-            title="AI Help"
-            initialPosition={
-              currentLayout.panels[PanelType.AiHelp].position || {
-                x: 20,
-                y: 80,
-              }
-            }
-            width={500}
-            height={400}
-            onClose={() => togglePanelVisibility(PanelType.AiHelp)}
-            onPositionChange={(x, y) => handlePositionChange(PanelType.AiHelp, x, y)}
-            className="bg-card"
-          >
-            <AiHelpPanel />
-          </FloatingPanel>
-        )}
-
-        {currentLayout.panels[PanelType.Notes].visible && currentLayout.panels[PanelType.Notes].isFloating && (
-          <FloatingPanel
-            title="Notes"
-            initialPosition={
-              currentLayout.panels[PanelType.Notes].position || {
-                x: 20,
-                y: 200,
-              }
-            }
-            width={450}
-            height={500}
-            onClose={() => togglePanelVisibility(PanelType.Notes)}
-            onPositionChange={(x, y) => handlePositionChange(PanelType.Notes, x, y)}
-            className="bg-card"
-          >
-            <NotesPanel problemId={problem?.id || "draft"} />
-          </FloatingPanel>
-        )} */}
       </div>
     </div>
   );

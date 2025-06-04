@@ -8,13 +8,9 @@ import useEditorLayout, {
 interface EditorLayoutContextType {
   currentLayout: Layout;
   currentLayoutName: LayoutPreset;
-  togglePanelVisibility: (panel: PanelType) => void;
   updatePanelSize: (panel: PanelType, size: number) => void;
-  updatePanelPosition: (panel: PanelType, x: number, y: number) => void;
-  togglePanelFloating: (panel: PanelType) => void;
   applyLayout: (preset: LayoutPreset) => void;
   resetLayout: () => void;
-  layoutPresets: Layout[];
 }
 
 const EditorLayoutContext = createContext<EditorLayoutContextType | undefined>(

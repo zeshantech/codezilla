@@ -118,8 +118,8 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
   }
 
   return (
-    <div className="flex flex-col h-full p-2">
-      <div className="flex items-center justify-between mb-3">
+    <div className="flex flex-col h-full space-y-2">
+      <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium">My Notes</h3>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -139,10 +139,10 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
         </DropdownMenu>
       </div>
 
-      <Separator className="mb-3" />
+      <Separator />
 
       {/* Notes list */}
-      <ScrollArea className="flex-1 mb-3">
+      <ScrollArea className="flex-1">
         {notes.length === 0 ? (
           <div className="h-24 flex items-center justify-center text-muted-foreground text-center p-4">
             <div>
@@ -242,7 +242,7 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
           className="w-full"
           disabled={!newNoteContent.trim()}
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus />
           Add Note
         </Button>
       </div>

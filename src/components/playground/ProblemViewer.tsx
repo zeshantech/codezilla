@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -11,7 +11,6 @@ import {
   Settings,
   Eye,
   EyeOff,
-  Move,
   MessageSquare,
   Brain,
 } from "lucide-react";
@@ -24,7 +23,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
 import { SpinnerBox } from "../ui/spinner";
@@ -37,7 +35,6 @@ interface TabConfig {
   label: string;
   icon: React.ReactNode;
   visible: boolean;
-  floating: boolean;
   component: React.ReactNode;
 }
 
@@ -194,13 +191,48 @@ export function ProblemViewer() {
     );
   };
 
-  const toggleTabFloating = (tabId: string) => {
-    setTabConfig((prev) =>
-      prev.map((tab) =>
-        tab.id === tabId ? { ...tab, floating: !tab.floating } : tab
-      )
-    );
-  };
+  // Initialize tab config when problem is available
+  useEffect(() => {
+    if (problem) {
+      setTabConfig([
+        {
+          id: "description",
+          label: "Description",
+          icon: <BookOpen className="h-4 w-4" />,
+          visible: true,
+          component: <DescriptionContent problem={problem} />,
+        },
+        {
+          id: "solution",
+          label: "Solution",
+          icon: <CopyCheck className="h-4 w-4" />,
+          visible: true,
+          component: <SolutionContent problem={problem} />,
+        },
+        {
+          id: "submissions",
+          label: "Submissions",
+          icon: <PenSquare className="h-4 w-4" />,
+          visible: true,
+          component: <SubmissionsContent />,
+        },
+        {
+          id: "ai-help",
+          label: "AI Help",
+          icon: <Brain className="h-4 w-4" />,
+          visible: true,
+          component: <AiHelpPanel />,
+        },
+        {
+          id: "notes",
+          label: "Notes",
+          icon: <MessageSquare className="h-4 w-4" />,
+          visible: true,
+          component: <NotesPanel problemId={problem.id} />,
+        },
+      ]);
+    }
+  }, [problem]);
 
   if (isLoadingProblem) {
     return <SpinnerBox />;
@@ -214,52 +246,6 @@ export function ProblemViewer() {
         icon={<FileCode />}
       />
     );
-  }
-
-  // Initialize tab config when problem is available
-  if (tabConfig.length === 0) {
-    setTabConfig([
-      {
-        id: "description",
-        label: "Description",
-        icon: <BookOpen className="h-4 w-4" />,
-        visible: true,
-        floating: false,
-        component: <DescriptionContent problem={problem} />,
-      },
-      {
-        id: "solution",
-        label: "Solution",
-        icon: <CopyCheck className="h-4 w-4" />,
-        visible: true,
-        floating: false,
-        component: <SolutionContent problem={problem} />,
-      },
-      {
-        id: "submissions",
-        label: "Submissions",
-        icon: <PenSquare className="h-4 w-4" />,
-        visible: true,
-        floating: false,
-        component: <SubmissionsContent />,
-      },
-      {
-        id: "ai-help",
-        label: "AI Help",
-        icon: <Brain className="h-4 w-4" />,
-        visible: true,
-        floating: false,
-        component: <AiHelpPanel />,
-      },
-      {
-        id: "notes",
-        label: "Notes",
-        icon: <MessageSquare className="h-4 w-4" />,
-        visible: true,
-        floating: false,
-        component: <NotesPanel problemId={problem.id} />,
-      },
-    ]);
   }
 
   return (
@@ -294,19 +280,6 @@ export function ProblemViewer() {
                           <Label>{tab.label}</Label>
                         </div>
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => toggleTabFloating(tab.id)}
-                            className="p-1 hover:bg-muted rounded-md"
-                            title={tab.floating ? "Unfloat tab" : "Float tab"}
-                          >
-                            <Move
-                              className={`h-4 w-4 ${
-                                tab.floating
-                                  ? "text-primary"
-                                  : "text-muted-foreground"
-                              }`}
-                            />
-                          </button>
                           <button
                             onClick={() => toggleTabVisibility(tab.id)}
                             className="p-1 hover:bg-muted rounded-md"
@@ -343,13 +316,9 @@ export function ProblemViewer() {
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className={tab.floating ? "relative" : ""}
                 >
                   {tab.icon}
                   {tab.label}
-                  {tab.floating && (
-                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
-                  )}
                 </TabsTrigger>
               ))}
           </TabsList>

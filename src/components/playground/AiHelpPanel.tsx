@@ -111,7 +111,7 @@ export function AiHelpPanel() {
   };
 
   return (
-    <div className="flex flex-col h-full space-y-2 ">
+    <div className="flex flex-col h-full space-y-2">
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium">AI Assistant</h3>
         <Button
