@@ -29,6 +29,10 @@ import { SpinnerBox } from "../ui/spinner";
 import { EmptyState } from "../ui/emptyState";
 import { AiHelpPanel } from "./AiHelpPanel";
 import { NotesPanel } from "./NotesPanel";
+import { ISubmission, SubmissionStatusEnum } from "@/types";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import Copier from "../ui/copier";
 
 interface TabConfig {
   id: string;
@@ -56,9 +60,9 @@ function DescriptionContent({ problem }: { problem: any }) {
         >
           <h3 className="font-semibold text-base">Constraints</h3>
           {showConstraints ? (
-            <ChevronUp className="h-4 w-4" />
+            <ChevronUp className="size-4" />
           ) : (
-            <ChevronDown className="h-4 w-4" />
+            <ChevronDown className="size-4" />
           )}
         </div>
         {showConstraints && (
@@ -114,27 +118,22 @@ function DescriptionContent({ problem }: { problem: any }) {
   );
 }
 
-function SolutionContent({ problem }: { problem: any }) {
+function SolutionContent() {
+  const { problem } = useCodeEditorContext();
+
   return (
-    <div>
-      {problem.solution ? (
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold text-base">Solution</h3>
-            <Select
-              defaultValue="javascript"
-              options={[
-                { value: "javascript", label: "JavaScript" },
-                { value: "python", label: "Python" },
-                { value: "java", label: "Java" },
-                { value: "cpp", label: "C++" },
-              ]}
-            />
+    <div className="space-y-4">
+      {problem?.solution ? (
+        Object.entries(problem.solution).map(([language, solution]) => (
+          <div>
+            <h3 className="font-semibold text-base capitalize">{language}</h3>
+
+            <div className="bg-muted p-4 rounded-md overflow-auto whitespace-pre-wrap relative">
+              <Copier text={solution} className="absolute top-2 right-2" />
+              {solution}
+            </div>
           </div>
-          <div className="bg-muted/30 p-3 rounded-md font-mono text-xs whitespace-pre-wrap overflow-auto">
-            <p>Solution code would be displayed here</p>
-          </div>
-        </div>
+        ))
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="rounded-full bg-muted p-3 mb-4">
@@ -151,15 +150,111 @@ function SolutionContent({ problem }: { problem: any }) {
 }
 
 function SubmissionsContent() {
-  return (
-    <div className="py-12 text-center">
-      <div className="rounded-full bg-muted p-3 mb-4 mx-auto w-fit">
-        <PenSquare className="h-6 w-6 text-muted-foreground" />
+  const {
+    submissions,
+    isLoadingSubmissions,
+    updateCode,
+    changeLanguage,
+    language,
+  } = useCodeEditorContext();
+
+  const handleLoadSubmission = (submission: ISubmission) => {
+    if (submission.language !== language) {
+      changeLanguage(submission.language);
+    }
+    updateCode(submission.code);
+    toast.success("Submission loaded");
+  };
+
+  if (isLoadingSubmissions) {
+    return <SpinnerBox />;
+  }
+
+  if (!submissions || submissions.length === 0) {
+    return (
+      <div className="py-12 text-center">
+        <div className="rounded-full bg-muted p-3 mb-4 mx-auto w-fit">
+          <PenSquare className="h-6 w-6 text-muted-foreground" />
+        </div>
+        <h3 className="text-lg font-medium mb-1">Your Submissions</h3>
+        <p className="text-muted-foreground">
+          You haven't submitted any solutions yet.
+        </p>
       </div>
-      <h3 className="text-lg font-medium mb-1">Your Submissions</h3>
-      <p className="text-muted-foreground">
-        You haven't submitted any solutions yet.
-      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Your Submissions</h3>
+      <div className="space-y-4">
+        {submissions.map((submission: ISubmission) => (
+          <div
+            key={submission.id}
+            className={`p-4 rounded-md border ${
+              submission.status === SubmissionStatusEnum.SOLVED
+                ? "bg-success/10 border-success/30"
+                : submission.status === SubmissionStatusEnum.FAILED
+                ? "bg-error/10 border-error/30"
+                : "bg-warning/10 border-warning/30"
+            }`}
+          >
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={
+                    submission.status === SubmissionStatusEnum.SOLVED
+                      ? "success"
+                      : submission.status === SubmissionStatusEnum.FAILED
+                      ? "error"
+                      : "warning"
+                  }
+                >
+                  {submission.status}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(submission.createdAt).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleLoadSubmission(submission)}
+                >
+                  Load Code
+                </Button>
+                {submission.executionTime && (
+                  <span className="bg-muted px-2 py-1 rounded-md text-xs">
+                    {submission.executionTime} ms
+                  </span>
+                )}
+                {submission.memoryUsed && (
+                  <span className="bg-muted px-2 py-1 rounded-md text-xs">
+                    {submission.memoryUsed} MB
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-background p-3 rounded-md">
+              <pre className="text-xs overflow-auto max-h-36 hide-scrollbar">
+                <code>{submission.code}</code>
+              </pre>
+            </div>
+
+            {/* TODO: check it later */}
+            {submission.error && (
+              <div className="mt-3 p-2 bg-error/10 rounded-md">
+                <h4 className="text-sm font-medium mb-1 text-error">Error</h4>
+                <pre className="text-xs text-error overflow-auto">
+                  {submission.error}
+                </pre>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -198,35 +293,35 @@ export function ProblemViewer() {
         {
           id: "description",
           label: "Description",
-          icon: <BookOpen className="h-4 w-4" />,
+          icon: <BookOpen className="size-4" />,
           visible: true,
           component: <DescriptionContent problem={problem} />,
         },
         {
           id: "solution",
           label: "Solution",
-          icon: <CopyCheck className="h-4 w-4" />,
+          icon: <CopyCheck className="size-4" />,
           visible: true,
-          component: <SolutionContent problem={problem} />,
+          component: <SolutionContent />,
         },
         {
           id: "submissions",
           label: "Submissions",
-          icon: <PenSquare className="h-4 w-4" />,
+          icon: <PenSquare className="size-4" />,
           visible: true,
           component: <SubmissionsContent />,
         },
         {
           id: "ai-help",
           label: "AI Help",
-          icon: <Brain className="h-4 w-4" />,
+          icon: <Brain className="size-4" />,
           visible: true,
           component: <AiHelpPanel />,
         },
         {
           id: "notes",
           label: "Notes",
-          icon: <MessageSquare className="h-4 w-4" />,
+          icon: <MessageSquare className="size-4" />,
           visible: true,
           component: <NotesPanel problemId={problem.id} />,
         },
@@ -264,7 +359,7 @@ export function ProblemViewer() {
               <Popover>
                 <PopoverTrigger asChild>
                   <button className="p-2 hover:bg-muted rounded-md">
-                    <Settings className="h-4 w-4" />
+                    <Settings className="size-4" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80">
@@ -286,9 +381,9 @@ export function ProblemViewer() {
                             title={tab.visible ? "Hide tab" : "Show tab"}
                           >
                             {tab.visible ? (
-                              <Eye className="h-4 w-4" />
+                              <Eye className="size-4" />
                             ) : (
-                              <EyeOff className="h-4 w-4" />
+                              <EyeOff className="size-4" />
                             )}
                           </button>
                         </div>
@@ -313,10 +408,7 @@ export function ProblemViewer() {
             {tabConfig
               .filter((tab) => tab.visible)
               .map((tab) => (
-                <TabsTrigger
-                  key={tab.id}
-                  value={tab.id}
-                >
+                <TabsTrigger key={tab.id} value={tab.id}>
                   {tab.icon}
                   {tab.label}
                 </TabsTrigger>

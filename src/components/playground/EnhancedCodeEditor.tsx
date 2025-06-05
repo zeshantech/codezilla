@@ -5,17 +5,33 @@ import useEditorSettings from "@/hooks/useEditorSettings";
 import EditorToolbar from "./EditorToolbar";
 import { Spinner } from "../ui/spinner";
 import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
+import { useLocalSettings } from "./SettingsDialog";
 
 interface EnhancedCodeEditorProps {
   readOnly?: boolean;
   autoFocus?: boolean;
 }
 
-export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: EnhancedCodeEditorProps) {
+export function EnhancedCodeEditor({
+  readOnly = false,
+  autoFocus = false,
+}: EnhancedCodeEditorProps) {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
   const { settings } = useEditorSettings();
-  const { code, language, updateCode, formatCode: onFormat, runCode, resetCode, saveCode } = useCodeEditorContext();
+  const localSettingsContext = useLocalSettings();
+  const {
+    code,
+    language,
+    updateCode,
+    formatCode: onFormat,
+    runCode,
+    resetCode,
+    saveCode,
+  } = useCodeEditorContext();
+
+  // Use local settings if available (for immediate feedback), otherwise use the settings from the hook
+  const effectiveSettings = localSettingsContext?.localSettings || settings;
 
   const getMonacoLanguage = (lang: ProgrammingLanguageEnum) => {
     switch (lang) {
@@ -71,23 +87,34 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
     });
 
     // Set the theme
-    monaco.editor.setTheme(settings.theme === "dark" ? "codezilla-dark" : "codezilla-light");
+    monaco.editor.setTheme(
+      effectiveSettings.theme === "dark" ? "codezilla-dark" : "codezilla-light"
+    );
 
     // Register keyboard shortcuts if enabled
-    if (settings.keyboardShortcuts.format && onFormat) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => onFormat());
+    if (effectiveSettings.keyboardShortcuts.format && onFormat) {
+      editor.addCommand(
+        monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF,
+        () => onFormat()
+      );
     }
 
-    if (settings.keyboardShortcuts.save && saveCode) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => saveCode());
+    if (effectiveSettings.keyboardShortcuts.save && saveCode) {
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
+        saveCode()
+      );
     }
 
-    if (settings.keyboardShortcuts.run && runCode) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runCode());
+    if (effectiveSettings.keyboardShortcuts.run && runCode) {
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
+        runCode()
+      );
     }
 
-    if (settings.keyboardShortcuts.reset && resetCode) {
-      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => resetCode());
+    if (effectiveSettings.keyboardShortcuts.reset && resetCode) {
+      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () =>
+        resetCode()
+      );
     }
 
     // Focus editor if autoFocus is true
@@ -103,21 +130,27 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
       const editor = editorRef.current;
 
       // Update theme
-      monaco.editor.setTheme(settings.theme === "dark" ? "codezilla-dark" : "codezilla-light");
+      monaco.editor.setTheme(
+        effectiveSettings.theme === "dark"
+          ? "codezilla-dark"
+          : "codezilla-light"
+      );
 
       // Update editor settings
       editor.updateOptions({
         readOnly,
-        fontSize: settings.fontSize,
-        tabSize: settings.tabSize,
-        insertSpaces: settings.indentUsingSpaces,
-        fontLigatures: settings.enableLigatures,
-        minimap: { enabled: settings.showMinimap },
-        lineNumbers: settings.showLineNumbers ? "on" : "off",
-        wordWrap: settings.wordWrap ? "on" : "off",
+        fontSize: effectiveSettings.fontSize,
+        tabSize: effectiveSettings.tabSize,
+        insertSpaces: effectiveSettings.indentUsingSpaces,
+        fontLigatures: effectiveSettings.enableLigatures,
+        minimap: { enabled: effectiveSettings.showMinimap },
+        lineNumbers: effectiveSettings.showLineNumbers ? "on" : "off",
+        wordWrap: effectiveSettings.wordWrap ? "on" : "off",
         scrollBeyondLastLine: false,
         automaticLayout: true,
-        renderWhitespace: settings.showInvisibles ? "all" : "selection",
+        renderWhitespace: effectiveSettings.showInvisibles
+          ? "all"
+          : "selection",
         cursorStyle: "line",
         cursorBlinking: "smooth",
         cursorSmoothCaretAnimation: "on",
@@ -129,11 +162,15 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
         formatOnType: false,
         folding: true,
         glyphMargin: false,
-        renderLineHighlight: settings.highlightActiveLine ? "all" : "none",
-        suggestOnTriggerCharacters: settings.autoComplete,
-        snippetSuggestions: settings.enableSnippets ? "inline" : "none",
-        quickSuggestions: settings.autoComplete,
-        parameterHints: { enabled: settings.autoComplete },
+        renderLineHighlight: effectiveSettings.highlightActiveLine
+          ? "all"
+          : "none",
+        suggestOnTriggerCharacters: effectiveSettings.autoComplete,
+        snippetSuggestions: effectiveSettings.enableSnippets
+          ? "inline"
+          : "none",
+        quickSuggestions: effectiveSettings.autoComplete,
+        parameterHints: { enabled: effectiveSettings.autoComplete },
         bracketPairColorization: { enabled: true },
         guides: {
           bracketPairs: true,
@@ -143,23 +180,40 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
       });
 
       // Assign keyboard shortcuts
-      if (settings.keyboardShortcuts.format && onFormat) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => onFormat());
+      if (effectiveSettings.keyboardShortcuts.format && onFormat) {
+        editor.addCommand(
+          monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF,
+          () => onFormat()
+        );
       }
 
-      if (settings.keyboardShortcuts.save && saveCode) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => saveCode());
+      if (effectiveSettings.keyboardShortcuts.save && saveCode) {
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
+          saveCode()
+        );
       }
 
-      if (settings.keyboardShortcuts.run && runCode) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runCode());
+      if (effectiveSettings.keyboardShortcuts.run && runCode) {
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
+          runCode()
+        );
       }
 
-      if (settings.keyboardShortcuts.reset && resetCode) {
-        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => resetCode());
+      if (effectiveSettings.keyboardShortcuts.reset && resetCode) {
+        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () =>
+          resetCode()
+        );
       }
     }
-  }, [settings, readOnly, onFormat, saveCode, runCode, resetCode]);
+  }, [
+    effectiveSettings,
+    localSettingsContext?.localSettings,
+    readOnly,
+    onFormat,
+    saveCode,
+    runCode,
+    resetCode,
+  ]);
 
   // Handle code changes
   const handleEditorChange: OnChange = (value) => {
@@ -177,7 +231,7 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
 
   // Format on save if enabled
   useEffect(() => {
-    if (settings.formatOnSave && saveCode) {
+    if (effectiveSettings.formatOnSave && saveCode) {
       const handleSave = (e: KeyboardEvent) => {
         if ((e.ctrlKey || e.metaKey) && e.key === "s") {
           e.preventDefault();
@@ -191,7 +245,7 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
         window.removeEventListener("keydown", handleSave);
       };
     }
-  }, [settings.formatOnSave, saveCode]);
+  }, [effectiveSettings.formatOnSave, saveCode]);
 
   // Handle loading a submission from history
 
@@ -204,7 +258,11 @@ export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: Enha
         value={code}
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}
-        theme={settings.theme === "dark" ? "codezilla-dark" : "codezilla-light"}
+        theme={
+          effectiveSettings.theme === "dark"
+            ? "codezilla-dark"
+            : "codezilla-light"
+        }
         loading={
           <div className="flex items-center justify-center h-full">
             <Spinner>Loading editor...</Spinner>

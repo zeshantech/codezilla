@@ -28,48 +28,48 @@ const DEFAULT_SETTINGS: DefaultEditorSettings = {
   showInvisibles: false,
   enableLigatures: true,
   enableSnippets: true,
-  language: ProgrammingLanguageEnum.JAVASCRIPT
+  language: ProgrammingLanguageEnum.JAVASCRIPT,
 };
 
 // GET /api/editor-settings/[userId]
-export const GET = apiHandler(async (request: NextRequest, { params }: { params: { userId: string } }) => {
-  await dbConnect();
+export const GET = apiHandler(
+  async (request: NextRequest, params: Promise<{ userId: string }>) => {
+    const { userId } = await params;
 
-  const userId = params.userId;
+    let editorSettings = await EditorSettings.findOne({ userId });
 
-  let editorSettings = await EditorSettings.findOne({ userId });
+    if (!editorSettings) {
+      // Create default settings if none exist
+      editorSettings = await EditorSettings.create({
+        userId,
+        settings: DEFAULT_SETTINGS,
+      });
+    }
 
-  if (!editorSettings) {
-    // Create default settings if none exist
-    editorSettings = await EditorSettings.create({
-      userId,
-      settings: DEFAULT_SETTINGS,
-    });
+    return { data: editorSettings, status: StatusCodes.OK };
   }
-
-  return { data: editorSettings, status: StatusCodes.OK };
-});
+);
 
 // PUT /api/editor-settings/[userId]
-export const PUT = apiHandler(async (request: NextRequest, { params }: { params: { userId: string } }) => {
-  await dbConnect();
+export const PUT = apiHandler(
+  async (request: NextRequest, params: Promise<{ userId: string }>) => {
+    const { userId } = await params;
+    const { settings } = await request.json();
 
-  const userId = params.userId;
-  const { settings } = await request.json();
+    let editorSettings = await EditorSettings.findOne({ userId });
 
-  let editorSettings = await EditorSettings.findOne({ userId });
+    if (!editorSettings) {
+      // Create settings if none exist
+      editorSettings = await EditorSettings.create({
+        userId,
+        settings,
+      });
+    } else {
+      // Update existing settings
+      editorSettings.settings = settings;
+      await editorSettings.save();
+    }
 
-  if (!editorSettings) {
-    // Create settings if none exist
-    editorSettings = await EditorSettings.create({
-      userId,
-      settings,
-    });
-  } else {
-    // Update existing settings
-    editorSettings.settings = settings;
-    await editorSettings.save();
+    return { data: editorSettings, status: StatusCodes.OK };
   }
-
-  return { data: editorSettings, status: StatusCodes.OK };
-});
+);

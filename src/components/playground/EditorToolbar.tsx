@@ -1,15 +1,21 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Code, Save, Undo2, FileCode, DownloadCloud } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
 import { ProgrammingLanguageEnum } from "@/types";
-import SubmissionHistoryDrawer from "./SubmissionHistoryDrawer";
 import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
 import { noop } from "@/lib/utils";
 
 export default function EditorToolbar() {
-  const { changeLanguage, language, saveCode, isDirty, resetCode, formatCode } = useCodeEditorContext();
+  const { changeLanguage, language, saveCode, isDirty, resetCode, formatCode } =
+    useCodeEditorContext();
 
   const handleLanguageChange = (value: string) => {
     changeLanguage(value as ProgrammingLanguageEnum);
@@ -32,10 +38,14 @@ export default function EditorToolbar() {
       </Select>
 
       <div className="ml-auto" />
-      <SubmissionHistoryDrawer />
 
       {/* Save button */}
-      <Button variant="outline" size="sm" onClick={saveCode} disabled={!isDirty}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={saveCode}
+        disabled={!isDirty}
+      >
         <Save />
         Save
       </Button>

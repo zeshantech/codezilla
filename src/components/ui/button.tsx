@@ -4,7 +4,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 import NextLink from "next/link";
 
 import { cn } from "@/lib/utils";
-import { Spinner } from "./spinner";
 
 export type ButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {

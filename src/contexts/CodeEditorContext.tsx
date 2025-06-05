@@ -1,6 +1,11 @@
 import { createContext, useContext } from "react";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
-import { IProblem, IRunTestsResult, ProgrammingLanguageEnum } from "@/types";
+import {
+  IProblem,
+  IRunTestsResult,
+  ProgrammingLanguageEnum,
+  ISubmission,
+} from "@/types";
 import { ReactNode } from "react";
 
 interface CodeEditorContextProps {
@@ -12,7 +17,7 @@ interface CodeEditorContextProps {
   problemSlug: string;
   executionResult: IRunTestsResult | null;
   isExecutingCode: boolean;
-  submissions: any;
+  submissions: ISubmission[];
   isLoadingSubmissions: boolean;
   isErrorSubmissions: boolean;
   errorSubmissions: unknown;
@@ -50,23 +55,36 @@ interface CodeEditorProviderProps {
   initialCode?: string;
 }
 
-const CodeEditorContext = createContext<CodeEditorContextProps | undefined>(undefined);
+const CodeEditorContext = createContext<CodeEditorContextProps | undefined>(
+  undefined
+);
 
-export function CodeEditorProvider({ children, problemSlug, initialLanguage, initialCode }: CodeEditorProviderProps) {
+export function CodeEditorProvider({
+  children,
+  problemSlug,
+  initialLanguage,
+  initialCode,
+}: CodeEditorProviderProps) {
   const codeEditorProps = useCodeEditor({
     problemSlug,
     initialLanguage,
     initialCode,
   });
 
-  return <CodeEditorContext.Provider value={codeEditorProps}>{children}</CodeEditorContext.Provider>;
+  return (
+    <CodeEditorContext.Provider value={codeEditorProps}>
+      {children}
+    </CodeEditorContext.Provider>
+  );
 }
 
 export function useCodeEditorContext() {
   const context = useContext(CodeEditorContext);
 
   if (context === undefined) {
-    throw new Error("useCodeEditorContext must be used within a CodeEditorProvider");
+    throw new Error(
+      "useCodeEditorContext must be used within a CodeEditorProvider"
+    );
   }
 
   return context;

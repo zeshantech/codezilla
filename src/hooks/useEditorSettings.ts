@@ -62,7 +62,9 @@ export function useEditorSettings(userId = DEFAULT_USER_ID) {
         }
 
         // Then try to load from server (which will be more up-to-date)
-        const serverSettings = await editorSettingsAPI.fetchEditorSettings(userId);
+        const serverSettings = await editorSettingsAPI.fetchEditorSettings(
+          userId
+        );
         if (serverSettings) {
           setSettings(serverSettings);
           // Update localStorage with server settings
@@ -93,7 +95,7 @@ export function useEditorSettings(userId = DEFAULT_USER_ID) {
 
         // Update server
         await editorSettingsAPI.updateEditorSettings(userId, updatedSettings);
-        toast.success("Settings saved successfully");
+        // Don't show a toast for every setting change to avoid too many notifications
       } catch (error) {
         console.error("Failed to save settings:", error);
         toast.error("Failed to save settings");
@@ -126,7 +128,10 @@ export function useEditorSettings(userId = DEFAULT_USER_ID) {
 
   // Update a single setting both locally and on the server
   const updateSetting = useCallback(
-    async <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => {
+    async <K extends keyof EditorSettings>(
+      key: K,
+      value: EditorSettings[K]
+    ) => {
       setIsSaving(true);
 
       try {
@@ -138,7 +143,7 @@ export function useEditorSettings(userId = DEFAULT_USER_ID) {
 
         // Update server
         await editorSettingsAPI.updateEditorSettings(userId, updatedSettings);
-        toast.success("Setting updated successfully");
+        // Don't show a toast for every setting change
       } catch (error) {
         console.error("Failed to update setting:", error);
         toast.error("Failed to update setting");
