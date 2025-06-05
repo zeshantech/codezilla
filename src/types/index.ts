@@ -115,7 +115,12 @@ export interface IEditorConfig {
   formatOnSave: boolean;
 }
 
-export type SortOption = "popularity" | "newest" | "title" | "difficulty" | "completion_rate";
+export type SortOption =
+  | "popularity"
+  | "newest"
+  | "title"
+  | "difficulty"
+  | "completion_rate";
 
 export interface IProblemFilters {
   search?: string;
@@ -225,7 +230,7 @@ export interface IError {
 
 export interface ISubmission extends ISchema {
   user: string;
-  problem: string;
+  problem: string | IProblem;
   code: string;
   language: ProgrammingLanguageEnum;
   status: SubmissionStatusEnum;
@@ -265,4 +270,20 @@ export interface ICodeExecutionResult {
 export interface IRunTestsResult extends ICodeExecutionResult {
   testResults?: ITestResult[];
   allTestsPassed?: boolean;
+}
+
+export interface INote extends ISchema {
+  user: string;
+  problem: string | IProblem;
+  content: string;
+}
+
+export interface INoteCreateInput {
+  content: string;
+  problemId: string;
+}
+
+export interface INoteUpdateInput {
+  noteId: string;
+  content: string;
 }

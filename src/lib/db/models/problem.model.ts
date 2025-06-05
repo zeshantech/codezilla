@@ -51,4 +51,5 @@ const ProblemSchema: Schema<IProblem> = new Schema<IProblem>(
 
 ProblemSchema.plugin(toJSON);
 
-export const Problem: Model<IProblem> = models?.Problem || model<IProblem>("Problem", ProblemSchema);
+export const Problem: Model<IProblem> =
+  models?.Problem || model<IProblem>("Problem", ProblemSchema);

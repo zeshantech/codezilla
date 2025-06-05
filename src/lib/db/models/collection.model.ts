@@ -28,4 +28,5 @@ const CollectionSchema: Schema<ICollection> = new Schema<ICollection>(
 
 CollectionSchema.plugin(toJSON);
 
-export const Collection: Model<ICollection> = models?.Collection || model<ICollection>("Collection", CollectionSchema);
+export const Collection: Model<ICollection> =
+  models?.Collection || model<ICollection>("Collection", CollectionSchema);

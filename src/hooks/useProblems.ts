@@ -1,6 +1,10 @@
 import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { IProblemFilters, ProgrammingLanguageEnum, IProblemCreateInput } from "@/types";
+import {
+  IProblemFilters,
+  ProgrammingLanguageEnum,
+  IProblemCreateInput,
+} from "@/types";
 import { toast } from "sonner";
 import * as problemsAPI from "@/lib/api/problems";
 import * as usersAPI from "@/lib/api/users";
@@ -77,7 +81,21 @@ export function useProblems() {
   // Update a problem's user code
   const useUpdateProblemCode = () => {
     return useMutation({
-      mutationFn: ({ problemId, code, language }: { problemId: string; code: string; language: ProgrammingLanguageEnum }) => problemsAPI.updateProblemCode(CURRENT_USER_ID, problemId, code, language),
+      mutationFn: ({
+        problemId,
+        code,
+        language,
+      }: {
+        problemId: string;
+        code: string;
+        language: ProgrammingLanguageEnum;
+      }) =>
+        problemsAPI.updateProblemCode(
+          CURRENT_USER_ID,
+          problemId,
+          code,
+          language
+        ),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["user", "progress"] });
         toast.success("Code saved successfully!");
@@ -92,7 +110,10 @@ export function useProblems() {
   // Get user progress for a specific problem
   const getUserProblemProgress = useCallback(async (problemId: string) => {
     try {
-      const progress = await usersAPI.getUserProblemProgress(CURRENT_USER_ID, problemId);
+      const progress = await usersAPI.getUserProblemProgress(
+        CURRENT_USER_ID,
+        problemId
+      );
       return progress;
     } catch (error) {
       console.error("Error getting problem progress:", error);
@@ -129,8 +150,8 @@ export function useProblems() {
     isAllProblemsError: allProblemsQuery.error,
     isFeaturedProblemsError: featuredProblemsQuery.error,
     isRandomProblemError: randomProblemQuery.error,
-    isCreateProblemError: createProblemMutation.error,
-    isUpdateProblemCodeError: updateProblemCodeMutation.error,
+    isCreateProblemError: createProblemMutation.isError,
+    isUpdateProblemCodeError: updateProblemCodeMutation.isError,
 
     allProblems: allProblemsQuery.data,
     isAllProblemsLoading: allProblemsQuery.isLoading,

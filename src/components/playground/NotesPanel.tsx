@@ -10,6 +10,7 @@ import {
   MoreVertical,
   FileEdit,
   Clock,
+  MessageSquare,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -28,15 +29,29 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useNotes } from "@/hooks/useNotes";
-import { Spinner } from "../ui/spinner";
+import { Spinner, SpinnerBox } from "../ui/spinner";
+import { Editor } from "../blocks/editor-00/editor";
+import { NotesEditor } from "./NotesEditor";
+import { EmptyState } from "../ui/emptyState";
+import dayjs from "dayjs";
 
 interface NotesPanelProps {
   problemId: string;
 }
 
 export function NotesPanel({ problemId }: NotesPanelProps) {
-  const { notes, isLoading, addNote, updateNote, deleteNote, clearNotes } =
-    useNotes(problemId);
+  const {
+    allNotes,
+    isAllNotesLoading,
+    createNote,
+    updateNote,
+    deleteNote,
+    clearNotes,
+    isCreateNotePending,
+    isUpdateNotePending,
+    isDeleteNotePending,
+    isClearNotesPending,
+  } = useNotes(problemId);
 
   const [newNoteContent, setNewNoteContent] = useState("");
   const [editingNote, setEditingNote] = useState<{
@@ -47,53 +62,38 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Focus the textarea when editing a note
   useEffect(() => {
     if (editingNote && textareaRef.current) {
       textareaRef.current.focus();
     }
   }, [editingNote]);
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  };
-
-  // Handle adding a new note
   const handleAddNote = () => {
     if (newNoteContent.trim()) {
-      addNote(newNoteContent.trim());
+      createNote(newNoteContent.trim());
       setNewNoteContent("");
     }
   };
 
-  // Handle saving an edited note
   const handleSaveEdit = () => {
     if (editingNote && editingNote.content.trim()) {
-      updateNote(editingNote.id, editingNote.content.trim());
+      updateNote({
+        noteId: editingNote.id,
+        content: editingNote.content.trim(),
+      });
       setEditingNote(null);
     }
   };
 
-  // Cancel editing
   const handleCancelEdit = () => {
     setEditingNote(null);
   };
 
-  // Start editing a note
   const handleEditNote = (id: string, content: string) => {
     setEditingNote({ id, content });
   };
 
-  // Handle key presses in the textarea
   const handleKeyDown = (e: React.KeyboardEvent, isEditing = false) => {
-    // Save note on Ctrl+Enter
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       if (isEditing) {
@@ -103,18 +103,13 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
       }
     }
 
-    // Cancel on Escape
     if (e.key === "Escape" && isEditing) {
       handleCancelEdit();
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
+  if (isAllNotesLoading) {
+    return <SpinnerBox />;
   }
 
   return (
@@ -143,18 +138,24 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
 
       {/* Notes list */}
       <ScrollArea className="flex-1">
-        {notes.length === 0 ? (
-          <div className="h-24 flex items-center justify-center text-muted-foreground text-center p-4">
-            <div>
-              <p className="mb-1">No notes yet</p>
-              <p className="text-xs">
-                Add a note below to keep track of your thoughts
-              </p>
-            </div>
-          </div>
+        {!allNotes?.length ? (
+          // <div className="h-24 flex items-center justify-center text-muted-foreground text-center p-4">
+          //   <div>
+          //     <p className="mb-1">No notes yet</p>
+          //     <p className="text-xs">
+          //       Add a note below to keep track of your thoughts
+          //     </p>
+          //   </div>
+          // </div>
+
+          <EmptyState
+            title="No notes yet"
+            description="Add a note below to keep track of your thoughts"
+            icon={<MessageSquare />}
+          />
         ) : (
           <div className="space-y-3">
-            {notes.map((note) => (
+            {allNotes.map((note) => (
               <div
                 key={note.id}
                 className={`border rounded-md p-3 ${
@@ -186,7 +187,11 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
                       >
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={handleSaveEdit}>
+                      <Button
+                        size="sm"
+                        onClick={handleSaveEdit}
+                        loading={isUpdateNotePending}
+                      >
                         <Save className="mr-2 h-4 w-4" />
                         Save
                       </Button>
@@ -198,10 +203,12 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
                       {note.content}
                     </div>
                     <div className="flex justify-between items-center">
-                      <div className="flex items-center text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3 mr-1" />
-                        {formatDate(note.updatedAt)}
-                      </div>
+                      {note.updatedAt && (
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {dayjs(note.updatedAt).format("MMM D, h:mm A")}
+                        </div>
+                      )}
                       <div className="flex space-x-1">
                         <Button
                           variant="ghost"
@@ -214,6 +221,7 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
                           variant="ghost"
                           size="icon-xs"
                           onClick={() => deleteNote(note.id)}
+                          loading={isDeleteNotePending}
                         >
                           <Trash2 />
                         </Button>
@@ -227,27 +235,26 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
         )}
       </ScrollArea>
 
-      {/* Add new note */}
       <div className="mt-auto">
         <Textarea
           value={newNoteContent}
           onChange={(e) => setNewNoteContent(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Add a new note... (Ctrl+Enter to save)"
-          className="mb-2 min-h-[80px]"
+          className="mb-2 min-h-[80px] resize-none"
         />
         <Button
           onClick={handleAddNote}
           size="sm"
           className="w-full"
           disabled={!newNoteContent.trim()}
+          loading={isCreateNotePending}
         >
           <Plus />
           Add Note
         </Button>
       </div>
 
-      {/* Confirmation dialog for clearing all notes */}
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -260,8 +267,9 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={clearNotes}
-              className="bg-red-600 hover:bg-red-700"
+              disabled={isClearNotesPending}
+              onClick={() => clearNotes()}
+              className="bg-error"
             >
               Delete All
             </AlertDialogAction>

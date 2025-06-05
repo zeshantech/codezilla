@@ -1,5 +1,9 @@
 import { Schema, Document, Model, models, model } from "mongoose";
-import { ISubmission, ProgrammingLanguageEnum, SubmissionStatusEnum } from "@/types";
+import {
+  ISubmission,
+  ProgrammingLanguageEnum,
+  SubmissionStatusEnum,
+} from "@/types";
 import toJSON from "@/lib/plugins/toJSON";
 
 export interface SubmissionDocument extends ISubmission, Omit<Document, "id"> {}
@@ -18,7 +22,7 @@ const TestResultSchema = new Schema(
 const SubmissionSchema = new Schema<ISubmission>(
   {
     user: { type: String, required: true },
-    problem: { type: String, required: true },
+    problem: { type: Schema.Types.ObjectId, ref: "Problem", required: true },
     code: { type: String, required: true },
     language: {
       type: String,
@@ -48,4 +52,5 @@ SubmissionSchema.index({ createdAt: -1 });
 
 SubmissionSchema.plugin(toJSON);
 
-export const Submission: Model<ISubmission> = models?.Submission || model<ISubmission>("Submission", SubmissionSchema);
+export const Submission: Model<ISubmission> =
+  models?.Submission || model<ISubmission>("Submission", SubmissionSchema);
