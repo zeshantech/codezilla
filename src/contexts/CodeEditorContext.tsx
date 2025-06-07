@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import {
   IProblem,
-  IRunTestsResult,
+  IRunTestsOutput,
   ProgrammingLanguageEnum,
   ISubmission,
 } from "@/types";
@@ -15,14 +15,14 @@ interface CodeEditorContextProps {
   problem: IProblem | null;
   isLoadingProblem: boolean;
   problemSlug: string;
-  executionResult: IRunTestsResult | null;
+  executionResult: IRunTestsOutput | null;
   isExecutingCode: boolean;
   submissions: ISubmission[];
   isLoadingSubmissions: boolean;
   isErrorSubmissions: boolean;
   errorSubmissions: unknown;
 
-  saveSubmission: (executionResult: IRunTestsResult) => void;
+  saveSubmission: (executionResult: IRunTestsOutput) => void;
   isSavingSubmission: boolean;
   isSuccessSavingSubmission: boolean;
   isErrorSavingSubmission: boolean;
@@ -42,7 +42,7 @@ interface CodeEditorContextProps {
 
   updateCode: (newCode: string) => void;
   changeLanguage: (newLanguage: ProgrammingLanguageEnum) => void;
-  runCode: () => Promise<IRunTestsResult | undefined>;
+  runCode: () => Promise<IRunTestsOutput | undefined>;
   resetCode: () => void;
   formatCode: () => void;
   clearExecutionResult: () => void;

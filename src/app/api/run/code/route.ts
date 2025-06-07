@@ -1,9 +1,9 @@
 import { apiHandler } from "@/lib/errorHandler";
-import { ICodeExecutionResult } from "@/types";
+import { ICodeExecutionOutput } from "@/types";
 import { StatusCodes } from "@/constants/statusCodes";
 
 export const POST = apiHandler(async () => {
-  const result: ICodeExecutionResult = {
+  const result: ICodeExecutionOutput = {
     status: "success",
     output: ["Hello, world!", "Happy coding!", "Goodbye, world!"],
     executionTime: 10,

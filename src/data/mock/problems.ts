@@ -10,12 +10,6 @@ export const PROBLEMS: IProblem[] = [
     category: "Arrays",
     description:
       "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.",
-    constraints: [
-      "2 <= nums.length <= 10^4",
-      "-10^9 <= nums[i] <= 10^9",
-      "-10^9 <= target <= 10^9",
-      "Only one valid answer exists.",
-    ],
     examples: [
       {
         input: "nums = [2,7,11,15], target = 9",
@@ -63,10 +57,6 @@ export const PROBLEMS: IProblem[] = [
     category: "Stacks",
     description:
       "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid. An input string is valid if: Open brackets must be closed by the same type of brackets. Open brackets must be closed in the correct order. Every close bracket has a corresponding open bracket of the same type.",
-    constraints: [
-      "1 <= s.length <= 10^4",
-      "s consists of parentheses only '()[]{}'.",
-    ],
     examples: [
       {
         input: 's = "()"',
@@ -123,10 +113,6 @@ export const PROBLEMS: IProblem[] = [
     category: "Strings",
     description:
       "Given a string s, find the length of the longest substring without repeating characters.",
-    constraints: [
-      "0 <= s.length <= 5 * 10^4",
-      "s consists of English letters, digits, symbols and spaces.",
-    ],
     examples: [
       {
         input: 's = "abcabcbb"',
@@ -184,13 +170,6 @@ export const PROBLEMS: IProblem[] = [
     category: "Arrays",
     description:
       "You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively. Merge nums1 and nums2 into a single array sorted in non-decreasing order. The final sorted array should not be returned by the function, but instead be stored inside the array nums1. To accommodate this, nums1 has a length of m + n, where the first m elements denote the elements that should be merged, and the last n elements are set to 0 and should be ignored. nums2 has a length of n.",
-    constraints: [
-      "nums1.length == m + n",
-      "nums2.length == n",
-      "0 <= m, n <= 200",
-      "1 <= m + n <= 200",
-      "-10^9 <= nums1[i], nums2[j] <= 10^9",
-    ],
     examples: [
       {
         input: "nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3",
@@ -240,12 +219,6 @@ export const PROBLEMS: IProblem[] = [
     category: "Binary Search",
     description:
       "Given an array of integers nums which is sorted in ascending order, and an integer target, write a function to search target in nums. If target exists, then return its index. Otherwise, return -1. You must write an algorithm with O(log n) runtime complexity.",
-    constraints: [
-      "1 <= nums.length <= 10^4",
-      "-10^4 < nums[i], target < 10^4",
-      "All the integers in nums are unique.",
-      "nums is sorted in ascending order.",
-    ],
     examples: [
       {
         input: "nums = [-1,0,3,5,9,12], target = 9",
@@ -293,7 +266,6 @@ export const PROBLEMS: IProblem[] = [
     category: "Dynamic Programming",
     description:
       "You are given an array prices where prices[i] is the price of a given stock on the ith day. You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.",
-    constraints: ["1 <= prices.length <= 10^5", "0 <= prices[i] <= 10^4"],
     examples: [
       {
         input: "prices = [7,1,5,3,6,4]",

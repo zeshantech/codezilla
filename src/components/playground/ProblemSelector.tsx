@@ -4,8 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { DifficultyEnum } from "@/types";
-import { useProblems } from "@/hooks/useProblems";
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { useProblem, useAllProblems } from "@/hooks/useProblems";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { SearchInput } from "../ui/search-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -13,7 +21,6 @@ export function ProblemSelector() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const { useProblem, useAllProblems } = useProblems();
   const collection = searchParams.get("collection") as string;
   const currentProblemSlug = params.slug as string;
   const { data: allProblems } = useAllProblems({ collectionSlug: collection });
@@ -28,7 +35,13 @@ export function ProblemSelector() {
   const [search, setSearch] = useState("");
 
   // Filter problems based on search
-  const filteredProblems = allProblems?.filter((problem) => problem.title.toLowerCase().includes(search.toLowerCase()) || problem.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase())));
+  const filteredProblems = allProblems?.filter(
+    (problem) =>
+      problem.title.toLowerCase().includes(search.toLowerCase()) ||
+      problem.tags.some((tag) =>
+        tag.toLowerCase().includes(search.toLowerCase())
+      )
+  );
 
   // Handle problem selection
   const handleSelect = (slug: string) => {
@@ -52,11 +65,17 @@ export function ProblemSelector() {
   return (
     <Drawer direction="left">
       <DrawerTrigger>
-        <Button variant="outline" className="w-64 justify-between" disabled={isLoading}>
+        <Button
+          variant="outline"
+          className="w-64 justify-between"
+          disabled={isLoading}
+        >
           {currentProblem ? (
             <div className="flex items-center gap-2 overflow-hidden">
               <span className="truncate">{currentProblem.title}</span>
-              <Badge variant={getDifficultyBadge(currentProblem.difficulty)}>{currentProblem.difficulty}</Badge>
+              <Badge variant={getDifficultyBadge(currentProblem.difficulty)}>
+                {currentProblem.difficulty}
+              </Badge>
             </div>
           ) : (
             "Select problem..."
@@ -69,17 +88,33 @@ export function ProblemSelector() {
           <DrawerTitle>Select a Problem</DrawerTitle>
         </DrawerHeader>
         <div className="px-2">
-          <SearchInput autoFocus placeholder="Search problems..." value={search} onChange={(e) => setSearch(e.target.value)} className="mb-2" />
+          <SearchInput
+            autoFocus
+            placeholder="Search problems..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="mb-2"
+          />
           <ScrollArea className="h-[80vh]">
             {filteredProblems?.map((problem) => (
-              <div key={problem.id} className="flex justify-between p-2 hover:bg-muted cursor-pointer rounded" onClick={() => handleSelect(problem.slug)}>
+              <div
+                key={problem.id}
+                className="flex justify-between p-2 hover:bg-muted cursor-pointer rounded"
+                onClick={() => handleSelect(problem.slug)}
+              >
                 <div className="flex flex-col">
                   <span>{problem.title}</span>
-                  <span className="text-xs text-muted-foreground">{problem.tags.join(", ")}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {problem.tags.join(", ")}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={getDifficultyBadge(problem.difficulty)}>{problem.difficulty}</Badge>
-                  {problem.slug === currentProblemSlug && <Check className="h-4 w-4" />}
+                  <Badge variant={getDifficultyBadge(problem.difficulty)}>
+                    {problem.difficulty}
+                  </Badge>
+                  {problem.slug === currentProblemSlug && (
+                    <Check className="h-4 w-4" />
+                  )}
                 </div>
               </div>
             ))}

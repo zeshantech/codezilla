@@ -13,14 +13,11 @@ const ExampleSchema = new Schema<IExample>(
   { _id: false }
 );
 
-const TestCaseSchema = new Schema<ITestCase>(
-  {
-    input: { type: String, required: true },
-    expectedOutput: { type: String, required: true },
-    isHidden: { type: Boolean, default: false },
-  },
-  { _id: false }
-);
+const TestCaseSchema = new Schema<ITestCase>({
+  input: { type: String, required: true },
+  expectedOutput: { type: String, required: true },
+  isHidden: { type: Boolean, default: false },
+});
 
 const ProblemSchema: Schema<IProblem> = new Schema<IProblem>(
   {
@@ -33,7 +30,6 @@ const ProblemSchema: Schema<IProblem> = new Schema<IProblem>(
     },
     category: { type: String, required: true },
     description: { type: String, required: true },
-    constraints: { type: [String], required: true },
     examples: { type: [ExampleSchema], required: true },
     testCases: { type: [TestCaseSchema], required: true },
     starterCode: { type: Map, of: String, required: true },

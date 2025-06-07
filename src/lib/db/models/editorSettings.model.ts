@@ -1,32 +1,19 @@
 import { Schema, Document, Model, models, model } from "mongoose";
-import { ProgrammingLanguageEnum } from "@/types";
+import { IEditorSettings } from "@/types";
 import toJSON from "@/lib/plugins/toJSON";
 
-export interface EditorSettingsDocument extends Document {
-  userId: string;
-  settings: {
-    theme: "light" | "dark";
-    fontSize: number;
-    tabSize: number;
-    wordWrap: boolean;
-    showLineNumbers: boolean;
-    showMinimap: boolean;
-    autoComplete: boolean;
-    formatOnSave: boolean;
-    keyboardShortcuts: Record<string, boolean>;
-    indentUsingSpaces: boolean;
-    highlightActiveLine: boolean;
-    highlightGutter: boolean;
-    showInvisibles: boolean;
-    enableLigatures: boolean;
-    enableSnippets: boolean;
-    language: ProgrammingLanguageEnum;
-  };
+interface IEditorSettingsSchema {
+  user: string;
+  settings: IEditorSettings;
 }
 
-const EditorSettingsSchema = new Schema<EditorSettingsDocument>(
+export interface EditorSettingsDocument
+  extends IEditorSettingsSchema,
+    Omit<Document, "id"> {}
+
+const EditorSettingsSchema = new Schema<IEditorSettingsSchema>(
   {
-    userId: { type: String, required: true, unique: true },
+    user: { type: String, required: true, unique: true },
     settings: {
       theme: { type: String, enum: ["light", "dark"], default: "dark" },
       fontSize: { type: Number, default: 14 },
@@ -62,4 +49,6 @@ const EditorSettingsSchema = new Schema<EditorSettingsDocument>(
 
 EditorSettingsSchema.plugin(toJSON);
 
-export const EditorSettings: Model<EditorSettingsDocument> = models?.EditorSettings || model<EditorSettingsDocument>("EditorSettings", EditorSettingsSchema);
+export const EditorSettings: Model<IEditorSettingsSchema> =
+  models?.EditorSettings ||
+  model<IEditorSettingsSchema>("EditorSettings", EditorSettingsSchema);

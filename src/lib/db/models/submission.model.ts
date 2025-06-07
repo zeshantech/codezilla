@@ -3,18 +3,19 @@ import {
   ISubmission,
   ProgrammingLanguageEnum,
   SubmissionStatusEnum,
+  ITestResult,
 } from "@/types";
 import toJSON from "@/lib/plugins/toJSON";
 
 export interface SubmissionDocument extends ISubmission, Omit<Document, "id"> {}
 
-const TestResultSchema = new Schema(
+const TestResultSchema = new Schema<ITestResult>(
   {
     passed: { type: Boolean, required: true },
     input: { type: String, required: true },
     expectedOutput: { type: String, required: true },
     actualOutput: { type: String, required: true },
-    testCaseId: { type: Number, required: true },
+    testCaseId: { type: String, required: true },
   },
   { _id: false }
 );

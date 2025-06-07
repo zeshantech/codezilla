@@ -33,6 +33,7 @@ export interface IExample {
 }
 
 export interface ITestCase {
+  id: string;
   input: string;
   expectedOutput: string;
   isHidden?: boolean;
@@ -44,7 +45,6 @@ export interface IProblem extends ISchema {
   difficulty: DifficultyEnum;
   category: string;
   description: string;
-  constraints: string[];
   examples: IExample[];
   testCases: ITestCase[];
   starterCode: Record<ProgrammingLanguageEnum, string>;
@@ -205,7 +205,6 @@ export interface IProblemSaveInput {
   difficulty: DifficultyEnum;
   category: string;
   description: string;
-  constraints: string[];
   examples: IExample[];
   testCases: ITestCase[];
   starterCode: Record<ProgrammingLanguageEnum, string>;
@@ -246,30 +245,43 @@ export interface ITestResult {
   input: string;
   expectedOutput: string;
   actualOutput: string;
-  testCaseId: number;
+  testCaseId: string;
 }
 
-export interface ICodeExecutionRequest {
+export interface ICodeExecutionInput {
   code: string;
   language: ProgrammingLanguageEnum;
 }
 
-export interface IRunTestRequest extends ICodeExecutionRequest {
+export interface IRunTestRequest extends ICodeExecutionInput {
   problemId: string;
   testCaseIdz?: number[];
 }
 
-export interface ICodeExecutionResult {
-  status: "success" | "error" | "running";
+export interface ICodeExecutionOutput {
+  status: "success" | "error";
   output: string[];
   error?: string;
   executionTime?: number;
   memoryUsed?: number;
 }
 
-export interface IRunTestsResult extends ICodeExecutionResult {
+export interface IRunTestsOutput extends ICodeExecutionOutput {
   testResults?: ITestResult[];
   allTestsPassed?: boolean;
+}
+
+export interface ISaveSubmissionInput {
+  problemId: string;
+  code: string;
+  language: ProgrammingLanguageEnum;
+  executionResult: IRunTestsOutput;
+}
+
+export interface IRunTestCasesInput extends IRunTestRequest {
+  testCaseIdz?: number[];
+  code: string;
+  language: ProgrammingLanguageEnum;
 }
 
 export interface INote extends ISchema {
@@ -286,4 +298,23 @@ export interface INoteCreateInput {
 export interface INoteUpdateInput {
   noteId: string;
   content: string;
+}
+
+export interface IEditorSettings {
+  theme: "light" | "dark";
+  fontSize: number;
+  tabSize: number;
+  wordWrap: boolean;
+  showLineNumbers: boolean;
+  showMinimap: boolean;
+  autoComplete: boolean;
+  formatOnSave: boolean;
+  keyboardShortcuts: Record<string, boolean>;
+  indentUsingSpaces: boolean;
+  highlightActiveLine: boolean;
+  highlightGutter: boolean;
+  showInvisibles: boolean;
+  enableLigatures: boolean;
+  enableSnippets: boolean;
+  language: ProgrammingLanguageEnum;
 }

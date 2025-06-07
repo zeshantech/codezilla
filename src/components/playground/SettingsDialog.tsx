@@ -7,6 +7,7 @@ import {
 } from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -27,27 +28,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Settings, Keyboard, Code, PaintBucket, RotateCcw } from "lucide-react";
-import useEditorSettings, { EditorSettings } from "@/hooks/useEditorSettings";
+import useEditorSettings from "@/hooks/useEditorSettings";
 import { cn, debounce } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { IEditorSettings } from "@/types";
+import { DEFAULT_EDITOR_SETTINGS } from "@/constants/editor";
 
-// Create a context to hold local settings that can be accessed by the editor
-export interface LocalSettingsContextType {
-  localSettings: EditorSettings | null;
-}
-
-// Default context value is null to indicate no local settings are available
-export const LocalSettingsContext = createContext<LocalSettingsContextType>({
-  localSettings: null,
+const LocalSettingsContext = createContext<{
+  localSettings: IEditorSettings;
+}>({
+  localSettings: DEFAULT_EDITOR_SETTINGS,
 });
 
-export const useLocalSettings = () => useContext(LocalSettingsContext);
+// Custom hook to use local settings context
+export const useLocalSettings = () => {
+  const context = useContext(LocalSettingsContext);
+  return context;
+};
 
 interface SettingItemProps {
   label: string;
   description?: string;
   children: React.ReactNode;
   className?: string;
+}
+
+interface SettingsDialogProps {
+  onChangeSettings: (newSettings: Partial<IEditorSettings>) => void;
+  settings: IEditorSettings;
+  resetSettings: () => void;
 }
 
 function SettingItem({
@@ -76,53 +85,27 @@ function SettingItem({
   );
 }
 
-export function SettingsDialog() {
+export function SettingsDialog({
+  onChangeSettings,
+  settings,
+  resetSettings,
+}: SettingsDialogProps) {
   const [activeTab, setActiveTab] = useState("appearance");
-  const [open, setOpen] = useState(false);
-  const [localSettings, setLocalSettings] = useState<EditorSettings | null>(
-    null
+  const [localSettings, setLocalSettings] = useState<IEditorSettings>(
+    settings || DEFAULT_EDITOR_SETTINGS
   );
 
-  const { settings, updateSettings, resetSettings, isSaving, isLoaded } =
-    useEditorSettings();
-
-  // Set local settings when the actual settings load or change
   useEffect(() => {
-    if (settings && isLoaded) {
+    if (settings) {
       setLocalSettings(settings);
     }
-  }, [settings, isLoaded]);
+  }, [settings]);
 
   // Create a debounced version of updateSettings
-  const debouncedUpdateSettings = useCallback(
-    debounce((newSettings: Partial<EditorSettings>) => {
-      updateSettings(newSettings);
-    }, 10000),
-    [updateSettings]
-  );
-
-  // Handle local settings change
-  const handleSettingChange = (newSettings: Partial<EditorSettings>) => {
-    if (!localSettings) return;
-
-    const updatedSettings = { ...localSettings, ...newSettings };
-    setLocalSettings(updatedSettings);
-    debouncedUpdateSettings(newSettings);
-  };
-
-  // Reset settings and close dialog
-  const handleResetSettings = async () => {
-    await resetSettings();
-    setOpen(false);
-  };
-
-  if (!isLoaded || !localSettings) {
-    return null;
-  }
 
   return (
     <LocalSettingsContext.Provider value={{ localSettings }}>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog>
         <DialogTrigger>
           <Button variant="outline" size="icon-sm">
             <Settings />
@@ -195,7 +178,7 @@ export function SettingsDialog() {
                       <Select
                         value={localSettings.theme}
                         onValueChange={(value) =>
-                          handleSettingChange({
+                          onChangeSettings({
                             theme: value as "light" | "dark",
                           })
                         }
@@ -226,7 +209,7 @@ export function SettingsDialog() {
                         max={24}
                         step={1}
                         onValueChange={(value) =>
-                          handleSettingChange({ fontSize: value[0] })
+                          onChangeSettings({ fontSize: value[0] })
                         }
                         className="w-full sm:w-[130px]"
                       />
@@ -242,7 +225,7 @@ export function SettingsDialog() {
                         id="showMinimap"
                         checked={localSettings.showMinimap}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ showMinimap: checked })
+                          onChangeSettings({ showMinimap: checked })
                         }
                       />
                     </SettingItem>
@@ -257,7 +240,7 @@ export function SettingsDialog() {
                         id="showLineNumbers"
                         checked={localSettings.showLineNumbers}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ showLineNumbers: checked })
+                          onChangeSettings({ showLineNumbers: checked })
                         }
                       />
                     </SettingItem>
@@ -272,7 +255,7 @@ export function SettingsDialog() {
                         id="wordWrap"
                         checked={localSettings.wordWrap}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ wordWrap: checked })
+                          onChangeSettings({ wordWrap: checked })
                         }
                       />
                     </SettingItem>
@@ -287,7 +270,7 @@ export function SettingsDialog() {
                         id="enableLigatures"
                         checked={localSettings.enableLigatures}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ enableLigatures: checked })
+                          onChangeSettings({ enableLigatures: checked })
                         }
                       />
                     </SettingItem>
@@ -314,7 +297,7 @@ export function SettingsDialog() {
                         max={8}
                         step={1}
                         onValueChange={(value) =>
-                          handleSettingChange({ tabSize: value[0] })
+                          onChangeSettings({ tabSize: value[0] })
                         }
                         className="w-full sm:w-[130px]"
                       />
@@ -331,7 +314,7 @@ export function SettingsDialog() {
                           localSettings.indentUsingSpaces ? "spaces" : "tabs"
                         }
                         onValueChange={(value) =>
-                          handleSettingChange({
+                          onChangeSettings({
                             indentUsingSpaces: value === "spaces",
                           })
                         }
@@ -359,7 +342,7 @@ export function SettingsDialog() {
                         id="autoComplete"
                         checked={localSettings.autoComplete}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ autoComplete: checked })
+                          onChangeSettings({ autoComplete: checked })
                         }
                       />
                     </SettingItem>
@@ -374,7 +357,7 @@ export function SettingsDialog() {
                         id="formatOnSave"
                         checked={localSettings.formatOnSave}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ formatOnSave: checked })
+                          onChangeSettings({ formatOnSave: checked })
                         }
                       />
                     </SettingItem>
@@ -389,7 +372,7 @@ export function SettingsDialog() {
                         id="enableSnippets"
                         checked={localSettings.enableSnippets}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ enableSnippets: checked })
+                          onChangeSettings({ enableSnippets: checked })
                         }
                       />
                     </SettingItem>
@@ -404,7 +387,7 @@ export function SettingsDialog() {
                         id="highlightActiveLine"
                         checked={localSettings.highlightActiveLine}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ highlightActiveLine: checked })
+                          onChangeSettings({ highlightActiveLine: checked })
                         }
                       />
                     </SettingItem>
@@ -419,7 +402,7 @@ export function SettingsDialog() {
                         id="showInvisibles"
                         checked={localSettings.showInvisibles}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({ showInvisibles: checked })
+                          onChangeSettings({ showInvisibles: checked })
                         }
                       />
                     </SettingItem>
@@ -440,7 +423,7 @@ export function SettingsDialog() {
                         id="shortcutFormat"
                         checked={localSettings.keyboardShortcuts.format}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({
+                          onChangeSettings({
                             keyboardShortcuts: {
                               ...localSettings.keyboardShortcuts,
                               format: checked,
@@ -457,7 +440,7 @@ export function SettingsDialog() {
                         id="shortcutSave"
                         checked={localSettings.keyboardShortcuts.save}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({
+                          onChangeSettings({
                             keyboardShortcuts: {
                               ...localSettings.keyboardShortcuts,
                               save: checked,
@@ -474,7 +457,7 @@ export function SettingsDialog() {
                         id="shortcutRun"
                         checked={localSettings.keyboardShortcuts.run}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({
+                          onChangeSettings({
                             keyboardShortcuts: {
                               ...localSettings.keyboardShortcuts,
                               run: checked,
@@ -491,7 +474,7 @@ export function SettingsDialog() {
                         id="shortcutReset"
                         checked={localSettings.keyboardShortcuts.reset}
                         onCheckedChange={(checked) =>
-                          handleSettingChange({
+                          onChangeSettings({
                             keyboardShortcuts: {
                               ...localSettings.keyboardShortcuts,
                               reset: checked,
@@ -507,15 +490,16 @@ export function SettingsDialog() {
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={handleResetSettings}
-              disabled={isSaving}
-              className="w-full sm:w-auto"
-            >
-              <RotateCcw />
-              Reset to Defaults
-            </Button>
+            <DialogClose>
+              <Button
+                variant="outline"
+                onClick={() => resetSettings()}
+                className="w-full sm:w-auto"
+              >
+                <RotateCcw />
+                Reset to Defaults
+              </Button>
+            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>

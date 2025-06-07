@@ -1,11 +1,13 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { ProgrammingLanguageEnum } from "@/types";
+import { IEditorSettings, ProgrammingLanguageEnum } from "@/types";
 import useEditorSettings from "@/hooks/useEditorSettings";
 import EditorToolbar from "./EditorToolbar";
 import { Spinner } from "../ui/spinner";
 import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
+import { DEFAULT_EDITOR_SETTINGS } from "@/constants/editor";
 import { useLocalSettings } from "./SettingsDialog";
+import debounce from "lodash.debounce";
 
 interface EnhancedCodeEditorProps {
   readOnly?: boolean;
@@ -16,10 +18,6 @@ export function EnhancedCodeEditor({
   readOnly = false,
   autoFocus = false,
 }: EnhancedCodeEditorProps) {
-  const editorRef = useRef<any>(null);
-  const monacoRef = useRef<any>(null);
-  const { settings } = useEditorSettings();
-  const localSettingsContext = useLocalSettings();
   const {
     code,
     language,
@@ -29,9 +27,40 @@ export function EnhancedCodeEditor({
     resetCode,
     saveCode,
   } = useCodeEditorContext();
+  const editorRef = useRef<any>(null);
+  const monacoRef = useRef<any>(null);
 
-  // Use local settings if available (for immediate feedback), otherwise use the settings from the hook
-  const effectiveSettings = localSettingsContext?.localSettings || settings;
+  const {
+    settings,
+    isSettingsLoading,
+    updateSettings,
+    isResetSettingsPending,
+    resetSettings,
+  } = useEditorSettings();
+
+  const [effectiveSettings, setEffectiveSettings] = useState<IEditorSettings>(
+    DEFAULT_EDITOR_SETTINGS
+  );
+
+  useEffect(() => {
+    if (settings) {
+      setEffectiveSettings(settings);
+    }
+  }, [settings]);
+
+  const debouncedUpdateSettings = useCallback(
+    debounce((newSettings: Partial<IEditorSettings>) => {
+      updateSettings(newSettings);
+    }, 5000),
+    [updateSettings]
+  );
+
+  // Handle local settings change
+  const handleSettingChange = (newSettings: Partial<IEditorSettings>) => {
+    const updatedSettings = { ...effectiveSettings, ...newSettings };
+    setEffectiveSettings(updatedSettings);
+    debouncedUpdateSettings(newSettings);
+  };
 
   const getMonacoLanguage = (lang: ProgrammingLanguageEnum) => {
     switch (lang) {
@@ -205,15 +234,7 @@ export function EnhancedCodeEditor({
         );
       }
     }
-  }, [
-    effectiveSettings,
-    localSettingsContext?.localSettings,
-    readOnly,
-    onFormat,
-    saveCode,
-    runCode,
-    resetCode,
-  ]);
+  }, [effectiveSettings, readOnly, onFormat, saveCode, runCode, resetCode]);
 
   // Handle code changes
   const handleEditorChange: OnChange = (value) => {
@@ -251,7 +272,16 @@ export function EnhancedCodeEditor({
 
   return (
     <div className="h-full w-full">
-      <EditorToolbar />
+      <EditorToolbar
+        onChangeSettings={handleSettingChange}
+        settings={effectiveSettings}
+        resetSettings={resetSettings}
+      />
+
+      {(isSettingsLoading || isResetSettingsPending) && (
+        <Spinner className="absolute bottom-2 right-2 z-10" />
+      )}
+
       <Editor
         height="100%"
         language={getMonacoLanguage(language)}

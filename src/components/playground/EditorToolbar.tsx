@@ -9,11 +9,21 @@ import {
 } from "@/components/ui/select";
 import { Code, Save, Undo2, FileCode, DownloadCloud } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
-import { ProgrammingLanguageEnum } from "@/types";
+import { IEditorSettings, ProgrammingLanguageEnum } from "@/types";
 import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
 import { noop } from "@/lib/utils";
 
-export default function EditorToolbar() {
+interface EditorToolbarProps {
+  onChangeSettings: (newSettings: Partial<IEditorSettings>) => void;
+  settings: IEditorSettings;
+  resetSettings: () => void;
+}
+
+export default function EditorToolbar({
+  onChangeSettings,
+  settings,
+  resetSettings,
+}: EditorToolbarProps) {
   const { changeLanguage, language, saveCode, isDirty, resetCode, formatCode } =
     useCodeEditorContext();
 
@@ -68,7 +78,11 @@ export default function EditorToolbar() {
       </Button>
 
       {/* Settings dialog */}
-      <SettingsDialog />
+      <SettingsDialog
+        resetSettings={resetSettings}
+        onChangeSettings={onChangeSettings}
+        settings={settings}
+      />
     </div>
   );
 }

@@ -1,195 +1,90 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { IEditorConfig, ProgrammingLanguageEnum } from "@/types";
+import { useCallback } from "react";
+import { IEditorSettings } from "@/types";
 import * as editorSettingsAPI from "@/lib/api/editorSettings/index";
 import { toast } from "sonner";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { DEFAULT_EDITOR_SETTINGS } from "@/constants/editor";
 
-export interface EditorSettings extends IEditorConfig {
-  keyboardShortcuts: Record<string, boolean>;
-  indentUsingSpaces: boolean;
-  highlightActiveLine: boolean;
-  highlightGutter: boolean;
-  showInvisibles: boolean;
-  enableLigatures: boolean;
-  enableSnippets: boolean;
-  language: ProgrammingLanguageEnum;
-}
+export function useEditorSettings() {
+  const USER_ID = "user123";
+  const queryClient = useQueryClient();
 
-// Use a default user ID for now
-const DEFAULT_USER_ID = "user123";
+  const useGetEditorSettings = () => {
+    return useQuery({
+      queryKey: ["editor-settings", USER_ID],
+      queryFn: async () => {
+        const result = await editorSettingsAPI.fetchEditorSettings(USER_ID);
 
-const DEFAULT_SETTINGS: EditorSettings = {
-  theme: "dark",
-  fontSize: 14,
-  tabSize: 2,
-  wordWrap: true,
-  showLineNumbers: true,
-  showMinimap: false,
-  autoComplete: true,
-  formatOnSave: true,
-  keyboardShortcuts: {
-    format: true,
-    save: true,
-    run: true,
-    reset: true,
-  },
-  indentUsingSpaces: true,
-  highlightActiveLine: true,
-  highlightGutter: true,
-  showInvisibles: false,
-  enableLigatures: true,
-  enableSnippets: true,
-  language: ProgrammingLanguageEnum.JAVASCRIPT,
-};
+        return result;
+      },
+      staleTime: 1000 * 60 * 5,
+    });
+  };
 
-export function useEditorSettings(userId = DEFAULT_USER_ID) {
-  const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const useUpdateEditorSettings = () => {
+    return useMutation({
+      mutationFn: (settings: IEditorSettings) =>
+        editorSettingsAPI.updateEditorSettings(USER_ID, settings),
+      onError: () => {
+        toast.error("Failed to update settings");
+      },
+    });
+  };
 
-  // Generate storage key using user ID for multi-user support
-  const storageKey = `editor-settings-${userId}`;
+  const useResetEditorSettings = () => {
+    return useMutation({
+      mutationFn: () => editorSettingsAPI.resetEditorSettings(USER_ID),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["editor-settings", USER_ID],
+        });
+      },
+      onError: () => {
+        toast.error("Failed to reset settings");
+      },
+    });
+  };
 
-  // Load settings from localStorage and server on component mount
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        // First try to load from localStorage for immediate UI display
-        const localSettings = localStorage.getItem(storageKey);
-        if (localSettings) {
-          setSettings(JSON.parse(localSettings));
-        }
+  const settingsQuery = useGetEditorSettings();
+  const updateSettingsMutation = useUpdateEditorSettings();
+  const resetSettingsMutation = useResetEditorSettings();
 
-        // Then try to load from server (which will be more up-to-date)
-        const serverSettings = await editorSettingsAPI.fetchEditorSettings(
-          userId
-        );
-        if (serverSettings) {
-          setSettings(serverSettings);
-          // Update localStorage with server settings
-          localStorage.setItem(storageKey, JSON.stringify(serverSettings));
-        }
-
-        setIsLoaded(true);
-      } catch (error) {
-        console.error("Failed to load settings:", error);
-        setIsLoaded(true);
-      }
-    };
-
-    loadSettings();
-  }, [storageKey, userId]);
-
-  // Update settings both locally and on the server
   const updateSettings = useCallback(
-    async (newSettings: Partial<EditorSettings>) => {
-      setIsSaving(true);
-
-      try {
-        const updatedSettings = { ...settings, ...newSettings };
-
-        // Update local state and localStorage
-        setSettings(updatedSettings);
-        localStorage.setItem(storageKey, JSON.stringify(updatedSettings));
-
-        // Update server
-        await editorSettingsAPI.updateEditorSettings(userId, updatedSettings);
-        // Don't show a toast for every setting change to avoid too many notifications
-      } catch (error) {
-        console.error("Failed to save settings:", error);
-        toast.error("Failed to save settings");
-      } finally {
-        setIsSaving(false);
-      }
+    (partialSettings: Partial<IEditorSettings>) => {
+      const currentSettings = settingsQuery.data || DEFAULT_EDITOR_SETTINGS;
+      const mergedSettings = { ...currentSettings, ...partialSettings };
+      return updateSettingsMutation.mutate(mergedSettings);
     },
-    [settings, storageKey, userId]
+    [updateSettingsMutation, settingsQuery.data]
   );
 
-  // Reset settings to default both locally and on the server
-  const resetSettings = useCallback(async () => {
-    setIsSaving(true);
-
-    try {
-      // Update local state and localStorage
-      setSettings(DEFAULT_SETTINGS);
-      localStorage.setItem(storageKey, JSON.stringify(DEFAULT_SETTINGS));
-
-      // Reset on server
-      await editorSettingsAPI.resetEditorSettings(userId);
-      toast.success("Settings reset to defaults");
-    } catch (error) {
-      console.error("Failed to reset settings:", error);
-      toast.error("Failed to reset settings");
-    } finally {
-      setIsSaving(false);
-    }
-  }, [storageKey, userId]);
-
-  // Update a single setting both locally and on the server
-  const updateSetting = useCallback(
-    async <K extends keyof EditorSettings>(
-      key: K,
-      value: EditorSettings[K]
-    ) => {
-      setIsSaving(true);
-
-      try {
-        const updatedSettings = { ...settings, [key]: value };
-
-        // Update local state and localStorage
-        setSettings(updatedSettings);
-        localStorage.setItem(storageKey, JSON.stringify(updatedSettings));
-
-        // Update server
-        await editorSettingsAPI.updateEditorSettings(userId, updatedSettings);
-        // Don't show a toast for every setting change
-      } catch (error) {
-        console.error("Failed to update setting:", error);
-        toast.error("Failed to update setting");
-      } finally {
-        setIsSaving(false);
-      }
-    },
-    [settings, storageKey, userId]
-  );
-
-  // Toggle boolean setting both locally and on the server
-  const toggleSetting = useCallback(
-    async (key: keyof EditorSettings) => {
-      const currentValue = settings[key];
-      if (typeof currentValue !== "boolean") {
-        return;
-      }
-
-      await updateSetting(key, !currentValue as any);
-    },
-    [settings, updateSetting]
-  );
-
-  // Extract editor config from settings
-  const getEditorConfig = useCallback((): IEditorConfig => {
-    return {
-      theme: settings.theme,
-      fontSize: settings.fontSize,
-      tabSize: settings.tabSize,
-      wordWrap: settings.wordWrap,
-      showLineNumbers: settings.showLineNumbers,
-      showMinimap: settings.showMinimap,
-      autoComplete: settings.autoComplete,
-      formatOnSave: settings.formatOnSave,
-    };
-  }, [settings]);
+  const resetSettings = useCallback(() => {
+    return resetSettingsMutation.mutate();
+  }, [resetSettingsMutation]);
 
   return {
-    settings,
-    isLoaded,
-    isSaving,
+    useGetEditorSettings,
+    settings: settingsQuery.data || DEFAULT_EDITOR_SETTINGS,
+    settingsError: settingsQuery.error,
+    isSettingsLoading: settingsQuery.isLoading,
+    isSettingsError: settingsQuery.error,
+    isSettingsSuccess: settingsQuery.isSuccess,
+
+    useUpdateEditorSettings,
     updateSettings,
+    isUpdateSettingsError: updateSettingsMutation.isError,
+    updateSettingsError: updateSettingsMutation.error,
+    isUpdateSettingsPending: updateSettingsMutation.isPending,
+    isUpdateSettingsSuccess: updateSettingsMutation.isSuccess,
+
+    useResetEditorSettings,
     resetSettings,
-    updateSetting,
-    toggleSetting,
-    getEditorConfig,
+    isResetSettingsError: resetSettingsMutation.isError,
+    resetSettingsError: resetSettingsMutation.error,
+    isResetSettingsPending: resetSettingsMutation.isPending,
+    isResetSettingsSuccess: resetSettingsMutation.isSuccess,
   };
 }
 

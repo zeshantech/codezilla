@@ -16,7 +16,15 @@ export async function POST(req: Request) {
 }
 
 export async function aiProblemCreator(input: IProblemCreateInput) {
-  const { difficulty, complexity, topics, customPrompt, exampleCount, timeLimit, memoryLimit } = input;
+  const {
+    difficulty,
+    complexity,
+    topics,
+    customPrompt,
+    exampleCount,
+    timeLimit,
+    memoryLimit,
+  } = input;
 
   // Construct the prompt for the AI
   const prompt = `Create a coding problem with the following specifications:
@@ -33,7 +41,6 @@ Format the response as a JSON object with the following structure:
   "title": "Problem title",
   "category": "Main category",
   "description": "Full markdown description with problem statement, input/output format, and constraints",
-  "constraints": ["constraint1", "constraint2"],
   "examples": [
     {"input": "example input", "output": "example output", "explanation": "explanation"}
   ],
@@ -57,15 +64,18 @@ Format the response as a JSON object with the following structure:
 
   try {
     // Call OpenAI API
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/generate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/ai/generate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: prompt }],
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);
@@ -90,114 +100,126 @@ Format the response as a JSON object with the following structure:
 // Fallback problem in case AI generation fails
 function getFallbackProblem(topic?: string) {
   return {
-    title: "Sum Two Numbers",
+    title: "Find Maximum Number",
     category: topic || "Basic Algorithms",
     description: `
-## Sum Two Numbers
+<p>Write a function that takes an array of integers and returns the maximum value found in the array. If the array is empty, return null or an appropriate value based on the language.</p>
 
-You are given two integers, a and b. Your task is to write a function that returns the sum of these two numbers.
+<h3>Input Format</h3>
+<ul>
+  <li>An array of integers</li>
+</ul>
 
-### Problem Description
+<h3>Output Format</h3>
+<ul>
+  <li>An integer representing the maximum value in the array</li>
+</ul>
 
-Write a function that takes two integer parameters and returns their sum.
-
-### Input Format
-- Two integers a and b
-
-### Output Format
-- An integer representing the sum of a and b
-
-### Constraints
-- ${-Math.pow(10, 9)} ≤ a, b ≤ ${Math.pow(10, 9)}
+<h3>Constraints</h3>
+<ul>
+  <li>Array length will be between 1 and 10^5 (1 ≤ array.length ≤ 10^5)</li>
+  <li>Array elements will be between -10^9 and 10^9 (-10^9 ≤ array[i] ≤ 10^9)</li>
+</ul>
     `,
-    constraints: [`-${Math.pow(10, 9)} ≤ a, b ≤ ${Math.pow(10, 9)}`],
     examples: [
       {
-        input: "a = 3, b = 5",
-        output: "8",
-        explanation: "The sum of 3 and 5 is 8.",
+        input: "[3, 7, 2, 9, 1]",
+        output: "9",
+        explanation: "9 is the largest number in the array.",
       },
       {
-        input: "a = -2, b = 7",
-        output: "5",
-        explanation: "The sum of -2 and 7 is 5.",
+        input: "[-5, -2, -10, -1]",
+        output: "-1",
+        explanation:
+          "-1 is the largest number in the array of negative integers.",
       },
       {
-        input: "a = 0, b = 0",
-        output: "0",
-        explanation: "The sum of 0 and 0 is 0.",
+        input: "[42]",
+        output: "42",
+        explanation:
+          "In an array with only one element, that element is the maximum.",
       },
     ],
     testCases: [
       {
-        input: "3, 5",
-        expectedOutput: "8",
+        input: "[3, 7, 2, 9, 1]",
+        expectedOutput: "9",
       },
       {
-        input: "-2, 7",
-        expectedOutput: "5",
+        input: "[-5, -2, -10, -1]",
+        expectedOutput: "-1",
       },
       {
-        input: "0, 0",
-        expectedOutput: "0",
+        input: "[42]",
+        expectedOutput: "42",
       },
       {
-        input: "1000, 1000",
-        expectedOutput: "2000",
+        input: "[100, 100, 100]",
+        expectedOutput: "100",
       },
       {
-        input: "-5, -7",
-        expectedOutput: "-12",
+        input: "[0, 5, 9, 8, -10, -20, 15, 7]",
+        expectedOutput: "15",
         isHidden: true,
       },
     ],
     starterCode: {
       javascript: `/**
- * @param {number} a - The first integer
- * @param {number} b - The second integer
- * @return {number} - The sum of a and b
+ * @param {number[]} nums - Array of integers
+ * @return {number} - The maximum value in the array
  */
-function sumTwoNumbers(a, b) {
+function findMaximum(nums) {
   // Write your code here
   
 }`,
       python: `class Solution:
-    def sum_two_numbers(self, a: int, b: int) -> int:
+    def find_maximum(self, nums: list[int]) -> int:
         # Write your code here
         pass`,
       java: `class Solution {
-    public int sumTwoNumbers(int a, int b) {
+    public int findMaximum(int[] nums) {
         // Write your code here
         return 0;
     }
 }`,
       cpp: `class Solution {
 public:
-    int sumTwoNumbers(int a, int b) {
+    int findMaximum(std::vector<int>& nums) {
         // Write your code here
         return 0;
     }
 };`,
     },
     solution: {
-      javascript: `function sumTwoNumbers(a, b) {
-  return a + b;
+      javascript: `function findMaximum(nums) {
+  if (nums.length === 0) return null;
+  return Math.max(...nums);
 }`,
       python: `class Solution:
-    def sum_two_numbers(self, a: int, b: int) -> int:
-        return a + b`,
+    def find_maximum(self, nums: list[int]) -> int:
+        if not nums:
+            return None
+        return max(nums)`,
       java: `class Solution {
-    public int sumTwoNumbers(int a, int b) {
-        return a + b;
+    public int findMaximum(int[] nums) {
+        if (nums.length == 0) return Integer.MIN_VALUE;
+        int max = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] > max) {
+                max = nums[i];
+            }
+        }
+        return max;
     }
 }`,
       cpp: `class Solution {
 public:
-    int sumTwoNumbers(int a, int b) {
-        return a + b;
+    int findMaximum(std::vector<int>& nums) {
+        if (nums.empty()) return INT_MIN;
+        return *std::max_element(nums.begin(), nums.end());
     }
 };`,
     },
-    tags: ["math", "beginner", "basic"],
+    tags: ["arrays", "beginner", "basic"],
   };
 }

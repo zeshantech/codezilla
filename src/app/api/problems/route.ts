@@ -21,7 +21,11 @@ export const GET = apiHandler(async (request: NextRequest) => {
 
   if (validatedParams.search) {
     const searchTerm = validatedParams.search.toLowerCase();
-    query = query.or([{ title: { $regex: searchTerm, $options: "i" } }, { description: { $regex: searchTerm, $options: "i" } }, { tags: { $in: [new RegExp(searchTerm, "i")] } }]);
+    query = query.or([
+      { title: { $regex: searchTerm, $options: "i" } },
+      { description: { $regex: searchTerm, $options: "i" } },
+      { tags: { $in: [new RegExp(searchTerm, "i")] } },
+    ]);
   }
 
   if (validatedParams?.categories && validatedParams.categories.length > 0) {
@@ -32,7 +36,10 @@ export const GET = apiHandler(async (request: NextRequest) => {
     query = query.where("isFeatured").equals(validatedParams.featured);
   }
 
-  if (validatedParams?.difficulties && validatedParams.difficulties.length > 0) {
+  if (
+    validatedParams?.difficulties &&
+    validatedParams.difficulties.length > 0
+  ) {
     query = query.where("difficulty").in(validatedParams.difficulties);
   }
 
@@ -66,13 +73,24 @@ export const GET = apiHandler(async (request: NextRequest) => {
   return { data: problems, status: StatusCodes.OK };
 });
 
+const generateSlug = async (title: string) => {
+  let slug = title.toLowerCase().replace(/ /g, "-");
+  const existingProblem = await Problem.findOne({ slug });
+  if (existingProblem) {
+    const dateNow = Date.now().toString();
+    slug = slug + "-" + dateNow.slice(dateNow.length - 4);
+  }
+
+  return slug;
+};
+
 export const POST = apiHandler(async (request: NextRequest) => {
   const validatedData = await validateCreateProblem(request);
 
   const newProblem = await Problem.create({
     ...validatedData,
     createdBy: CURRENT_USER_ID,
-    slug: validatedData.title.toLowerCase().replace(/ /g, "-"),
+    slug: await generateSlug(validatedData.title),
   });
 
   return { data: newProblem, status: StatusCodes.CREATED };

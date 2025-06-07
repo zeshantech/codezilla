@@ -33,6 +33,7 @@ import { ISubmission, SubmissionStatusEnum } from "@/types";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Copier from "../ui/copier";
+import DOMPurify from "dompurify";
 
 interface TabConfig {
   id: string;
@@ -44,35 +45,14 @@ interface TabConfig {
 
 // Tab Content Components
 function DescriptionContent({ problem }: { problem: any }) {
-  const [showConstraints, setShowConstraints] = useState<boolean>(true);
-
   return (
-    <div className="text-sm">
+    <div className="text-sm space-y-4">
       <div
-        className="prose prose-sm dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: problem.description }}
+        dangerouslySetInnerHTML={{
+          __html: problem.description,
+        }}
+        className="space-y-6 blog-content [&>h1]:text-3xl [&>h1]:font-bold [&>h2]:text-2xl [&>h2]:font-semibold [&>h3]:text-xl [&>h3]:font-semibold [&>p]:my-4 [&>ul]:list-disc [&>ul]:list-inside [&>ul]:space-y-2 [&>ol]:list-decimal [&>ol]:list-inside [&>ol]:space-y-2 [&>li]:ml-4 [&>img]:w-full [&>img]:rounded-lg [&>a]:text-blue-500 [&>a]:underline [&>blockquote]:border-l-4 [&>blockquote]:border-gray-300 [&>blockquote]:pl-4 [&>blockquote]:italic [&>pre]:bg-gray-100 [&>pre]:dark:bg-gray-800 [&>pre]:p-4 [&>pre]:rounded [&>code]:font-mono [&>code]:text-sm [&>table]:w-full [&>table]:border-collapse [&>th]:border [&>th]:border-gray-300 [&>th]:dark:border-gray-700 [&>th]:p-2 [&>td]:border [&>td]:border-gray-300 [&>td]:dark:border-gray-700 [&>td]:p-2"
       />
-
-      <div>
-        <div
-          className="flex items-center justify-between cursor-pointer mb-1"
-          onClick={() => setShowConstraints(!showConstraints)}
-        >
-          <h3 className="font-semibold text-base">Constraints</h3>
-          {showConstraints ? (
-            <ChevronUp className="size-4" />
-          ) : (
-            <ChevronDown className="size-4" />
-          )}
-        </div>
-        {showConstraints && (
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            {problem.constraints.map((constraint: string, idx: number) => (
-              <li key={idx}>{constraint}</li>
-            ))}
-          </ul>
-        )}
-      </div>
 
       <Separator />
 

@@ -11,7 +11,9 @@ export const getProblemsQuerySchema = z.object({
     .enum(["true", "false"])
     .optional()
     .transform((val) => stbConverter(val)),
-  sortBy: z.enum(["popularity", "newest", "title", "difficulty", "completion_rate"]).optional(),
+  sortBy: z
+    .enum(["popularity", "newest", "title", "difficulty", "completion_rate"])
+    .optional(),
   myProblems: z.boolean().optional(),
 });
 
@@ -20,7 +22,6 @@ export const createProblemSchema = z.object({
   difficulty: z.nativeEnum(DifficultyEnum),
   category: z.string(),
   description: z.string(),
-  constraints: z.array(z.string()),
   examples: z.array(
     z.object({
       input: z.string(),

@@ -4,68 +4,6 @@ import { toast } from "sonner";
 import * as collectionsAPI from "@/lib/api/collections";
 
 export function useCollections() {
-  const queryClient = useQueryClient();
-
-  const useAllCollections = (filters?: ICollectionFilters) => {
-    return useQuery({
-      queryKey: ["collections", filters],
-      queryFn: () => collectionsAPI.fetchCollections(filters),
-      staleTime: 1000 * 60 * 5,
-    });
-  };
-
-  const useCollection = (slug: string | undefined) => {
-    return useQuery({
-      queryKey: ["collection", slug],
-      queryFn: () => collectionsAPI.fetchCollectionBySlug(slug || ""),
-      enabled: !!slug,
-      staleTime: 1000 * 60 * 5,
-    });
-  };
-
-  const useFeaturedCollections = () => {
-    return useQuery({
-      queryKey: ["collections", "featured"],
-      queryFn: collectionsAPI.fetchFeaturedCollections,
-      staleTime: 1000 * 60 * 5,
-    });
-  };
-
-  const useCreateCollection = () => {
-    return useMutation({
-      mutationFn: (collection: ICollectionCreateInput) => {
-        return collectionsAPI.createCollection(collection);
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["collections"] });
-        toast.success("Collection created successfully!");
-      },
-      onError: (error) => {
-        toast.error("Failed to create collection");
-        console.error("Error creating collection:", error);
-      },
-    });
-  };
-
-  const useUpdateCollection = () => {
-    return useMutation({
-      mutationFn: ({ id, ...collection }: { id: string } & Partial<ICollectionCreateInput>) => {
-        return collectionsAPI.updateCollection(id, collection);
-      },
-      onSuccess: (updatedCollection) => {
-        queryClient.invalidateQueries({
-          queryKey: ["collection", updatedCollection.id],
-        });
-        queryClient.invalidateQueries({ queryKey: ["collections"] });
-        toast.success("Collection updated successfully!");
-      },
-      onError: (error) => {
-        toast.error("Failed to update collection");
-        console.error("Error updating collection:", error);
-      },
-    });
-  };
-
   const allCollectionsQuery = useAllCollections();
   const featuredCollectionsQuery = useFeaturedCollections();
   const createCollectionMutation = useCreateCollection();
@@ -100,4 +38,69 @@ export function useCollections() {
   };
 }
 
-export default useCollections;
+export const useAllCollections = (filters?: ICollectionFilters) => {
+  return useQuery({
+    queryKey: ["collections", filters],
+    queryFn: () => collectionsAPI.fetchCollections(filters),
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useCollection = (slug: string | undefined) => {
+  return useQuery({
+    queryKey: ["collection", slug],
+    queryFn: () => collectionsAPI.fetchCollectionBySlug(slug || ""),
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useFeaturedCollections = () => {
+  return useQuery({
+    queryKey: ["collections", "featured"],
+    queryFn: collectionsAPI.fetchFeaturedCollections,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useCreateCollection = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (collection: ICollectionCreateInput) => {
+      return collectionsAPI.createCollection(collection);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["collections"] });
+      toast.success("Collection created successfully!");
+    },
+    onError: (error) => {
+      toast.error("Failed to create collection");
+      console.error("Error creating collection:", error);
+    },
+  });
+};
+
+export const useUpdateCollection = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      ...collection
+    }: { id: string } & Partial<ICollectionCreateInput>) => {
+      return collectionsAPI.updateCollection(id, collection);
+    },
+    onSuccess: (updatedCollection) => {
+      queryClient.invalidateQueries({
+        queryKey: ["collection", updatedCollection.id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["collections"] });
+      toast.success("Collection updated successfully!");
+    },
+    onError: (error) => {
+      toast.error("Failed to update collection");
+      console.error("Error updating collection:", error);
+    },
+  });
+};

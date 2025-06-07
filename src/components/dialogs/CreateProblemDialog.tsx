@@ -28,7 +28,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useProblems } from "@/hooks/useProblems";
+import { useCreateProblem } from "@/hooks/useProblems";
 import { Card, CardContent } from "@/components/ui/card";
 import { Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -94,7 +94,8 @@ type FormValues = z.infer<typeof formSchema>;
 export function CreateProblemDialog() {
   const [open, setOpen] = useState(false);
   const [advancedOptions, setAdvancedOptions] = useState(false);
-  const { createProblem, isCreatingProblem } = useProblems();
+  const { mutate: createProblem, isPending: isCreatingProblem } =
+    useCreateProblem();
 
   // Initialize form with react-hook-form and zod validation
   const {
@@ -167,7 +168,7 @@ export function CreateProblemDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Sparkles className="mr-2 h-4 w-4" />
+          <Sparkles />
           Generate Problem
         </Button>
       </DialogTrigger>
