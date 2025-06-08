@@ -1,4 +1,7 @@
-import { IProblem, IUser, ProgrammingLanguageEnum } from "./index";
+import { ISchema } from "./index";
+import { ProgrammingLanguageEnum } from "./enums";
+import { IProblem } from "./problems";
+import { LucideIcon } from "lucide-react";
 
 export interface UserProfile extends IUser {
   settings: UserProfileSettings;
@@ -92,4 +95,88 @@ export interface ProfileContext {
   isError: boolean;
   updateProfile: (data: Partial<UserProfile>) => Promise<boolean>;
   updateSettings: (settings: Partial<UserProfileSettings>) => Promise<boolean>;
+}
+
+export interface IUserSettings {
+  notifications: {
+    email: boolean;
+    browser: boolean;
+    mobile: boolean;
+  };
+  appearance: {
+    theme: "light" | "dark" | "system";
+    codeFont: string;
+    fontSize: number;
+  };
+  preferences: {
+    defaultLanguage: ProgrammingLanguageEnum;
+    defaultTabSize: number;
+    autosave: boolean;
+  };
+  privacy: {
+    showActivity: boolean;
+    showSolutions: boolean;
+    showProfile: boolean;
+  };
+}
+
+export interface IUserProfileUpdate {
+  name?: string;
+  bio?: string;
+  avatarUrl?: string;
+  email?: string;
+}
+
+export interface IUserStats {
+  totalPoints: number;
+  rank: number;
+  completedProblems: number;
+  completedCollections: number;
+  streak: number;
+  joinedDate: string;
+}
+
+export interface IUserProfile {
+  id: string;
+  name: string;
+  email: string;
+  bio: string;
+  avatarUrl: string;
+  joinedDate: string;
+  settings: IUserSettings;
+}
+
+export interface IProblemStats {
+  attempted: number;
+  solved: number;
+  submissions: number;
+  successRate: number;
+  averageAttempts: number;
+  averageTime: number;
+}
+
+export interface ICategory {
+  id: string;
+  name: string;
+  count: number;
+  icon: LucideIcon;
+}
+
+export interface IUserProblemProgress {
+  problem: string;
+  status: "attempted" | "solved" | "not_started";
+  submissions: number;
+  lastSubmissionDate?: string;
+  timeTaken?: number;
+  code?: Record<ProgrammingLanguageEnum, string>;
+}
+
+export interface IUser extends ISchema {
+  problemsProgress: Record<string, IUserProblemProgress>;
+  completedProblems: number;
+  completedCollections: number;
+  createdProblems: number;
+  createdCollections: number;
+  streak: number;
+  points: number;
 }

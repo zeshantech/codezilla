@@ -1,5 +1,6 @@
 import { Schema, Document, Model, models, model } from "mongoose";
-import { DifficultyEnum, ICollection } from "@/types";
+import { DifficultyEnum } from "@/types/enums";
+import { ICollection } from "@/types/collections";
 import toJSON from "@/lib/plugins/toJSON";
 
 export interface CollectionDocument extends ICollection, Omit<Document, "id"> {}

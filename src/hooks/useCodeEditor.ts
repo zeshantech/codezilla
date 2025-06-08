@@ -1,18 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  IRunTestsOutput,
-  IError,
-  ISubmission,
-  ISaveSubmissionInput,
-  IRunTestCasesInput,
-} from "@/types";
+import { IRunTestsOutput, IRunTestCasesInput, IRunTestCasesOutput } from "@/types/testCases";
 import { toast } from "sonner";
 import { useCodeExecution } from "./useCodeExecution";
 import { CURRENT_USER } from "@/data/mock/users";
-import { ProgrammingLanguageEnum } from "@/types";
+import { ProgrammingLanguageEnum, ResultStatusEnum } from "@/types/enums";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api/api";
 import { useProblem } from "./useProblems";
+import { ISubmission } from "@/types/submissions";
 
 interface UseCodeEditorProps {
   problemSlug: string;
@@ -62,21 +57,6 @@ export function useCodeEditor({
       },
       staleTime: 1000 * 60 * 5,
       enabled: !!problemId,
-    });
-  };
-
-  const useSaveCode = () => {
-    return useMutation({
-      mutationFn: async () => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      },
-      onSuccess: () => {
-        setIsDirty(false);
-        toast.success("Code saved successfully!");
-      },
-      onError: () => {
-        toast.error("Failed to save code");
-      },
     });
   };
 
@@ -212,10 +192,10 @@ export function useCodeEditors(problemSlug: string) {
 
         return response.data;
       },
-      onSuccess: (result) => {
-        if (result.status === "error") {
+      onSuccess: (result: IRunTestCasesOutput) => {
+        if (result.status === ResultStatusEnum.FAILED) {
           toast.error("Test execution failed. Check the error message.");
-        } else if (result.allTestsPassed) {
+        } else if (result.) {
           toast.success("All tests passed! 🎉");
         } else {
           const passedCount =
@@ -250,8 +230,6 @@ export function useCodeEditors(problemSlug: string) {
     return code;
   }, []);
 
-  const saveSubmissionMutation = useSaveSubmission();
-
   return {
     problem,
     isLoadingProblem,
@@ -276,22 +254,16 @@ const useGetSubmissions = (problemId: string) => {
   });
 };
 
-const useSaveSubmission = () => {
-  const queryClient = useQueryClient();
+const useSaveCode = () => {
   return useMutation({
-    mutationFn: async (executionResult: ISaveSubmissionInput) => {
-      const response = await api.post("/submissions", executionResult);
-
-      return response.data;
+    mutationFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
     },
-    onSuccess: (submission: ISubmission) => {
-      queryClient.invalidateQueries({
-        queryKey: ["submissions", submission.problem],
-      });
+    onSuccess: () => {
+      toast.success("Code saved successfully!");
     },
-    onError: (error: string) => {
-      console.log(error);
-      toast.error(error || "Error saving submission");
+    onError: () => {
+      toast.error("Failed to save code");
     },
   });
 };

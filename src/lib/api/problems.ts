@@ -1,12 +1,8 @@
 "use server";
 
 import { Problem } from "../db/models/problem.model";
-import {
-  IProblem,
-  IProblemFilters,
-  IProblemSaveInput,
-  ProgrammingLanguageEnum,
-} from "@/types";
+import { IProblem, IProblemFilters, IProblemSaveInput } from "@/types/problems";
+import { ProgrammingLanguageEnum } from "@/types/enums";
 import api from "./api";
 
 export async function fetchProblems(

@@ -4,7 +4,7 @@ import EnhancedPlayground from "@/components/playground/EnhancedPlayground";
 import { SpinnerBackdrop } from "@/components/ui/spinner";
 import { CodeEditorProvider } from "@/contexts/CodeEditorContext";
 import { useProblem } from "@/hooks/useProblems";
-import { ProgrammingLanguageEnum } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types/enums";
 
 export default function Playground({ slug }: { slug: string }) {
   // const { data: problem, isLoading, isError } = useProblem(slug);

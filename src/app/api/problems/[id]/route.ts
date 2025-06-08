@@ -1,28 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { fetchProblemById } from "@/lib/api/problems";
-import dbConnect from "@/lib/db/connection";
+import { getProblemById } from "../helpers";
+import { apiHandler } from "@/lib/errorHandler";
+import { StatusCodes } from "@/constants/statusCodes";
 
-export async function GET(
-  _: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-): Promise<NextResponse> {
+export const GET = apiHandler(async (_, params: Promise<{ id: string }>) => {
   const { id } = await params;
+  const problem = await getProblemById(id);
 
-  try {
-    await dbConnect();
-
-    const problem = await fetchProblemById(id);
-
-    if (!problem) {
-      return NextResponse.json({ error: "Problem not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(problem);
-  } catch (error) {
-    console.error(`Error fetching problem ${id}:`, error);
-    return NextResponse.json(
-      { error: "Failed to fetch problem" },
-      { status: 500 }
-    );
-  }
-}
+  return { data: problem, status: StatusCodes.OK };
+});

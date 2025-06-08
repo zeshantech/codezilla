@@ -4,6 +4,7 @@ import { createValidator } from "@/lib/validator";
 import { apiHandler } from "@/lib/errorHandler";
 import { StatusCodes } from "@/constants/statusCodes";
 import { Problem } from "@/lib/db/models/problem.model";
+import { generateSlug } from "./helpers";
 
 const CURRENT_USER_ID = "666666666666666666666666";
 
@@ -72,17 +73,6 @@ export const GET = apiHandler(async (request: NextRequest) => {
   const problems = await query.exec();
   return { data: problems, status: StatusCodes.OK };
 });
-
-const generateSlug = async (title: string) => {
-  let slug = title.toLowerCase().replace(/ /g, "-");
-  const existingProblem = await Problem.findOne({ slug });
-  if (existingProblem) {
-    const dateNow = Date.now().toString();
-    slug = slug + "-" + dateNow.slice(dateNow.length - 4);
-  }
-
-  return slug;
-};
 
 export const POST = apiHandler(async (request: NextRequest) => {
   const validatedData = await validateCreateProblem(request);

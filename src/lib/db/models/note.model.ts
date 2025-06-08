@@ -1,5 +1,5 @@
 import { Schema, Document, models, Model, model } from "mongoose";
-import { INote } from "@/types";
+import { INote } from "@/types/notes";
 import toJSON from "@/lib/plugins/toJSON";
 
 export interface NoteDocument extends INote, Omit<Document, "id"> {}

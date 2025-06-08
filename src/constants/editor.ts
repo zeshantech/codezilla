@@ -1,4 +1,5 @@
-import { ProgrammingLanguageEnum, IEditorSettings } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types/enums";
+import { IEditorSettings } from "@/types/editor";
 
 export const DEFAULT_EDITOR_SETTINGS: IEditorSettings = {
   theme: "dark",

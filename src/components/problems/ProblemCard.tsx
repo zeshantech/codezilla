@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, Star, CheckCircle2, Clock, Award } from "lucide-react";
-import { IProblem } from "@/types";
+import { IProblem } from "@/types/problems";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

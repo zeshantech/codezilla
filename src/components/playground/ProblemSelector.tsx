@@ -3,7 +3,7 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { DifficultyEnum } from "@/types";
+import { DifficultyEnum } from "@/types/enums";
 import { useProblem, useAllProblems } from "@/hooks/useProblems";
 import {
   Drawer,

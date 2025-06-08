@@ -1,4 +1,4 @@
-import { ICodeExecutionInput, ICodeExecutionOutput } from "@/types";
+import { ICodeExecutionInput, ICodeExecutionOutput } from "@/types/testCases";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/api/api";
 

@@ -1,5 +1,5 @@
 import { Schema, Document, Model, models, model } from "mongoose";
-import { IEditorSettings } from "@/types";
+import { IEditorSettings } from "@/types/editor";
 import toJSON from "@/lib/plugins/toJSON";
 
 interface IEditorSettingsSchema {

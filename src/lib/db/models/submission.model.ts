@@ -1,24 +1,20 @@
 import { Schema, Document, Model, models, model } from "mongoose";
-import {
-  ISubmission,
-  ProgrammingLanguageEnum,
-  SubmissionStatusEnum,
-  ITestResult,
-} from "@/types";
+import { ISubmission } from "@/types/submissions";
 import toJSON from "@/lib/plugins/toJSON";
-
-export interface SubmissionDocument extends ISubmission, Omit<Document, "id"> {}
+import { ProgrammingLanguageEnum, ResultStatusEnum } from "@/types/enums";
+import { ITestResult } from "@/types/testCases";
 
 const TestResultSchema = new Schema<ITestResult>(
   {
     passed: { type: Boolean, required: true },
-    input: { type: String, required: true },
-    expectedOutput: { type: String, required: true },
-    actualOutput: { type: String, required: true },
-    testCaseId: { type: String, required: true },
+    output: { type: String, required: true },
+    testCase: { type: Schema.Types.ObjectId, ref: "TestCase", required: true },
+    error: { type: String },
   },
   { _id: false }
 );
+
+export interface SubmissionDocument extends ISubmission, Omit<Document, "id"> {}
 
 const SubmissionSchema = new Schema<ISubmission>(
   {
@@ -30,16 +26,15 @@ const SubmissionSchema = new Schema<ISubmission>(
       enum: Object.values(ProgrammingLanguageEnum),
       required: true,
     },
-    status: {
+    resultStatus: {
       type: String,
-      enum: Object.values(SubmissionStatusEnum),
+      enum: Object.values(ResultStatusEnum),
       required: true,
     },
     executionTime: { type: Number },
     memoryUsed: { type: Number },
-    testResults: { type: [TestResultSchema] },
     logs: { type: [String], default: [] },
-    error: { type: String },
+    testResults: { type: [TestResultSchema], default: [] },
   },
   {
     timestamps: true,
