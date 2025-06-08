@@ -5,22 +5,19 @@ import { IProblem, IProblemFilters, IProblemSaveInput } from "@/types/problems";
 import { ProgrammingLanguageEnum } from "@/types/enums";
 import api from "./api";
 
-export async function fetchProblems(
-  filters?: IProblemFilters
-): Promise<IProblem[]> {
+export async function fetchProblems(filters?: IProblemFilters): Promise<IProblem[]> {
   const response = await api.get("/problems", { params: filters });
   return response.data;
 }
 
-export async function fetchProblemById(id: string): Promise<IProblem | null> {
+export async function fetchProblemById(id: string): Promise<IProblem> {
   const response = await api.get(`/problems/${id}`);
   return response.data;
 }
 
-export async function fetchProblemBySlug(
-  slug: string
-): Promise<IProblem | null> {
+export async function fetchProblemBySlug(slug: string): Promise<IProblem> {
   const response = await api.get(`/problems/slug/${slug}`);
+
   return response.data;
 }
 
@@ -43,19 +40,12 @@ export async function fetchRandomProblem(): Promise<IProblem> {
   return problem;
 }
 
-export async function createProblem(
-  input: IProblemSaveInput
-): Promise<IProblem> {
+export async function createProblem(input: IProblemSaveInput): Promise<IProblem> {
   const response = await api.post("/problems", input);
   return response.data;
 }
 
-export async function updateProblemCode(
-  userId: string,
-  problemId: string,
-  code: string,
-  language: ProgrammingLanguageEnum
-): Promise<boolean> {
+export async function updateProblemCode(userId: string, problemId: string, code: string, language: ProgrammingLanguageEnum): Promise<boolean> {
   // await dbConnect();
 
   try {

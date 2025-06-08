@@ -11,19 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  LayoutGrid,
-  Code,
-  RefreshCw,
-} from "lucide-react";
+import { LayoutGrid, Code, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 export function LayoutSelector() {
-  const {
-    currentLayoutName,
-    applyLayout,
-    resetLayout,
-  } = useEditorLayoutContext();
+  const { currentLayoutName, applyLayout, resetLayout } =
+    useEditorLayoutContext();
 
   // Get human-readable names for layout presets
   const getLayoutName = (preset: LayoutPreset) => {

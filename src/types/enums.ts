@@ -13,6 +13,6 @@ export enum ProgrammingLanguageEnum {
 }
 
 export enum ResultStatusEnum {
-  PASSED = "passed",
+  SUCCESS = "success",
   FAILED = "failed",
 }

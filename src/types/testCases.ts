@@ -26,15 +26,39 @@ export interface IRunTestCasesInput {
   code: string;
   language: ProgrammingLanguageEnum;
   problemId: string;
-  testCaseIdz?: string[];
+  testCaseIdz: string[];
+}
+
+export interface ISubmitCodeInput {
+  code: string;
+  language: ProgrammingLanguageEnum;
+  problemId: string;
 }
 
 export interface IRunTestCasesOutput {
   status: ResultStatusEnum;
   error?: string;
+  failedTestCase?: ITestCase;
+  passedCount: number;
+  totalCount: number;
+  logs: string[];
+  testResults: {
+    passed: boolean;
+    output: string;
+    input: string;
+    expectedOutput: string;
+  }[];
+}
+
+export interface ISubmitCodeOutput {
+  status: ResultStatusEnum;
   executionTime: number;
   memoryUsed: number;
+  error?: string;
   failedTestCase?: ITestCase;
+  passedCount: number;
+  totalCount: number;
+  logs: string[];
 }
 
 export interface ICodeExecutionInput {
@@ -43,9 +67,7 @@ export interface ICodeExecutionInput {
 }
 
 export interface ICodeExecutionOutput {
-  status: "success" | "error";
-  output: string[];
+  status: ResultStatusEnum;
+  logs: string[];
   error?: string;
-  executionTime?: number;
-  memoryUsed?: number;
 }

@@ -5,7 +5,13 @@ export const RunTestsSchema = z.object({
   code: z.string(),
   language: z.nativeEnum(ProgrammingLanguageEnum),
   problemId: z.string(),
-  testCaseIdz: z.array(z.string()).optional(),
+  testCaseIdz: z.array(z.string()),
+});
+
+export const SubmitCodeSchema = z.object({
+  code: z.string(),
+  language: z.nativeEnum(ProgrammingLanguageEnum),
+  problemId: z.string(),
 });
 
 export const RunCodeSchema = z.object({

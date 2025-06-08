@@ -1,39 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  BookOpen,
-  FileCode,
-  CopyCheck,
-  PenSquare,
-  Settings,
-  Eye,
-  EyeOff,
-  MessageSquare,
-  Brain,
-} from "lucide-react";
+import { BookOpen, FileCode, CopyCheck, PenSquare, Settings, Eye, EyeOff, MessageSquare, Brain } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
-import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
+import { useCodeEditorStore } from "@/store/useCodeEditorStore";
 import { SpinnerBox } from "../ui/spinner";
 import { EmptyState } from "../ui/emptyState";
 import { AiHelpPanel } from "./AiHelpPanel";
 import { NotesPanel } from "./NotesPanel";
-import { ISubmission, SubmissionStatusEnum } from "@/types";
+import { ISubmission } from "@/types/submissions";
+import { ResultStatusEnum } from "@/types/enums";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Copier from "../ui/copier";
-import DOMPurify from "dompurify";
+import { useSubmissions } from "@/hooks/useCodeEditor";
 
 interface TabConfig {
   id: string;
@@ -64,29 +49,17 @@ function DescriptionContent({ problem }: { problem: any }) {
               <p className="font-medium">Example {idx + 1}:</p>
               <div className="mt-2 space-y-2">
                 <div className="grid grid-cols-[auto,1fr] gap-2">
-                  <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                    Input:
-                  </div>
-                  <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                    {example.input}
-                  </div>
+                  <div className="font-mono text-xs bg-background px-2 py-1 rounded">Input:</div>
+                  <div className="font-mono text-xs bg-background px-2 py-1 rounded">{example.input}</div>
                 </div>
                 <div className="grid grid-cols-[auto,1fr] gap-2">
-                  <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                    Output:
-                  </div>
-                  <div className="font-mono text-xs bg-background px-2 py-1 rounded">
-                    {example.output}
-                  </div>
+                  <div className="font-mono text-xs bg-background px-2 py-1 rounded">Output:</div>
+                  <div className="font-mono text-xs bg-background px-2 py-1 rounded">{example.output}</div>
                 </div>
                 {example.explanation && (
                   <div>
-                    <p className="text-xs text-muted-foreground mt-1 font-medium">
-                      Explanation:
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {example.explanation}
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1 font-medium">Explanation:</p>
+                    <p className="text-xs text-muted-foreground mt-1">{example.explanation}</p>
                   </div>
                 )}
               </div>
@@ -99,7 +72,7 @@ function DescriptionContent({ problem }: { problem: any }) {
 }
 
 function SolutionContent() {
-  const { problem } = useCodeEditorContext();
+  const problem = useCodeEditorStore((state) => state.problem);
 
   return (
     <div className="space-y-4">
@@ -120,9 +93,7 @@ function SolutionContent() {
             <FileCode className="h-6 w-6 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-medium mb-1">No solution available</h3>
-          <p className="text-muted-foreground">
-            Solution for this problem is not available yet.
-          </p>
+          <p className="text-muted-foreground">Solution for this problem is not available yet.</p>
         </div>
       )}
     </div>
@@ -130,19 +101,13 @@ function SolutionContent() {
 }
 
 function SubmissionsContent() {
-  const {
-    submissions,
-    isLoadingSubmissions,
-    updateCode,
-    changeLanguage,
-    language,
-  } = useCodeEditorContext();
+  const problem = useCodeEditorStore((state) => state.problem);
+  const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions(problem?.id || "");
 
   const handleLoadSubmission = (submission: ISubmission) => {
-    if (submission.language !== language) {
-      changeLanguage(submission.language);
-    }
-    updateCode(submission.code);
+    // TODO: implement this
+    //onLoadSubmission(submission);
+
     toast.success("Submission loaded");
   };
 
@@ -157,9 +122,7 @@ function SubmissionsContent() {
           <PenSquare className="h-6 w-6 text-muted-foreground" />
         </div>
         <h3 className="text-lg font-medium mb-1">Your Submissions</h3>
-        <p className="text-muted-foreground">
-          You haven't submitted any solutions yet.
-        </p>
+        <p className="text-muted-foreground">You haven't submitted any solutions yet.</p>
       </div>
     );
   }
@@ -172,48 +135,26 @@ function SubmissionsContent() {
           <div
             key={submission.id}
             className={`p-4 rounded-md border ${
-              submission.status === SubmissionStatusEnum.SOLVED
+              submission.resultStatus === ResultStatusEnum.SUCCESS
                 ? "bg-success/10 border-success/30"
-                : submission.status === SubmissionStatusEnum.FAILED
+                : submission.resultStatus === ResultStatusEnum.FAILED
                 ? "bg-error/10 border-error/30"
                 : "bg-warning/10 border-warning/30"
             }`}
           >
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center gap-2">
-                <Badge
-                  variant={
-                    submission.status === SubmissionStatusEnum.SOLVED
-                      ? "success"
-                      : submission.status === SubmissionStatusEnum.FAILED
-                      ? "error"
-                      : "warning"
-                  }
-                >
-                  {submission.status}
+                <Badge variant={submission.resultStatus === ResultStatusEnum.SUCCESS ? "success" : submission.resultStatus === ResultStatusEnum.FAILED ? "error" : "warning"}>
+                  {submission.resultStatus}
                 </Badge>
-                <span className="text-xs text-muted-foreground">
-                  {new Date(submission.createdAt).toLocaleString()}
-                </span>
+                <span className="text-xs text-muted-foreground">{new Date(submission.createdAt).toLocaleString()}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleLoadSubmission(submission)}
-                >
+                <Button variant="outline" size="sm" onClick={() => handleLoadSubmission(submission)}>
                   Load Code
                 </Button>
-                {submission.executionTime && (
-                  <span className="bg-muted px-2 py-1 rounded-md text-xs">
-                    {submission.executionTime} ms
-                  </span>
-                )}
-                {submission.memoryUsed && (
-                  <span className="bg-muted px-2 py-1 rounded-md text-xs">
-                    {submission.memoryUsed} MB
-                  </span>
-                )}
+                {submission.executionTime && <span className="bg-muted px-2 py-1 rounded-md text-xs">{submission.executionTime} ms</span>}
+                {submission.memoryUsed && <span className="bg-muted px-2 py-1 rounded-md text-xs">{submission.memoryUsed} MB</span>}
               </div>
             </div>
 
@@ -224,14 +165,14 @@ function SubmissionsContent() {
             </div>
 
             {/* TODO: check it later */}
-            {submission.error && (
+            {/* {submission.error && (
               <div className="mt-3 p-2 bg-error/10 rounded-md">
                 <h4 className="text-sm font-medium mb-1 text-error">Error</h4>
                 <pre className="text-xs text-error overflow-auto">
                   {submission.error}
                 </pre>
               </div>
-            )}
+            )} */}
           </div>
         ))}
       </div>
@@ -240,7 +181,9 @@ function SubmissionsContent() {
 }
 
 export function ProblemViewer() {
-  const { problem, isLoadingProblem } = useCodeEditorContext();
+  const problem = useCodeEditorStore((state) => state.problem);
+  const isLoadingProblem = useCodeEditorStore((state) => state.isLoadingProblem);
+
   const [activeTab, setActiveTab] = useState<string>("description");
   const [tabConfig, setTabConfig] = useState<TabConfig[]>([]);
 
@@ -259,11 +202,7 @@ export function ProblemViewer() {
   };
 
   const toggleTabVisibility = (tabId: string) => {
-    setTabConfig((prev) =>
-      prev.map((tab) =>
-        tab.id === tabId ? { ...tab, visible: !tab.visible } : tab
-      )
-    );
+    setTabConfig((prev) => prev.map((tab) => (tab.id === tabId ? { ...tab, visible: !tab.visible } : tab)));
   };
 
   // Initialize tab config when problem is available
@@ -314,25 +253,17 @@ export function ProblemViewer() {
   }
 
   if (!problem) {
-    return (
-      <EmptyState
-        title="Problem not found"
-        description="The problem you're looking for doesn't exist or has been removed."
-        icon={<FileCode />}
-      />
-    );
+    return <EmptyState title="Problem not found" description="The problem you're looking for doesn't exist or has been removed." icon={<FileCode />} />;
   }
 
   return (
-    <Card className="h-full overflow-auto">
+    <Card className="h-full overflow-auto border-none shadow-none">
       <CardHeader className="space-y-2">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-wrap">
               <CardTitle>{problem.title}</CardTitle>
-              <Badge variant={getDifficultyBadge(problem.difficulty)}>
-                {problem.difficulty}
-              </Badge>
+              <Badge variant={getDifficultyBadge(problem.difficulty)}>{problem.difficulty}</Badge>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="secondary">{problem.category}</Badge>
@@ -346,25 +277,14 @@ export function ProblemViewer() {
                   <div className="space-y-4">
                     <h4 className="font-medium">Tab Settings</h4>
                     {tabConfig.map((tab) => (
-                      <div
-                        key={tab.id}
-                        className="flex items-center justify-between"
-                      >
+                      <div key={tab.id} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {tab.icon}
                           <Label>{tab.label}</Label>
                         </div>
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => toggleTabVisibility(tab.id)}
-                            className="p-1 hover:bg-muted rounded-md"
-                            title={tab.visible ? "Hide tab" : "Show tab"}
-                          >
-                            {tab.visible ? (
-                              <Eye className="size-4" />
-                            ) : (
-                              <EyeOff className="size-4" />
-                            )}
+                          <button onClick={() => toggleTabVisibility(tab.id)} className="p-1 hover:bg-muted rounded-md" title={tab.visible ? "Hide tab" : "Show tab"}>
+                            {tab.visible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
                           </button>
                         </div>
                       </div>
@@ -397,33 +317,7 @@ export function ProblemViewer() {
         </Tabs>
       </CardHeader>
 
-      <CardContent className="space-y-4 h-full">
-        {tabConfig.find((tab) => tab.id === activeTab)?.component}
-      </CardContent>
+      <CardContent className="space-y-4 h-full">{tabConfig.find((tab) => tab.id === activeTab)?.component}</CardContent>
     </Card>
-  );
-}
-
-// Simple Select component for the solution tab
-function Select({
-  defaultValue,
-  options,
-}: {
-  defaultValue: string;
-  options: { value: string; label: string }[];
-}) {
-  return (
-    <div className="relative inline-block text-left">
-      <select
-        className="bg-muted/30 text-xs rounded-md px-2 py-1 border-border"
-        defaultValue={defaultValue}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
   );
 }

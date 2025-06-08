@@ -2,14 +2,7 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  CheckCircle2,
-  Clock,
-  Tag,
-  Users,
-} from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CheckCircle2, Clock, Tag, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -17,8 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProblemDetail } from "@/components/problems/ProblemDetail";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AppFooter } from "@/components/layout/AppFooter";
-import { useProblem } from "@/hooks/useProblems";
 import { CURRENT_USER } from "@/data/mock/users";
+import { useCodeEditorStore } from "@/store/useCodeEditorStore";
 
 // Create a client
 interface ProblemDetailPageProps {
@@ -32,7 +25,9 @@ export default function ProblemView({ params }: ProblemDetailPageProps) {
   const [activeTab, setActiveTab] = useState("description");
 
   // Fetch problem by slug
-  const { data: problem, isLoading, isError } = useProblem(slug);
+  const problem = useCodeEditorStore((state) => state.problem);
+  const isLoading = useCodeEditorStore((state) => state.isLoadingProblem);
+  const isError = useCodeEditorStore((state) => state.isErrorLoadingProblem);
 
   // Get user's progress on this problem
   const userProgress = problem
@@ -68,10 +63,7 @@ export default function ProblemView({ params }: ProblemDetailPageProps) {
           <div className="container">
             <div className="flex flex-col items-center justify-center h-[400px] text-center">
               <h1 className="text-2xl font-bold mb-4">Problem Not Found</h1>
-              <p className="text-muted-foreground mb-6">
-                The problem you're looking for doesn't exist or has been
-                removed.
-              </p>
+              <p className="text-muted-foreground mb-6">The problem you're looking for doesn't exist or has been removed.</p>
               <Button asChild>
                 <Link href="/problems">
                   <ArrowLeft className="mr-2 h-4 w-4" />
@@ -131,22 +123,12 @@ export default function ProblemView({ params }: ProblemDetailPageProps) {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <h1 className="text-3xl font-bold">{problem.title}</h1>
-                  <Badge
-                    variant="outline"
-                    className={getDifficultyBadge(problem.difficulty)}
-                  >
+                  <Badge variant="outline" className={getDifficultyBadge(problem.difficulty)}>
                     {problem.difficulty}
                   </Badge>
                   {problemStatus !== "not_started" && (
-                    <Badge
-                      variant="outline"
-                      className={getStatusBadge(problemStatus)}
-                    >
-                      {problemStatus === "solved" ? (
-                        <CheckCircle2 className="mr-1 h-3 w-3" />
-                      ) : (
-                        <Clock className="mr-1 h-3 w-3" />
-                      )}
+                    <Badge variant="outline" className={getStatusBadge(problemStatus)}>
+                      {problemStatus === "solved" ? <CheckCircle2 className="mr-1 h-3 w-3" /> : <Clock className="mr-1 h-3 w-3" />}
                       {problemStatus === "solved" ? "Solved" : "Attempted"}
                     </Badge>
                   )}
@@ -157,11 +139,7 @@ export default function ProblemView({ params }: ProblemDetailPageProps) {
               <div className="flex gap-2">
                 <Button variant="default" asChild>
                   <Link href={`/playground/${problem.slug}`}>
-                    {problemStatus === "solved"
-                      ? "View Solution"
-                      : problemStatus === "attempted"
-                      ? "Continue Solving"
-                      : "Solve Problem"}
+                    {problemStatus === "solved" ? "View Solution" : problemStatus === "attempted" ? "Continue Solving" : "Solve Problem"}
                     <ArrowUpRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -171,9 +149,7 @@ export default function ProblemView({ params }: ProblemDetailPageProps) {
             <div className="flex flex-wrap items-center gap-2 mt-2">
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <Users className="h-4 w-4" />
-                <span>
-                  {problem.completionCount.toLocaleString()} completions
-                </span>
+                <span>{problem.completionCount.toLocaleString()} completions</span>
               </div>
               <div className="flex flex-wrap gap-1 items-center">
                 <Tag className="h-4 w-4 text-muted-foreground mr-1" />
@@ -206,29 +182,18 @@ export default function ProblemView({ params }: ProblemDetailPageProps) {
                   <h3 className="text-lg font-medium mb-3">Hints</h3>
                   <div className="space-y-3">
                     <div className="p-3 bg-muted/40 rounded">
-                      <p>
-                        Try thinking about this problem in terms of a hash map
-                        for O(n) time complexity.
-                      </p>
+                      <p>Try thinking about this problem in terms of a hash map for O(n) time complexity.</p>
                     </div>
                     <div className="p-3 bg-muted/40 rounded">
-                      <p>
-                        Consider what happens when you encounter a duplicate
-                        value.
-                      </p>
+                      <p>Consider what happens when you encounter a duplicate value.</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="rounded-lg border p-6">
-                  <h3 className="text-lg font-medium mb-3">
-                    Community Solutions
-                  </h3>
+                  <h3 className="text-lg font-medium mb-3">Community Solutions</h3>
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">
-                      Solutions are available after you solve the problem or
-                      unlock them.
-                    </p>
+                    <p className="text-muted-foreground">Solutions are available after you solve the problem or unlock them.</p>
                     <Button className="mt-4" variant="outline">
                       Unlock Solutions
                     </Button>
@@ -240,10 +205,7 @@ export default function ProblemView({ params }: ProblemDetailPageProps) {
             <TabsContent value="discussion" className="mt-0">
               <div className="rounded-lg border p-6 text-center py-12">
                 <h3 className="text-lg font-medium mb-3">Discussion</h3>
-                <p className="text-muted-foreground">
-                  Join the conversation about this problem with other
-                  developers.
-                </p>
+                <p className="text-muted-foreground">Join the conversation about this problem with other developers.</p>
                 <Button className="mt-4" variant="outline">
                   View Discussions
                 </Button>

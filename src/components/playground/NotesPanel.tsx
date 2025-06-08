@@ -168,10 +168,10 @@ export function NotesPanel({ problemId }: NotesPanelProps) {
                   <div>
                     <Textarea
                       ref={textareaRef}
-                      value={editingNote.content}
+                      value={editingNote?.content}
                       onChange={(e) =>
                         setEditingNote({
-                          ...editingNote,
+                          id: editingNote?.id ?? "",
                           content: e.target.value,
                         })
                       }

@@ -1,12 +1,12 @@
 import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { IEditorSettings, ProgrammingLanguageEnum } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types/enums";
+import { IEditorSettings } from "@/types/editor";
 import useEditorSettings from "@/hooks/useEditorSettings";
 import EditorToolbar from "./EditorToolbar";
 import { Spinner } from "../ui/spinner";
-import { useCodeEditorContext } from "@/contexts/CodeEditorContext";
+import { useCodeEditorStore } from "@/store/useCodeEditorStore";
 import { DEFAULT_EDITOR_SETTINGS } from "@/constants/editor";
-import { useLocalSettings } from "./SettingsDialog";
 import debounce from "lodash.debounce";
 
 interface EnhancedCodeEditorProps {
@@ -14,33 +14,21 @@ interface EnhancedCodeEditorProps {
   autoFocus?: boolean;
 }
 
-export function EnhancedCodeEditor({
-  readOnly = false,
-  autoFocus = false,
-}: EnhancedCodeEditorProps) {
-  const {
-    code,
-    language,
-    updateCode,
-    formatCode: onFormat,
-    runCode,
-    resetCode,
-    saveCode,
-  } = useCodeEditorContext();
+export function EnhancedCodeEditor({ readOnly = false, autoFocus = false }: EnhancedCodeEditorProps) {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
 
-  const {
-    settings,
-    isSettingsLoading,
-    updateSettings,
-    isResetSettingsPending,
-    resetSettings,
-  } = useEditorSettings();
+  const code = useCodeEditorStore((state) => state.code);
+  const language = useCodeEditorStore((state) => state.language);
+  const updateCode = useCodeEditorStore((state) => state.updateCode);
+  const formatCode = useCodeEditorStore((state) => state.formatCode);
+  const executeCode = useCodeEditorStore((state) => state.executeCode);
+  const resetCode = useCodeEditorStore((state) => state.resetCode);
+  const saveCode = useCodeEditorStore((state) => state.saveCode);
 
-  const [effectiveSettings, setEffectiveSettings] = useState<IEditorSettings>(
-    DEFAULT_EDITOR_SETTINGS
-  );
+  const { settings, isSettingsLoading, updateSettings, isResetSettingsPending, resetSettings } = useEditorSettings();
+
+  const [effectiveSettings, setEffectiveSettings] = useState<IEditorSettings>(DEFAULT_EDITOR_SETTINGS);
 
   useEffect(() => {
     if (settings) {
@@ -116,34 +104,23 @@ export function EnhancedCodeEditor({
     });
 
     // Set the theme
-    monaco.editor.setTheme(
-      effectiveSettings.theme === "dark" ? "codezilla-dark" : "codezilla-light"
-    );
+    monaco.editor.setTheme(effectiveSettings.theme === "dark" ? "codezilla-dark" : "codezilla-light");
 
     // Register keyboard shortcuts if enabled
-    if (effectiveSettings.keyboardShortcuts.format && onFormat) {
-      editor.addCommand(
-        monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF,
-        () => onFormat()
-      );
+    if (effectiveSettings.keyboardShortcuts.format && formatCode) {
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => formatCode());
     }
 
     if (effectiveSettings.keyboardShortcuts.save && saveCode) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
-        saveCode()
-      );
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => saveCode());
     }
 
-    if (effectiveSettings.keyboardShortcuts.run && runCode) {
-      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
-        runCode()
-      );
+    if (effectiveSettings.keyboardShortcuts.run && executeCode) {
+      editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => executeCode());
     }
 
     if (effectiveSettings.keyboardShortcuts.reset && resetCode) {
-      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () =>
-        resetCode()
-      );
+      editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => resetCode());
     }
 
     // Focus editor if autoFocus is true
@@ -159,11 +136,7 @@ export function EnhancedCodeEditor({
       const editor = editorRef.current;
 
       // Update theme
-      monaco.editor.setTheme(
-        effectiveSettings.theme === "dark"
-          ? "codezilla-dark"
-          : "codezilla-light"
-      );
+      monaco.editor.setTheme(effectiveSettings.theme === "dark" ? "codezilla-dark" : "codezilla-light");
 
       // Update editor settings
       editor.updateOptions({
@@ -177,9 +150,7 @@ export function EnhancedCodeEditor({
         wordWrap: effectiveSettings.wordWrap ? "on" : "off",
         scrollBeyondLastLine: false,
         automaticLayout: true,
-        renderWhitespace: effectiveSettings.showInvisibles
-          ? "all"
-          : "selection",
+        renderWhitespace: effectiveSettings.showInvisibles ? "all" : "selection",
         cursorStyle: "line",
         cursorBlinking: "smooth",
         cursorSmoothCaretAnimation: "on",
@@ -191,13 +162,9 @@ export function EnhancedCodeEditor({
         formatOnType: false,
         folding: true,
         glyphMargin: false,
-        renderLineHighlight: effectiveSettings.highlightActiveLine
-          ? "all"
-          : "none",
+        renderLineHighlight: effectiveSettings.highlightActiveLine ? "all" : "none",
         suggestOnTriggerCharacters: effectiveSettings.autoComplete,
-        snippetSuggestions: effectiveSettings.enableSnippets
-          ? "inline"
-          : "none",
+        snippetSuggestions: effectiveSettings.enableSnippets ? "inline" : "none",
         quickSuggestions: effectiveSettings.autoComplete,
         parameterHints: { enabled: effectiveSettings.autoComplete },
         bracketPairColorization: { enabled: true },
@@ -209,44 +176,28 @@ export function EnhancedCodeEditor({
       });
 
       // Assign keyboard shortcuts
-      if (effectiveSettings.keyboardShortcuts.format && onFormat) {
-        editor.addCommand(
-          monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF,
-          () => onFormat()
-        );
+      if (effectiveSettings.keyboardShortcuts.format && formatCode) {
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => formatCode());
       }
 
       if (effectiveSettings.keyboardShortcuts.save && saveCode) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
-          saveCode()
-        );
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => saveCode());
       }
 
-      if (effectiveSettings.keyboardShortcuts.run && runCode) {
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
-          runCode()
-        );
+      if (effectiveSettings.keyboardShortcuts.run && executeCode) {
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => executeCode());
       }
 
       if (effectiveSettings.keyboardShortcuts.reset && resetCode) {
-        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () =>
-          resetCode()
-        );
+        editor.addCommand(monaco.KeyMod.Alt | monaco.KeyCode.KeyR, () => resetCode());
       }
     }
-  }, [effectiveSettings, readOnly, onFormat, saveCode, runCode, resetCode]);
+  }, [effectiveSettings, readOnly, formatCode, saveCode, executeCode, resetCode]);
 
   // Handle code changes
   const handleEditorChange: OnChange = (value) => {
     if (value !== undefined) {
       updateCode(value);
-    }
-  };
-
-  // Public method to format code
-  const formatCode = () => {
-    if (editorRef.current) {
-      editorRef.current.getAction("editor.action.formatDocument")?.run();
     }
   };
 
@@ -272,15 +223,9 @@ export function EnhancedCodeEditor({
 
   return (
     <div className="h-full w-full">
-      <EditorToolbar
-        onChangeSettings={handleSettingChange}
-        settings={effectiveSettings}
-        resetSettings={resetSettings}
-      />
+      <EditorToolbar onChangeSettings={handleSettingChange} settings={effectiveSettings} resetSettings={resetSettings} />
 
-      {(isSettingsLoading || isResetSettingsPending) && (
-        <Spinner className="absolute bottom-2 right-2 z-10" />
-      )}
+      {(isSettingsLoading || isResetSettingsPending) && <Spinner className="absolute bottom-2 right-2 z-10" />}
 
       <Editor
         height="100%"
@@ -288,11 +233,7 @@ export function EnhancedCodeEditor({
         value={code}
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}
-        theme={
-          effectiveSettings.theme === "dark"
-            ? "codezilla-dark"
-            : "codezilla-light"
-        }
+        theme={effectiveSettings.theme === "dark" ? "codezilla-dark" : "codezilla-light"}
         loading={
           <div className="flex items-center justify-center h-full">
             <Spinner>Loading editor...</Spinner>

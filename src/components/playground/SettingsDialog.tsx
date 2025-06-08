@@ -1,10 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  createContext,
-} from "react";
+import { useState, useEffect, useContext, createContext } from "react";
 import {
   Dialog,
   DialogClose,
@@ -28,10 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Settings, Keyboard, Code, PaintBucket, RotateCcw } from "lucide-react";
-import useEditorSettings from "@/hooks/useEditorSettings";
-import { cn, debounce } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { IEditorSettings } from "@/types";
+import { IEditorSettings } from "@/types/editor";
 import { DEFAULT_EDITOR_SETTINGS } from "@/constants/editor";
 
 const LocalSettingsContext = createContext<{

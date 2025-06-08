@@ -5,11 +5,7 @@ import { EnhancedCodeEditor } from "./EnhancedCodeEditor";
 import { EnhancedConsole } from "./EnhancedConsole";
 import { ProblemViewer } from "@/components/playground/ProblemViewer";
 import EnhancedToolbar from "./EnhancedToolbar";
-import {
-  ResizablePanel,
-  ResizablePanelGroup,
-  ResizableHandle,
-} from "@/components/ui/resizable";
+import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/components/ui/resizable";
 import { Card } from "@/components/ui/card";
 import { debounce } from "@/lib/utils";
 
@@ -46,14 +42,7 @@ export function EnhancedPlayground() {
             </>
           ) : null}
 
-          <ResizablePanel
-            defaultSize={
-              currentLayout.panels[PanelType.Problem].visible
-                ? 100 - currentLayout.panels[PanelType.Problem].size
-                : 100
-            }
-            minSize={40}
-          >
+          <ResizablePanel defaultSize={currentLayout.panels[PanelType.Problem].visible ? 100 - currentLayout.panels[PanelType.Problem].size : 100} minSize={40}>
             <ResizablePanelGroup direction="vertical">
               {currentLayout.panels[PanelType.Editor].visible && (
                 <>
@@ -61,9 +50,7 @@ export function EnhancedPlayground() {
                     defaultSize={currentLayout.panels[PanelType.Editor].size}
                     minSize={currentLayout.panels[PanelType.Editor].minSize}
                     className="p-2"
-                    onResize={(size) =>
-                      handlePanelResize(PanelType.Editor, size)
-                    }
+                    onResize={(size) => handlePanelResize(PanelType.Editor, size)}
                   >
                     <Card className="h-full py-0 overflow-hidden relative">
                       <EnhancedCodeEditor autoFocus />
@@ -74,16 +61,10 @@ export function EnhancedPlayground() {
                     <>
                       <ResizableHandle />
                       <ResizablePanel
-                        defaultSize={
-                          currentLayout.panels[PanelType.Console].size
-                        }
-                        minSize={
-                          currentLayout.panels[PanelType.Console].minSize
-                        }
+                        defaultSize={currentLayout.panels[PanelType.Console].size}
+                        minSize={currentLayout.panels[PanelType.Console].minSize}
                         className="p-2"
-                        onResize={(size) =>
-                          handlePanelResize(PanelType.Console, size)
-                        }
+                        onResize={(size) => handlePanelResize(PanelType.Console, size)}
                       >
                         <Card className="h-full py-0 overflow-hidden">
                           <EnhancedConsole />

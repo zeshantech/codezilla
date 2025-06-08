@@ -20,8 +20,9 @@ export function NotesEditor({
   placeholder = "Add a new note...",
   isLoading = false,
 }: NotesEditorProps) {
-  const [content, setContent] = useState(initialContent);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const [content, setContent] = useState(initialContent);
 
   useEffect(() => {
     if (textareaRef.current) {

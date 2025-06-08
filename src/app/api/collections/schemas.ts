@@ -1,4 +1,4 @@
-import { DifficultyEnum } from "@/types";
+import { DifficultyEnum } from "@/types/enums";
 import { stbConverter } from "@/lib/utils";
 import { z } from "zod";
 
@@ -12,7 +12,9 @@ export const getCollectionsQuerySchema = z.object({
     .enum(["true", "false"])
     .optional()
     .transform((val) => stbConverter(val)),
-  sortBy: z.enum(["popularity", "newest", "title", "difficulty", "completion_rate"]).optional(),
+  sortBy: z
+    .enum(["popularity", "newest", "title", "difficulty", "completion_rate"])
+    .optional(),
   myCollections: z.boolean().optional(),
 });
 
@@ -26,7 +28,10 @@ export const createCollectionSchema = z.object({
 });
 
 export const updateCollectionSchema = z.object({
-  title: z.string().min(3, { message: "Title must be at least 3 characters" }).optional(),
+  title: z
+    .string()
+    .min(3, { message: "Title must be at least 3 characters" })
+    .optional(),
   description: z.string().optional(),
   problems: z.array(z.string()).optional(),
   isPublic: z.boolean().optional(),
