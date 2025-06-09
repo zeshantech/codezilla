@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Filter, X } from "lucide-react";
-import { DifficultyEnum } from "@/types";
+import { DifficultyEnum } from "@/types/enums";
 import { debounce } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "../ui/search-input";

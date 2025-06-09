@@ -33,7 +33,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { DifficultyEnum } from "@/types";
+import { DifficultyEnum } from "@/types/enums";
 
 // Programming topics/concepts
 const programmingTopics = [

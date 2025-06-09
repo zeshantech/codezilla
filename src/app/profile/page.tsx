@@ -4,8 +4,13 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { AppFooter } from "@/components/layout/AppFooter";
 import { ProfileDashboard } from "@/components/profile/ProfileDashboard";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProfilePage() {
+  const { token } = useAuth();
+
+  console.log(token, "token");
+
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen flex-col">
