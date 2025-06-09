@@ -3,7 +3,7 @@ import { apiHandler } from "@/lib/errorHandler";
 import { createValidator } from "@/lib/validator";
 import { createSubmissionSchema } from "./schemas";
 import { Submission } from "@/lib/db/models/submission.model";
-import { SubmissionStatusEnum } from "@/types";
+import { ResultStatusEnum } from "@/types/enums";
 import { StatusCodes } from "@/constants/statusCodes";
 
 const CURRENT_USER_ID = "666666666666666666666666";
@@ -13,10 +13,10 @@ const validateCreateSubmission = createValidator(createSubmissionSchema, "body")
 export const POST = apiHandler(async (request: NextRequest) => {
   const validatedParams = await validateCreateSubmission(request);
 
-  let status: SubmissionStatusEnum = SubmissionStatusEnum.ATTEMPTED;
+  let status: ResultStatusEnum = ResultStatusEnum.FAILED;
 
   const executionResult = {
-    status: "success",
+    status: ResultStatusEnum.SUCCESS,
     output: ["Test case 1 passed", "Test case 2 passed"],
     testResults: [
       { passed: true, input: "1 2", expectedOutput: "3", actualOutput: "3", testCaseId: 1 },
@@ -29,9 +29,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
   };
 
   if (executionResult.testResults?.length) {
-    status = executionResult.allTestsPassed ? SubmissionStatusEnum.SOLVED : SubmissionStatusEnum.FAILED;
-  } else if (executionResult.status === "error") {
-    status = SubmissionStatusEnum.FAILED;
+    status = executionResult.allTestsPassed ? ResultStatusEnum.SUCCESS : ResultStatusEnum.FAILED;
   }
 
   const submission = await Submission.create({

@@ -16,12 +16,14 @@ interface ICodeEditor {
   code: string;
   language: ProgrammingLanguageEnum;
   isDirty: boolean;
+  codeEditorRef: any;
 
   // actions
   updateCode: (newCode: string) => void;
   changeLanguage: (newLanguage: ProgrammingLanguageEnum) => void;
   formatCode: () => void;
   resetCode: () => void;
+  setCodeEditorRef: (ref: any) => void;
 
   saveCodeResult: ICodeExecutionOutput | null; // TODO: will change
   saveCode: () => void;
@@ -61,6 +63,7 @@ export const useCodeEditorStore = create<ICodeEditor>((set, get) => ({
   code: "",
   language: ProgrammingLanguageEnum.JAVASCRIPT,
   isDirty: false,
+  codeEditorRef: null,
 
   saveCodeResult: null,
   isSavingCode: false,
@@ -146,6 +149,9 @@ export const useCodeEditorStore = create<ICodeEditor>((set, get) => ({
   },
   submitCode: () => {
     // Implementation will be handled by the useInitializeCodeEditor hook
+  },
+  setCodeEditorRef: (ref: any) => {
+    set({ codeEditorRef: ref });
   },
 }));
 

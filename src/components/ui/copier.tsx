@@ -3,13 +3,7 @@ import { cn } from "@/lib/utils";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
-export default function Copier({
-  text,
-  className,
-}: {
-  text: string;
-  className?: string;
-}) {
+export default function Copier({ text, className }: { text: string; className?: string }) {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = () => {
@@ -21,17 +15,8 @@ export default function Copier({
   };
 
   return (
-    <Button
-      variant="outline"
-      onClick={handleCopy}
-      className={className}
-      size="icon-sm"
-    >
-      {isCopied ? (
-        <Check className={cn("size-4 text-success")} />
-      ) : (
-        <Copy className={cn("size-4")} />
-      )}
+    <Button variant="outline" onClick={handleCopy} className={className} size="icon-sm">
+      {isCopied ? <Check className={cn("size-4 text-success")} /> : <Copy className={cn("size-4")} />}
     </Button>
   );
 }

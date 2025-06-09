@@ -4,15 +4,10 @@ import { CURRENT_USER } from "@/data/mock/users";
 import { PROBLEMS } from "@/data/mock/problems";
 import { CATEGORIES } from "@/data/mock/categories";
 import { toast } from "sonner";
-import {
-  UserProfile,
-  UserProfileSettings,
-  SkillStat,
-  ProblemsByCategory,
-  ProblemStatusCount,
-  ActivityRecord,
-} from "@/types/profile";
-import { ICategory, IProblem, ProgrammingLanguageEnum } from "@/types";
+import { UserProfile, UserProfileSettings, SkillStat, ProblemsByCategory, ProblemStatusCount, ActivityRecord } from "@/types/profile";
+import { ProgrammingLanguageEnum } from "@/types/enums";
+import { IProblem } from "@/types/problems";
+import { ICategory } from "@/types/profile";
 
 // Mock data for user profile
 const MOCK_PROFILE = {
@@ -44,8 +39,7 @@ const MOCK_PROFILE = {
       id: "badge-1",
       name: "Problem Solver",
       description: "Solved 10 problems",
-      imageUrl:
-        "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
+      imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
       earnedAt: "2023-02-15T00:00:00Z",
       level: "bronze",
     },
@@ -53,8 +47,7 @@ const MOCK_PROFILE = {
       id: "badge-2",
       name: "Streak Master",
       description: "Maintained a 5-day streak",
-      imageUrl:
-        "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
+      imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
       earnedAt: "2023-03-10T00:00:00Z",
       level: "silver",
     },
@@ -62,8 +55,7 @@ const MOCK_PROFILE = {
       id: "badge-3",
       name: "JavaScript Guru",
       description: "Solved 5 problems in JavaScript",
-      imageUrl:
-        "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
+      imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
       earnedAt: "2023-02-20T00:00:00Z",
       level: "bronze",
     },
@@ -81,7 +73,7 @@ const MOCK_PROFILE = {
   ],
   languageStats: {
     javascript: {
-      language:ProgrammingLanguageEnum.JAVASCRIPT,
+      language: ProgrammingLanguageEnum.JAVASCRIPT,
       problemsSolved: 8,
       percentage: 70,
       experienceLevel: "Intermediate",
@@ -93,7 +85,7 @@ const MOCK_PROFILE = {
       experienceLevel: "Beginner",
     },
     java: {
-      language:ProgrammingLanguageEnum.JAVA,
+      language: ProgrammingLanguageEnum.JAVA,
       problemsSolved: 1,
       percentage: 5,
       experienceLevel: "Beginner",
@@ -180,9 +172,7 @@ const updateUserProfile = async (_: Partial<UserProfile>): Promise<boolean> => {
 };
 
 // Update user settings
-const updateUserSettings = async (
-  _: Partial<UserProfileSettings>
-): Promise<boolean> => {
+const updateUserSettings = async (_: Partial<UserProfileSettings>): Promise<boolean> => {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 600));
   // In a real app, this would call an API endpoint to update settings
@@ -198,22 +188,15 @@ const calculateSkillStats = (
   const stats: SkillStat[] = [];
 
   categories.forEach((category) => {
-    const categoryProblems = problems.filter(
-      (p) => p.category === category.name
-    );
-    const solvedProblems = categoryProblems.filter(
-      (p) => userProgress[p.id]?.status === "solved"
-    ).length;
+    const categoryProblems = problems.filter((p) => p.category === category.name);
+    const solvedProblems = categoryProblems.filter((p) => userProgress[p.id]?.status === "solved").length;
 
     stats.push({
       categoryId: category.id,
       categoryName: category.name,
       problemsSolved: solvedProblems,
       totalProblems: categoryProblems.length,
-      percentage:
-        categoryProblems.length > 0
-          ? Math.round((solvedProblems / categoryProblems.length) * 100)
-          : 0,
+      percentage: categoryProblems.length > 0 ? Math.round((solvedProblems / categoryProblems.length) * 100) : 0,
     });
   });
 
@@ -228,9 +211,7 @@ const getProblemsByCategory = (
   userProgress: any // TODO: UserProfile["problemsProgress"]
 ): ProblemsByCategory[] => {
   return categories.map((category) => {
-    const categoryProblems = problems.filter(
-      (p) => p.category === category.name
-    );
+    const categoryProblems = problems.filter((p) => p.category === category.name);
 
     // Count problems by status
     const statusCount: ProblemStatusCount = {
@@ -303,11 +284,7 @@ export function useProfile() {
 
   // Get skill stats
   const getSkillStats = useCallback((limit?: number) => {
-    const stats = calculateSkillStats(
-      PROBLEMS,
-      CATEGORIES,
-      MOCK_PROFILE.badges
-    );
+    const stats = calculateSkillStats(PROBLEMS, CATEGORIES, MOCK_PROFILE.badges);
     return limit ? stats.slice(0, limit) : stats;
   }, []);
 
@@ -320,9 +297,7 @@ export function useProfile() {
   const getActivityHistory = useCallback((days: number = 30) => {
     // Get the requested number of days, but return them in reverse order (newest first)
     // so that newer dates appear first in charts and displays
-    return [...MOCK_PROFILE.activityHistory]
-      .slice(0, days)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return [...MOCK_PROFILE.activityHistory].slice(0, days).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, []);
 
   // Get language statistics

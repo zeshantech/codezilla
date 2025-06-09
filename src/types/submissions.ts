@@ -15,6 +15,19 @@ export interface ISubmission extends ISchema {
   testResults: ITestResult[];
 }
 
+export interface IPerformanceDistribution {
+  value: number;
+  count: number;
+  percentage: number;
+}
+
+export interface ISubmissionDetails extends ISubmission {
+  runtimeDistribution?: IPerformanceDistribution[];
+  memoryDistribution?: IPerformanceDistribution[];
+  runtimePercentile?: number;
+  memoryPercentile?: number;
+}
+
 export interface ICreateSubmissionInput {
   problemId: string;
   code: string;

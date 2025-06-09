@@ -1,4 +1,5 @@
-import { DifficultyEnum, IProblem } from "@/types";
+import { IProblem } from "@/types/problems";
+import { DifficultyEnum } from "@/types/enums";
 import { getStarterCode } from "./starterCode";
 
 export const PROBLEMS: IProblem[] = [
@@ -111,8 +112,7 @@ export const PROBLEMS: IProblem[] = [
     slug: "longest-substring-without-repeating-characters",
     difficulty: DifficultyEnum.MEDIUM,
     category: "Strings",
-    description:
-      "Given a string s, find the length of the longest substring without repeating characters.",
+    description: "Given a string s, find the length of the longest substring without repeating characters.",
     examples: [
       {
         input: 's = "abcabcbb"',
@@ -127,8 +127,7 @@ export const PROBLEMS: IProblem[] = [
       {
         input: 's = "pwwkew"',
         output: "3",
-        explanation:
-          "The answer is 'wke', with the length of 3. Notice that the answer must be a substring, 'pwke' is a subsequence and not a substring.",
+        explanation: "The answer is 'wke', with the length of 3. Notice that the answer must be a substring, 'pwke' is a subsequence and not a substring.",
       },
     ],
     testCases: [
@@ -174,14 +173,12 @@ export const PROBLEMS: IProblem[] = [
       {
         input: "nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3",
         output: "[1,2,2,3,5,6]",
-        explanation:
-          "The arrays we are merging are [1,2,3] and [2,5,6]. The result of the merge is [1,2,2,3,5,6].",
+        explanation: "The arrays we are merging are [1,2,3] and [2,5,6]. The result of the merge is [1,2,2,3,5,6].",
       },
       {
         input: "nums1 = [1], m = 1, nums2 = [], n = 0",
         output: "[1]",
-        explanation:
-          "The arrays we are merging are [1] and []. The result of the merge is [1].",
+        explanation: "The arrays we are merging are [1] and []. The result of the merge is [1].",
       },
     ],
     testCases: [
@@ -270,14 +267,12 @@ export const PROBLEMS: IProblem[] = [
       {
         input: "prices = [7,1,5,3,6,4]",
         output: "5",
-        explanation:
-          "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5. Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.",
+        explanation: "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5. Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.",
       },
       {
         input: "prices = [7,6,4,3,1]",
         output: "0",
-        explanation:
-          "In this case, no transactions are done and the max profit = 0.",
+        explanation: "In this case, no transactions are done and the max profit = 0.",
       },
     ],
     testCases: [

@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import Keycloak, { IProfile } from "keycloak-js";
 import { initKeycloak, login, logout, getProfile } from "@/lib/keycloak";
 import { noop } from "@/lib/utils";
@@ -31,9 +25,7 @@ const defaultValue: AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>(defaultValue);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [token, setToken] = useState<string | undefined>(undefined);
@@ -44,7 +36,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     try {
       if (authenticated && keycloak) {
         const userProfile = await getProfile();
-        setProfile(userProfile);
+        setProfile({
+          ...userProfile,
+          avatar: Array.isArray(userProfile?.attributes?.avatar) ? userProfile?.attributes?.avatar[0] : userProfile?.attributes?.avatar ?? "",
+          bio: userProfile?.attributes?.bio ?? "",
+        });
       } else {
         setProfile(undefined);
       }
@@ -68,8 +64,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         await keycloak.init({
           onLoad: "check-sso",
-          silentCheckSsoRedirectUri:
-            window.location.origin + "/silent-check-sso.html",
+          silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
           checkLoginIframe: false,
         });
 

@@ -17,7 +17,6 @@ export const POST = apiHandler(async (req: NextRequest) => {
   const validatedParams = await validateSubmitCode(req);
 
   const problem = await getProblemById(validatedParams.problemId);
-
   const testCases = await TestCase.find({ problem: problem._id });
 
   await createSubmission(
@@ -32,11 +31,7 @@ export const POST = apiHandler(async (req: NextRequest) => {
         error: "Undefined is not a function (evaluating 'undefined.split')",
         testCase: testCase.id,
       })),
-      logs: [
-        "Undefined is not a function (evaluating 'undefined.split')",
-        "Undefined is not a function (evaluating 'undefined.split')",
-        "Undefined is not a function (evaluating 'undefined.split')",
-      ],
+      logs: ["Undefined is not a function (evaluating 'undefined.split')", "Undefined is not a function (evaluating 'undefined.split')", "Undefined is not a function (evaluating 'undefined.split')"],
       executionTime: 100,
       memoryUsed: 100,
     },
@@ -52,6 +47,7 @@ export const POST = apiHandler(async (req: NextRequest) => {
       failedTestCase: testCases[1],
       passedCount: 0,
       totalCount: testCases.length,
+      logs: ["Undefined is not a function (evaluating 'undefined.split')", "Undefined is not a function (evaluating 'undefined.split')", "Undefined is not a function (evaluating 'undefined.split')"],
     } satisfies ISubmitCodeOutput,
     status: StatusCodes.OK,
   };

@@ -1,10 +1,7 @@
 import { Submission } from "@/lib/db/models/submission.model";
 import { ICreateSubmissionInput } from "@/types/submissions";
 
-export const createSubmission = async (
-  input: ICreateSubmissionInput,
-  userId: string
-) => {
+export const createSubmission = async (input: ICreateSubmissionInput, userId: string) => {
   const submission = await Submission.create({
     user: userId,
     problem: input.problemId,

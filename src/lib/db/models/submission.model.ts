@@ -48,5 +48,4 @@ SubmissionSchema.index({ createdAt: -1 });
 
 SubmissionSchema.plugin(toJSON);
 
-export const Submission: Model<ISubmission> =
-  models?.Submission || model<ISubmission>("Submission", SubmissionSchema);
+export const Submission: Model<ISubmission> = models?.Submission || model<ISubmission>("Submission", SubmissionSchema);

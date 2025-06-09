@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BookOpen, FileCode, CopyCheck, PenSquare, Settings, Eye, EyeOff, MessageSquare, Brain } from "lucide-react";
+import { BookOpen, FileCode, CopyCheck, PenSquare, Settings, Eye, EyeOff, MessageSquare, Brain, Timer, Watch, Clock, MemoryStick, Cpu } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -19,6 +19,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Copier from "../ui/copier";
 import { useSubmissions } from "@/hooks/useCodeEditor";
+import { SubmissionDetails } from "./SubmissionDetails";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
+import dayjs from "dayjs";
 
 interface TabConfig {
   id: string;
@@ -78,12 +81,13 @@ function SolutionContent() {
     <div className="space-y-4">
       {problem?.solution ? (
         Object.entries(problem.solution).map(([language, solution]) => (
-          <div>
-            <h3 className="font-semibold text-base capitalize">{language}</h3>
-
-            <div className="bg-muted p-4 rounded-md overflow-auto whitespace-pre-wrap relative">
-              <Copier text={solution} className="absolute top-2 right-2" />
-              {solution}
+          <div className="max-h-96">
+            <h3 className="font-medium mb-2 capitalize">{language}</h3>
+            <div className="bg-muted p-4 rounded-md overflow-auto relative group">
+              <Copier text={solution} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100" />
+              <pre className="text-xs">
+                <code>{solution}</code>
+              </pre>
             </div>
           </div>
         ))
@@ -103,12 +107,19 @@ function SolutionContent() {
 function SubmissionsContent() {
   const problem = useCodeEditorStore((state) => state.problem);
   const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions(problem?.id || "");
+  const codeEditorRef = useCodeEditorStore((state) => state.codeEditorRef);
 
-  const handleLoadSubmission = (submission: ISubmission) => {
-    // TODO: implement this
-    //onLoadSubmission(submission);
+  const handleLoadSubmission = (code: string) => {
+    if (codeEditorRef) {
+      codeEditorRef.setValue(code);
+      toast.success("Code loaded successfully");
+    } else {
+      toast.error("Code editor not ready");
+    }
+  };
 
-    toast.success("Submission loaded");
+  const handleLoadCode = (submission: ISubmission) => {
+    handleLoadSubmission(submission.code);
   };
 
   if (isLoadingSubmissions) {
@@ -128,55 +139,52 @@ function SubmissionsContent() {
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Your Submissions</h3>
-      <div className="space-y-4">
-        {submissions.map((submission: ISubmission) => (
-          <div
-            key={submission.id}
-            className={`p-4 rounded-md border ${
-              submission.resultStatus === ResultStatusEnum.SUCCESS
-                ? "bg-success/10 border-success/30"
-                : submission.resultStatus === ResultStatusEnum.FAILED
-                ? "bg-error/10 border-error/30"
-                : "bg-warning/10 border-warning/30"
-            }`}
-          >
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center gap-2">
-                <Badge variant={submission.resultStatus === ResultStatusEnum.SUCCESS ? "success" : submission.resultStatus === ResultStatusEnum.FAILED ? "error" : "warning"}>
-                  {submission.resultStatus}
+    <Accordion type="single" collapsible className="space-y-4">
+      {submissions.map((submission: ISubmission) => (
+        <AccordionItem
+          key={submission.id}
+          className={`rounded-md border ${submission.resultStatus === ResultStatusEnum.SUCCESS ? "bg-success/10 border-success/30" : "bg-error/10 border-error/30"}`}
+          value={submission.id}
+        >
+          <AccordionTrigger className="flex justify-between items-center hover:no-underline p-2">
+            <div className="flex items-center gap-2">
+              <Badge variant={submission.resultStatus === ResultStatusEnum.SUCCESS ? "success" : submission.resultStatus === ResultStatusEnum.FAILED ? "error" : "warning"}>
+                {submission.resultStatus}
+              </Badge>
+              <span className="text-xs text-muted-foreground">{dayjs(submission.createdAt).format("MMM D, YYYY h:mm A")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLoadCode(submission);
+                }}
+              >
+                Load Code
+              </Button>
+              {submission.executionTime && (
+                <Badge variant="outline" className="bg-muted">
+                  <Clock className="size-3" />
+                  {submission.executionTime} ms
                 </Badge>
-                <span className="text-xs text-muted-foreground">{new Date(submission.createdAt).toLocaleString()}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleLoadSubmission(submission)}>
-                  Load Code
-                </Button>
-                {submission.executionTime && <span className="bg-muted px-2 py-1 rounded-md text-xs">{submission.executionTime} ms</span>}
-                {submission.memoryUsed && <span className="bg-muted px-2 py-1 rounded-md text-xs">{submission.memoryUsed} MB</span>}
-              </div>
+              )}
+              {submission.memoryUsed && (
+                <Badge variant="outline" className="bg-muted">
+                  <Cpu className="size-3" />
+                  {submission.memoryUsed} MB
+                </Badge>
+              )}
             </div>
+          </AccordionTrigger>
 
-            <div className="bg-background p-3 rounded-md">
-              <pre className="text-xs overflow-auto max-h-36 hide-scrollbar">
-                <code>{submission.code}</code>
-              </pre>
-            </div>
-
-            {/* TODO: check it later */}
-            {/* {submission.error && (
-              <div className="mt-3 p-2 bg-error/10 rounded-md">
-                <h4 className="text-sm font-medium mb-1 text-error">Error</h4>
-                <pre className="text-xs text-error overflow-auto">
-                  {submission.error}
-                </pre>
-              </div>
-            )} */}
-          </div>
-        ))}
-      </div>
-    </div>
+          <AccordionContent className="bg-background p-2">
+            <SubmissionDetails problemId={problem?.id || ""} submissionId={submission.id} onLoadCode={handleLoadSubmission} />
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
   );
 }
 

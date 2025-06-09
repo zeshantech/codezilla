@@ -7,7 +7,7 @@ import { ProgrammingLanguageEnum, ResultStatusEnum } from "@/types/enums";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api/api";
 import { useProblem } from "./useProblems";
-import { ISubmission } from "@/types/submissions";
+import { ISubmission, ISubmissionDetails } from "@/types/submissions";
 import { IError } from "@/types";
 
 // export function useCodeEditor({
@@ -234,6 +234,18 @@ export const useSubmissions = (problemId: string) => {
   });
 };
 
+export const useSubmission = (problemId: string, submissionId: string) => {
+  return useQuery({
+    queryKey: ["submission", submissionId],
+    queryFn: async () => {
+      const response = await api.get<ISubmissionDetails>(`/submissions/${problemId}/${submissionId}`);
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5,
+    enabled: !!problemId && !!submissionId,
+  });
+};
+
 export const useSaveCode = () => {
   return useMutation({
     mutationFn: async () => {
@@ -258,7 +270,7 @@ export const useRunTestCases = () => {
       return response.data;
     },
     onSuccess: (result: IRunTestCasesOutput) => {
-      if (result.status === ResultStatusEnum.PASSED) {
+      if (result.status === ResultStatusEnum.SUCCESS) {
         toast.success("All tests passed! 🎉");
       } else {
         toast.info(`Passed ${result.passedCount}/${result.totalCount} tests.`);
@@ -284,7 +296,7 @@ export const useSubmitCode = () => {
       return response.data;
     },
     onSuccess: (result: ISubmitCodeOutput) => {
-      if (result.status === ResultStatusEnum.PASSED) {
+      if (result.status === ResultStatusEnum.SUCCESS) {
         toast.success("All tests passed! 🎉");
       } else {
         toast.info(`Passed ${result.passedCount}/${result.totalCount} tests.`);
