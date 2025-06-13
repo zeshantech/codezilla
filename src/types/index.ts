@@ -4,12 +4,7 @@ export interface ISchema {
   updatedAt?: Date;
 }
 
-export type SortOption =
-  | "popularity"
-  | "newest"
-  | "title"
-  | "difficulty"
-  | "completion_rate";
+export type SortOption = "popularity" | "newest" | "title" | "difficulty" | "completion_rate";
 
 export interface IError {
   message: string;

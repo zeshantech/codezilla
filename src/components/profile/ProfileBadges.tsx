@@ -1,49 +1,27 @@
 "use client";
 
-import { UserBadge } from "@/types/profile";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { Lock } from "lucide-react";
+import { useUserProfileStore } from "@/store/useUserProfileStore";
+import { BadgeLevelType } from "@/types/profile";
+import dayjs from "dayjs";
 
-interface ProfileBadgesProps {
-  badges: UserBadge[];
-}
+export function ProfileBadges() {
+  const [activeTab, setActiveTab] = useState<BadgeLevelType | "all">("all");
 
-export function ProfileBadges({ badges }: ProfileBadgesProps) {
-  const [activeTab, setActiveTab] = useState<
-    "all" | "bronze" | "silver" | "gold" | "platinum"
-  >("all");
+  const badges = useUserProfileStore((state) => state.badges) || [];
 
-  const filteredBadges =
-    activeTab === "all"
-      ? badges
-      : badges.filter((badge) => badge.level === activeTab);
+  const filteredBadges = activeTab === "all" ? badges : badges.filter((badge) => badge.level === activeTab);
 
   const badgeCounts = {
     bronze: badges.filter((badge) => badge.level === "bronze").length,
     silver: badges.filter((badge) => badge.level === "silver").length,
     gold: badges.filter((badge) => badge.level === "gold").length,
     platinum: badges.filter((badge) => badge.level === "platinum").length,
-  };
-
-  // Helper function to format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   };
 
   // Get badge level color
@@ -67,9 +45,7 @@ export function ProfileBadges({ badges }: ProfileBadgesProps) {
       <Card>
         <CardHeader>
           <CardTitle>Your Badges</CardTitle>
-          <CardDescription>
-            Badges earned through your achievements
-          </CardDescription>
+          <CardDescription>Badges earned through your achievements</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
@@ -125,21 +101,13 @@ export function ProfileBadges({ badges }: ProfileBadgesProps) {
                             />
                           </div>
                         </div>
-                        <Badge
-                          className={`absolute top-2 right-2 capitalize ${getBadgeLevelColor(
-                            badge.level
-                          )}`}
-                        >
-                          {badge.level}
-                        </Badge>
+                        <Badge className={`absolute top-2 right-2 capitalize ${getBadgeLevelColor(badge.level)}`}>{badge.level}</Badge>
                       </div>
                       <CardHeader className="pb-2">
                         <CardTitle className="text-lg">{badge.name}</CardTitle>
                         <CardDescription>{badge.description}</CardDescription>
                       </CardHeader>
-                      <CardFooter className="text-xs text-muted-foreground border-t pt-2">
-                        Earned on {formatDate(badge.earnedAt)}
-                      </CardFooter>
+                      <CardFooter className="text-xs text-muted-foreground border-t pt-2">Earned on {dayjs(badge.createdAt).format("DD MMM YYYY")}</CardFooter>
                     </Card>
                   ))
                 ) : (
@@ -148,10 +116,7 @@ export function ProfileBadges({ badges }: ProfileBadgesProps) {
                       <Lock />
                     </div>
                     <h3 className="font-medium mb-1">No badges yet</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Solve more problems to earn{" "}
-                      {activeTab !== "all" ? activeTab : ""} badges
-                    </p>
+                    <p className="text-sm text-muted-foreground mb-4">Solve more problems to earn {activeTab !== "all" ? activeTab : ""} badges</p>
                     <Button variant="outline" size="sm">
                       View available badges
                     </Button>

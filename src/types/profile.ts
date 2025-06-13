@@ -1,24 +1,96 @@
 import { ISchema } from "./index";
 import { ProgrammingLanguageEnum } from "./enums";
-import { IProblem } from "./problems";
-import { LucideIcon } from "lucide-react";
 
-export interface UserProfile extends IUser {
-  settings: UserProfileSettings;
-  badges: UserBadge[];
-  certificates: UserCertificate[];
-  languageStats: Record<ProgrammingLanguageEnum, LanguageStat>;
-  activityHistory: ActivityRecord[];
+export type BadgeLevelType = "bronze" | "silver" | "gold" | "platinum";
+export type ExperienceLevelType = "beginner" | "intermediate" | "advanced" | "expert";
+export type ThemeType = "light" | "dark" | "system";
+
+export interface IUser extends ISchema {
+  firstName: string;
+  lastName: string;
+  email: string;
+  avatarUrl: string;
+  bio: string;
 }
 
-export interface UserProfileSettings {
+export interface IProfile extends ISchema {
+  completedProblems: number;
+  completedCollections: number;
+  streak: number;
+  points: number;
+}
+
+export interface IGetProfileOutput {
+  profile: IProfile & IUser;
+  settings: ISettings;
+  badges: IBadge[];
+  certificates: ICertificate[];
+}
+
+export interface IGetStatsOutput {
+  difficultyStats: IDifficultyStats;
+  activityStats: IActivityStat[];
+  skillStats: ISkillStat[];
+  languageStats: ILanguageStat[];
+}
+
+export interface IDifficultyStats {
+  easy: {
+    solved: number;
+    total: number;
+    percentage: number;
+  };
+  medium: {
+    solved: number;
+    total: number;
+    percentage: number;
+  };
+  hard: {
+    solved: number;
+    total: number;
+    percentage: number;
+  };
+}
+
+export interface ILanguageStat {
+  language: ProgrammingLanguageEnum;
+  problemsSolved: number;
+  percentage: number;
+  experienceLevel: ExperienceLevelType;
+}
+
+export interface IActivityStat {
+  from: Date;
+  to: Date;
+  problemsSolved: number;
+  submissions: number;
+  week: string;
+}
+
+export interface IBadge extends ISchema {
+  name: string;
+  description: string;
+  imageUrl: string;
+  level: BadgeLevelType;
+}
+
+export interface ICertificate extends ISchema {
+  name: string;
+  description: string;
+  imageUrl: string;
+  expiresAt?: string;
+  credentialId: string;
+  credentialUrl: string;
+}
+
+export interface ISettings {
   notifications: {
     email: boolean;
     browser: boolean;
     mobile: boolean;
   };
   appearance: {
-    theme: "light" | "dark" | "system";
+    theme: ThemeType;
     codeFont: string;
     fontSize: number;
   };
@@ -34,7 +106,7 @@ export interface UserProfileSettings {
   };
 }
 
-export interface SkillStat {
+export interface ISkillStat {
   categoryId: string;
   categoryName: string;
   problemsSolved: number;
@@ -42,141 +114,34 @@ export interface SkillStat {
   percentage: number;
 }
 
-export interface LanguageStat {
-  language: ProgrammingLanguageEnum;
-  problemsSolved: number;
-  percentage: number;
-  experienceLevel: "Beginner" | "Intermediate" | "Advanced" | "Expert";
-}
-
-export interface ActivityRecord {
-  date: string;
-  problemsSolved: number;
-  submissions: number;
-}
-
-export interface UserBadge {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  earnedAt: string;
-  level: "bronze" | "silver" | "gold" | "platinum";
-}
-
-export interface UserCertificate {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  earnedAt: string;
-  expiresAt?: string;
-  credentialId: string;
-  credentialUrl: string;
-}
-
-export interface ProblemStatusCount {
-  solved: number;
-  attempted: number;
-  notStarted: number;
-  total: number;
-}
-
-export interface ProblemsByCategory {
-  categoryId: string;
-  categoryName: string;
-  problems: IProblem[];
-  problemStatusCount: ProblemStatusCount;
-}
-
-export interface ProfileContext {
-  profile: UserProfile | null;
-  isLoading: boolean;
-  isError: boolean;
-  updateProfile: (data: Partial<UserProfile>) => Promise<boolean>;
-  updateSettings: (settings: Partial<UserProfileSettings>) => Promise<boolean>;
-}
-
-export interface IUserSettings {
-  notifications: {
-    email: boolean;
-    browser: boolean;
-    mobile: boolean;
-  };
-  appearance: {
-    theme: "light" | "dark" | "system";
-    codeFont: string;
-    fontSize: number;
-  };
-  preferences: {
-    defaultLanguage: ProgrammingLanguageEnum;
-    defaultTabSize: number;
-    autosave: boolean;
-  };
-  privacy: {
-    showActivity: boolean;
-    showSolutions: boolean;
-    showProfile: boolean;
-  };
-}
-
-export interface IUserProfileUpdate {
-  name?: string;
+// APIs inputs
+export interface IUpdateProfileInput {
+  firstName: string;
+  lastName: string;
   bio?: string;
   avatarUrl?: string;
-  email?: string;
 }
 
-export interface IUserStats {
-  totalPoints: number;
-  rank: number;
-  completedProblems: number;
-  completedCollections: number;
-  streak: number;
-  joinedDate: string;
+export interface IUpdateAppearanceInput {
+  theme: ThemeType;
+  codeFont: string;
+  fontSize: number;
 }
 
-export interface IUserProfile {
-  id: string;
-  name: string;
-  email: string;
-  bio: string;
-  avatarUrl: string;
-  joinedDate: string;
-  settings: IUserSettings;
+export interface IUpdatePreferencesInput {
+  defaultLanguage: ProgrammingLanguageEnum;
+  defaultTabSize: number;
+  autosave: boolean;
 }
 
-export interface IProblemStats {
-  attempted: number;
-  solved: number;
-  submissions: number;
-  successRate: number;
-  averageAttempts: number;
-  averageTime: number;
+export interface IUpdateNotificationsInput {
+  email: boolean;
+  browser: boolean;
+  mobile: boolean;
 }
 
-export interface ICategory {
-  id: string;
-  name: string;
-  count: number;
-  icon: LucideIcon;
-}
-
-export interface IUserProblemProgress {
-  problem: string;
-  status: "attempted" | "solved" | "not_started";
-  submissions: number;
-  lastSubmissionDate?: string;
-  timeTaken?: number;
-  code?: Record<ProgrammingLanguageEnum, string>;
-}
-
-export interface IUser extends ISchema {
-  problemsProgress: Record<string, IUserProblemProgress>;
-  completedProblems: number;
-  completedCollections: number;
-  createdProblems: number;
-  createdCollections: number;
-  streak: number;
-  points: number;
+export interface IUpdatePrivacyInput {
+  showActivity: boolean;
+  showSolutions: boolean;
+  showProfile: boolean;
 }

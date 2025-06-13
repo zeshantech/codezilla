@@ -77,3 +77,15 @@ export function stbConverter(value?: string): boolean | undefined {
   if (value === "false") return false;
   return undefined;
 }
+
+export function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+}
+
+export function enumToArray<T extends string>(enumType: T): { label: T; value: T }[] {
+  return Object.values(enumType).map((value) => ({ label: value as T, value: value as T }));
+}

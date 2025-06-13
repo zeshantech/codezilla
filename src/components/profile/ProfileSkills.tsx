@@ -1,37 +1,17 @@
 "use client";
 
-import { SkillStat } from "@/types/profile";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-} from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import { useMemo } from "react";
 import { ChevronRight } from "lucide-react";
+import { useUserProfileStore } from "@/store/useUserProfileStore";
 
-interface ProfileSkillsProps {
-  skillStats: SkillStat[];
-}
+export function ProfileSkills() {
+  const skillStats = useUserProfileStore((state) => state.skillStats) || [];
 
-export function ProfileSkills({ skillStats }: ProfileSkillsProps) {
-  // Convert skills data to format needed for radar chart
   const formattedSkillsData = useMemo(() => {
     return skillStats.map((skill) => ({
       subject: skill.categoryName,
@@ -44,7 +24,6 @@ export function ProfileSkills({ skillStats }: ProfileSkillsProps) {
 
   const isOverview = skillStats.length <= 5;
 
-  // Display skill cards for detailed view
   if (!isOverview) {
     return (
       <div className="space-y-6">
@@ -65,10 +44,7 @@ export function ProfileSkills({ skillStats }: ProfileSkillsProps) {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1 flex-1">
                     <div className="h-2 w-full bg-secondary/20 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary rounded-full"
-                        style={{ width: `${skill.A}%` }}
-                      />
+                      <div className="h-full bg-primary rounded-full" style={{ width: `${skill.A}%` }} />
                     </div>
                   </div>
                   <Badge className="ml-2">{skill.A}%</Badge>
@@ -81,14 +57,11 @@ export function ProfileSkills({ skillStats }: ProfileSkillsProps) {
     );
   }
 
-  // Display radar chart for overview
   return (
     <Card className="col-span-1">
       <CardHeader>
         <CardTitle>Skills Overview</CardTitle>
-        <CardDescription>
-          Based on your solved problems by category
-        </CardDescription>
+        <CardDescription>Based on your solved problems by category</CardDescription>
       </CardHeader>
       <CardContent className="h-80">
         <ChartContainer
@@ -122,23 +95,12 @@ export function ProfileSkills({ skillStats }: ProfileSkillsProps) {
                 />
               )}
             />
-            <Radar
-              name="Skill"
-              dataKey="A"
-              stroke="var(--color-A)"
-              fill="var(--color-A)"
-              fillOpacity={0.6}
-            />
+            <Radar name="Skill" dataKey="A" stroke="var(--color-A)" fill="var(--color-A)" fillOpacity={0.6} />
           </RadarChart>
         </ChartContainer>
       </CardContent>
       <CardFooter>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="ml-auto"
-          href="/profile?tab=skills"
-        >
+        <Button variant="ghost" size="sm" className="ml-auto" href="/profile?tab=skills">
           View all skills <ChevronRight />
         </Button>
       </CardFooter>

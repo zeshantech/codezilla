@@ -1,44 +1,20 @@
 "use client";
 
-import { ActivityRecord } from "@/types/profile";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-} from "@/components/ui/chart";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from "recharts";
+import { IActivityStat } from "@/types/profile";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useMemo } from "react";
+import { useUserProfileStore } from "@/store/useUserProfileStore";
 
-interface ProfileSubmissionGraphProps {
-  activityHistory: ActivityRecord[];
-}
+export function ProfileSubmissionGraph() {
+  const activityHistory = useUserProfileStore((state) => state.activityStats) || [];
 
-export function ProfileSubmissionGraph({
-  activityHistory,
-}: ProfileSubmissionGraphProps) {
-  // Process activity data for the chart
   const submissionData = useMemo(() => {
-    // Group activity records by week
-    const groupedByWeek: Record<string, { solved: number; attempted: number }> =
-      {};
+    const groupedByWeek: Record<string, { solved: number; attempted: number }> = {};
 
     activityHistory.forEach((record) => {
-      const date = new Date(record.date);
+      const date = new Date(record.from);
       const weekLabel = getWeekLabel(date);
 
       if (!groupedByWeek[weekLabel]) {
@@ -46,8 +22,7 @@ export function ProfileSubmissionGraph({
       }
 
       groupedByWeek[weekLabel].solved += record.problemsSolved;
-      groupedByWeek[weekLabel].attempted +=
-        record.submissions - record.problemsSolved;
+      groupedByWeek[weekLabel].attempted += record.submissions - record.problemsSolved;
     });
 
     // Convert to array format for chart
@@ -67,20 +42,7 @@ export function ProfileSubmissionGraph({
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
 
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const startMonth = monthNames[weekStart.getMonth()];
     const endMonth = monthNames[weekEnd.getMonth()];
 
@@ -118,39 +80,12 @@ export function ProfileSubmissionGraph({
         >
           <BarChart data={submissionData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis
-              dataKey="week"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 12 }}
-            />
+            <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-            <ChartTooltip
-              content={({ active, payload }) => (
-                <ChartTooltipContent
-                  active={active}
-                  payload={payload}
-                  labelFormatter={(label) => (
-                    <div className="font-medium">Week of {label}</div>
-                  )}
-                />
-              )}
-            />
-            <ChartLegend
-              content={({ payload }) => (
-                <ChartLegendContent payload={payload} />
-              )}
-            />
-            <Bar
-              dataKey="solved"
-              fill="var(--color-solved)"
-              radius={[4, 4, 0, 0]}
-            />
-            <Bar
-              dataKey="attempted"
-              fill="var(--color-attempted)"
-              radius={[4, 4, 0, 0]}
-            />
+            <ChartTooltip content={({ active, payload }) => <ChartTooltipContent active={active} payload={payload} labelFormatter={(label) => <div className="font-medium">Week of {label}</div>} />} />
+            <ChartLegend content={({ payload }) => <ChartLegendContent payload={payload} />} />
+            <Bar dataKey="solved" fill="var(--color-solved)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="attempted" fill="var(--color-attempted)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ChartContainer>
       </CardContent>

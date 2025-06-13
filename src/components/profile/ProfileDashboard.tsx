@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useProfile } from "@/hooks/useProfile";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,39 +14,26 @@ import { ProfileLanguages } from "./ProfileLanguages";
 import { ProfileBadges } from "./ProfileBadges";
 import { ProfilePremium } from "./ProfilePremium";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUserProfileStore } from "@/store/useUserProfileStore";
+import { noop } from "@/lib/utils";
 
 export function ProfileDashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const validTabs = [
-    "overview",
-    "skills",
-    "languages",
-    "badges",
-    "activity",
-    "certificates",
-    "problems",
-    "settings",
-    "premium",
-  ];
 
-  const [activeTab, setActiveTab] = useState(
-    validTabs.includes(tabParam || "") ? tabParam : "overview"
-  );
+  const profile = useUserProfileStore((state) => state.profile);
+  const activityStats = useUserProfileStore((state) => state.activityStats);
+  const skillStats = useUserProfileStore((state) => state.skillStats);
+  const languageStats = useUserProfileStore((state) => state.languageStats);
+  const certificates = useUserProfileStore((state) => state.certificates);
+  const settings = useUserProfileStore((state) => state.settings);
 
-  const {
-    profile,
-    isProfileLoading,
-    getSkillStats,
-    getProblemsByCategoryWithStatus,
-    getActivityHistory,
-    getLanguageStats,
-    getBadges,
-    getCertificates,
-    updateProfile,
-    updateSettings,
-  } = useProfile();
+  const isProfileLoading = useUserProfileStore((state) => state.isLoadingGetProfile);
+
+  const validTabs = ["overview", "skills", "languages", "badges", "activity", "certificates", "problems", "settings", "premium"];
+
+  const [activeTab, setActiveTab] = useState(validTabs.includes(tabParam || "") ? tabParam : "overview");
 
   useEffect(() => {
     if (activeTab === "overview") {
@@ -75,12 +61,7 @@ export function ProfileDashboard() {
     <div className="space-y-8">
       <ProfileHeader />
 
-      <Tabs
-        defaultValue="overview"
-        value={activeTab!}
-        onValueChange={setActiveTab}
-        className="space-y-4"
-      >
+      <Tabs defaultValue="overview" value={activeTab!} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="w-full">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="skills">Skills</TabsTrigger>
@@ -93,44 +74,36 @@ export function ProfileDashboard() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <ProfileProgress
-            user={profile}
-            problemsByCategory={getProblemsByCategoryWithStatus()}
-          />
+          {/* <ProfileProgress user={profile} problemsByCategory={getProblemsByCategoryWithStatus()} /> */}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ProfileSubmissionGraph activityHistory={getActivityHistory(14)} />
-            <ProfileSkills skillStats={getSkillStats(5)} />
+            <ProfileSubmissionGraph />
+            <ProfileSkills />
           </div>
         </TabsContent>
 
         <TabsContent value="skills">
-          <ProfileSkills skillStats={getSkillStats()} />
+          <ProfileSkills />
         </TabsContent>
 
         <TabsContent value="languages">
-          <ProfileLanguages languageStats={getLanguageStats() as any} />
+          <ProfileLanguages />
         </TabsContent>
 
         <TabsContent value="badges">
-          <ProfileBadges badges={getBadges() as any} />
+          <ProfileBadges />
         </TabsContent>
 
         <TabsContent value="activity">
-          <ProfileSubmissionGraph activityHistory={getActivityHistory(30)} />
+          <ProfileSubmissionGraph />
         </TabsContent>
 
         <TabsContent value="certificates">
-          <ProfileCertificates certificates={getCertificates()} />
+          <ProfileCertificates certificates={certificates || []} />
         </TabsContent>
 
         <TabsContent value="settings">
-          <ProfileSettings
-            user={profile}
-            settings={profile.settings}
-            onUpdateProfile={updateProfile}
-            onUpdateSettings={updateSettings}
-          />
+          <ProfileSettings user={profile} settings={settings || {}} onUpdateProfile={noop} onUpdateSettings={noop} />
         </TabsContent>
 
         <TabsContent value="premium">
