@@ -11,7 +11,7 @@ A comprehensive platform for practicing programming problems with real-time codi
 - MongoDB database integration
 
 ## Technology Stack
-
+ 
 - **Frontend**: Next.js, React, TypeScript, TailwindCSS
 - **Database**: MongoDB with Mongoose
 - **State Management**: React Query
