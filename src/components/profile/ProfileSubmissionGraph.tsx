@@ -59,7 +59,7 @@ export function ProfileSubmissionGraph() {
         <CardTitle>Submission Activity</CardTitle>
         <CardDescription>Your problem-solving activity</CardDescription>
       </CardHeader>
-      <CardContent className="h-80">
+      <CardContent>
         <ChartContainer
           config={{
             solved: {
