@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProblemCard } from "@/components/problems/ProblemCard";
 import { useCollection } from "@/hooks/useCollections";
-import { IProblem } from "@/types";
+import { IProblem } from "@/types/problems";
 import { SpinnerBackdrop } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/ui/emptyState";
 import { useRouter } from "next/navigation";

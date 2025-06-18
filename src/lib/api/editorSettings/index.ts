@@ -1,5 +1,5 @@
+import { IEditorSettings } from "@/types/editor";
 import api from "../api";
-import { IEditorSettings } from "@/types";
 
 export const fetchEditorSettings = async (userId: string) => {
   const response = await api.get(`/editor-settings/${userId}`);

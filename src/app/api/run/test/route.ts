@@ -27,6 +27,8 @@ export const POST = apiHandler(async (req: NextRequest) => {
       failedTestCase: testCases[1],
       passedCount: 0,
       totalCount: testCases.length,
+      logs: ["Running test cases...", "Test case 1: Input: 1 2, Expected Output: 3, Actual Output: 3", "Test case 2: Input: 2 3, Expected Output: 5, Actual Output: 5", "Test case 3: Input: 3 4, Expected Output: 7, Actual Output: 7", "Test case 4: Input: 4 5, Expected Output: 9, Actual Output: 9", "Test case 5: Input: 5 6, Expected Output: 11, Actual Output: 11"],
+      testResults: [],
     } satisfies IRunTestCasesOutput,
     status: StatusCodes.OK,
   };

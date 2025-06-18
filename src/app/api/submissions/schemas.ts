@@ -1,4 +1,4 @@
-import { ProgrammingLanguageEnum } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types/enums";
 import { z } from "zod";
 
 export const createSubmissionSchema = z.object({

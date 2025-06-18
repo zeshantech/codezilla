@@ -1,4 +1,4 @@
-import { ICollection, ICollectionCreateInput, ICollectionFilters } from "@/types";
+import { ICollection, ICollectionCreateInput, ICollectionFilters } from "@/types/collections";
 import api from "./api";
 
 // Fetch all collections (with optional filters)

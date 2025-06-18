@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { SpinnerBackdrop } from "./ui/spinner";
+import UnAuthenticatedComponent from "./UnAuthenticatedComponent";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <SpinnerBackdrop />;
   }
 
-  return authenticated ? <>{children}</> : null;
+  return authenticated ? children : <UnAuthenticatedComponent />;
 };
 
 export default ProtectedRoute;

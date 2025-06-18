@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback } from "react";
-import { IEditorSettings } from "@/types";
 import * as editorSettingsAPI from "@/lib/api/editorSettings/index";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DEFAULT_EDITOR_SETTINGS } from "@/constants/editor";
+import { IEditorSettings } from "@/types/editor";
 
 export function useEditorSettings() {
   const USER_ID = "user123";
@@ -25,8 +25,7 @@ export function useEditorSettings() {
 
   const useUpdateEditorSettings = () => {
     return useMutation({
-      mutationFn: (settings: IEditorSettings) =>
-        editorSettingsAPI.updateEditorSettings(USER_ID, settings),
+      mutationFn: (settings: IEditorSettings) => editorSettingsAPI.updateEditorSettings(USER_ID, settings),
       onError: () => {
         toast.error("Failed to update settings");
       },

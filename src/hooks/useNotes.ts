@@ -3,8 +3,8 @@
 import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { INoteUpdateInput } from "@/types";
 import * as notesAPI from "@/lib/api/notes";
+import { INoteUpdateInput } from "@/types/notes";
 
 export function useNotes(problemId: string) {
   const queryClient = useQueryClient();

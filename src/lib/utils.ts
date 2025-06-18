@@ -86,6 +86,6 @@ export function getInitials(name: string) {
     .toUpperCase();
 }
 
-export function enumToArray<T extends string>(enumType: T): { label: T; value: T }[] {
-  return Object.values(enumType).map((value) => ({ label: value as T, value: value as T }));
+export function enumToArray<T extends object>(enumType: T) {
+  return Object.values(enumType);
 }

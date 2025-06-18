@@ -5,16 +5,8 @@ import { ThemeProvider } from "next-themes";
 import { EditorLayoutProvider } from "@/providers/EditorLayoutProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
-import { ReactKeycloakProvider } from "@react-keycloak/web";
-import Keycloak from "keycloak-js";
 
 const queryClient = new QueryClient();
-
-const keycloak = new Keycloak({
-  url: "http://localhost:8080",
-  realm: "techyst",
-  clientId: "codezilla",
-});
 
 export default function Provider({ children }: { children: React.ReactNode }) {
   return (

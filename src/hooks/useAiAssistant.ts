@@ -1,5 +1,6 @@
+import { ProgrammingLanguageEnum } from "@/types/enums";
+import { IProblem } from "@/types/problems";
 import { useState, useCallback } from "react";
-import { ProgrammingLanguageEnum, IProblem } from "@/types";
 
 interface Message {
   id: string;
@@ -43,86 +44,73 @@ export function useAiAssistant(problem?: IProblem | null) {
   }, [problem]);
 
   // Send a message to the AI assistant
-  const sendMessage = useCallback(
-    async (content: string, code?: string, language?: ProgrammingLanguageEnum) => {
-      // Create the user message
-      const userMessage: Message = {
+  const sendMessage = useCallback(async (content: string, code?: string, language?: ProgrammingLanguageEnum) => {
+    // Create the user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: code ? `${content}\n\nHere is my code in ${language || "JavaScript"}:\n\`\`\`\n${code}\n\`\`\`` : content,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Update state with the user message and set loading to true
+    setState((prev) => ({
+      ...prev,
+      messages: [...prev.messages, userMessage],
+      isLoading: true,
+      error: null,
+    }));
+
+    try {
+      // In a real implementation, this would call an AI API
+      // For now, we'll use a mock implementation with some predefined responses
+
+      // Simulate network delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      let responseContent = "";
+
+      // Very simple mock responses based on keywords in the message
+      if (content.toLowerCase().includes("hint")) {
+        responseContent = "Try breaking down the problem into smaller steps. Consider the edge cases in your solution.";
+      } else if (content.toLowerCase().includes("error")) {
+        responseContent = "Check your syntax and make sure all variables are properly defined before use. Look for missing brackets or semicolons.";
+      } else if (content.toLowerCase().includes("optimize")) {
+        responseContent = "You might improve performance by using a more efficient data structure. Consider using a hash map to reduce the time complexity.";
+      } else if (content.toLowerCase().includes("test")) {
+        responseContent = "Try testing your code with different inputs, including edge cases like empty arrays, very large numbers, or negative values.";
+      } else if (code) {
+        responseContent = "I've reviewed your code. Consider handling edge cases better and adding more comments to explain your approach.";
+      } else {
+        responseContent = "I'm here to help! What specific aspect of the problem are you struggling with?";
+      }
+
+      // Create the assistant message
+      const assistantMessage: Message = {
         id: Date.now().toString(),
-        role: "user",
-        content: code
-          ? `${content}\n\nHere is my code in ${
-              language || "JavaScript"
-            }:\n\`\`\`\n${code}\n\`\`\``
-          : content,
+        role: "assistant",
+        content: responseContent,
         timestamp: new Date().toISOString(),
       };
 
-      // Update state with the user message and set loading to true
+      // Update state with the assistant message and set loading to false
       setState((prev) => ({
         ...prev,
-        messages: [...prev.messages, userMessage],
-        isLoading: true,
-        error: null,
+        messages: [...prev.messages, assistantMessage],
+        isLoading: false,
       }));
 
-      try {
-        // In a real implementation, this would call an AI API
-        // For now, we'll use a mock implementation with some predefined responses
-
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-
-        let responseContent = "";
-
-        // Very simple mock responses based on keywords in the message
-        if (content.toLowerCase().includes("hint")) {
-          responseContent =
-            "Try breaking down the problem into smaller steps. Consider the edge cases in your solution.";
-        } else if (content.toLowerCase().includes("error")) {
-          responseContent =
-            "Check your syntax and make sure all variables are properly defined before use. Look for missing brackets or semicolons.";
-        } else if (content.toLowerCase().includes("optimize")) {
-          responseContent =
-            "You might improve performance by using a more efficient data structure. Consider using a hash map to reduce the time complexity.";
-        } else if (content.toLowerCase().includes("test")) {
-          responseContent =
-            "Try testing your code with different inputs, including edge cases like empty arrays, very large numbers, or negative values.";
-        } else if (code) {
-          responseContent =
-            "I've reviewed your code. Consider handling edge cases better and adding more comments to explain your approach.";
-        } else {
-          responseContent =
-            "I'm here to help! What specific aspect of the problem are you struggling with?";
-        }
-
-        // Create the assistant message
-        const assistantMessage: Message = {
-          id: Date.now().toString(),
-          role: "assistant",
-          content: responseContent,
-          timestamp: new Date().toISOString(),
-        };
-
-        // Update state with the assistant message and set loading to false
-        setState((prev) => ({
-          ...prev,
-          messages: [...prev.messages, assistantMessage],
-          isLoading: false,
-        }));
-
-        return assistantMessage;
-      } catch (_) {
-        // Handle errors
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: "Failed to get response from AI. Please try again.",
-        }));
-        return null;
-      }
-    },
-    []
-  );
+      return assistantMessage;
+    } catch (_) {
+      // Handle errors
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Failed to get response from AI. Please try again.",
+      }));
+      return null;
+    }
+  }, []);
 
   // Clear the chat history
   const clearChat = useCallback(() => {

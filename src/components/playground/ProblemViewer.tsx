@@ -80,8 +80,8 @@ function SolutionContent() {
   return (
     <div className="space-y-4">
       {problem?.solution ? (
-        Object.entries(problem.solution).map(([language, solution]) => (
-          <div className="max-h-96">
+        Object.entries(problem.solution).map(([language, solution], idx) => (
+          <div className="max-h-96" key={idx}>
             <h3 className="font-medium mb-2 capitalize">{language}</h3>
             <div className="bg-muted p-4 rounded-md overflow-auto relative group">
               <Copier text={solution} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100" />

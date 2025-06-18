@@ -1,5 +1,5 @@
 import api from "./api";
-import { INote, INoteCreateInput, INoteUpdateInput } from "@/types";
+import { INote, INoteCreateInput, INoteUpdateInput } from "@/types/notes";
 
 export async function fetchNotes(problemId: string): Promise<INote[]> {
   const response = await api.get(`/notes/problem/${problemId}`);

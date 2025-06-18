@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { IActivityStat, IGetProfileOutput, IGetStatsOutput, ILanguageStat, ISkillStat, IUser } from "@/types/profile";
+import { ExperienceLevelType, IActivityStat, IGetProfileOutput, IGetStatsOutput, ILanguageStat, ISkillStat, IUser } from "@/types/profile";
 import { ProgrammingLanguageEnum } from "@/types/enums";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -83,16 +83,16 @@ const MOCK_PROFILE_OUTPUT: IGetProfileOutput = {
     firstName: "John",
     lastName: "Doe",
     email: "john.doe@example.com",
-    avatarUrl: "https://example.com/avatar.jpg",
-    bio: "I'm a software engineer",
+    avatarUrl: "https://yt3.googleusercontent.com/qGrcViAdsmfdL8NhR03s6jZVi2AP4A03XeBFShu2M4Jd88k1fNXDnpMEmHU6CvNJuMyA2z1maA0=s900-c-k-c0x00ffffff-no-rj",
+    bio: "Software Engineer",
   },
 };
 
 const generateActivityStats = (): IActivityStat[] => {
-  return Array.from({ length: 52 }, (_, i) => ({
+  return Array.from({ length: 10 }, (_, i) => ({
     week: `Week ${i + 1}`,
-    problemsSolved: Math.floor(Math.random() * 10),
-    submissions: Math.floor(Math.random() * 10),
+    problemsSolved: Math.floor(Math.random() * 5),
+    submissions: Math.floor(Math.random() * 10) + 5,
     from: new Date(new Date().setDate(new Date().getDate() - 7 * (i + 1))),
     to: new Date(new Date().setDate(new Date().getDate() - 7 * i)),
   }));
@@ -109,11 +109,11 @@ const generateSkillStats = (): ISkillStat[] => {
 };
 
 const generateLanguageStats = (): ILanguageStat[] => {
-  return Array.from({ length: 10 }, (_, i) => ({
-    language: ProgrammingLanguageEnum.JAVASCRIPT,
+  return Array.from({ length: 4 }, (_, i) => ({
+    language: Object.values(ProgrammingLanguageEnum)[i] as ProgrammingLanguageEnum,
     problemsSolved: Math.floor(Math.random() * 10),
     percentage: Math.floor(Math.random() * 100),
-    experienceLevel: ["beginner", "intermediate", "advanced", "expert"][Math.floor(Math.random() * 4)] as any,
+    experienceLevel: ["beginner", "intermediate", "advanced", "expert"][Math.floor(Math.random() * 4)] as ExperienceLevelType,
   }));
 };
 

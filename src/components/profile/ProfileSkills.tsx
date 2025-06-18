@@ -9,8 +9,8 @@ import { useMemo } from "react";
 import { ChevronRight } from "lucide-react";
 import { useUserProfileStore } from "@/store/useUserProfileStore";
 
-export function ProfileSkills() {
-  const skillStats = useUserProfileStore((state) => state.skillStats) || [];
+export function ProfileSkills({ isOverview = false }: { isOverview?: boolean }) {
+  const skillStats = useUserProfileStore((state) => state.skillStats)?.slice(0, isOverview ? 5 : undefined) || [];
 
   const formattedSkillsData = useMemo(() => {
     return skillStats.map((skill) => ({
@@ -21,8 +21,6 @@ export function ProfileSkills() {
       total: skill.totalProblems,
     }));
   }, [skillStats]);
-
-  const isOverview = skillStats.length <= 5;
 
   if (!isOverview) {
     return (

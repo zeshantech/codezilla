@@ -2,8 +2,9 @@
 
 import { useRef, useEffect } from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { ProgrammingLanguageEnum, IEditorConfig } from "@/types";
 import { Loader2 } from "lucide-react";
+import { ProgrammingLanguageEnum } from "@/types/enums";
+import { IEditorConfig } from "@/types/editor";
 
 interface CodeEditorProps {
   code: string;

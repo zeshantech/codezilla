@@ -8,15 +8,7 @@ import { debounce } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "../ui/search-input";
 import { Selector } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { CATEGORIES } from "@/data/mock/categories";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export interface IProblemFilters {
   search?: string;
@@ -34,8 +26,7 @@ export function ProblemFilters() {
     search: searchParams.get("search") || "",
     difficulties: searchParams.getAll("difficulty") as DifficultyEnum[],
     categories: searchParams.getAll("category"),
-    sortBy:
-      (searchParams.get("sortBy") as IProblemFilters["sortBy"]) || "popularity",
+    sortBy: (searchParams.get("sortBy") as IProblemFilters["sortBy"]) || "popularity",
   });
 
   const [searchQuery, setSearchQuery] = useState<string>(filters.search || "");
@@ -95,9 +86,7 @@ export function ProblemFilters() {
   // Toggle a difficulty in the filter
   const toggleDifficulty = (difficulty: DifficultyEnum) => {
     const currentDifficulties = filters.difficulties || [];
-    const updatedDifficulties = currentDifficulties.includes(difficulty)
-      ? currentDifficulties.filter((d) => d !== difficulty)
-      : [...currentDifficulties, difficulty];
+    const updatedDifficulties = currentDifficulties.includes(difficulty) ? currentDifficulties.filter((d) => d !== difficulty) : [...currentDifficulties, difficulty];
 
     updateFilters({ difficulties: updatedDifficulties });
   };
@@ -105,9 +94,7 @@ export function ProblemFilters() {
   // Toggle a category in the filter
   const toggleCategory = (category: string) => {
     const currentCategories = filters.categories || [];
-    const updatedCategories = currentCategories.includes(category)
-      ? currentCategories.filter((c) => c !== category)
-      : [...currentCategories, category];
+    const updatedCategories = currentCategories.includes(category) ? currentCategories.filter((c) => c !== category) : [...currentCategories, category];
 
     updateFilters({ categories: updatedCategories });
   };
@@ -121,10 +108,7 @@ export function ProblemFilters() {
   };
 
   // Check if any filters are active
-  const hasActiveFilters =
-    !!filters.search ||
-    (filters.difficulties && filters.difficulties.length > 0) ||
-    (filters.categories && filters.categories.length > 0);
+  const hasActiveFilters = !!filters.search || (filters.difficulties && filters.difficulties.length > 0) || (filters.categories && filters.categories.length > 0);
 
   return (
     <div className="flex flex-col sm:flex-row gap-3">
@@ -148,64 +132,19 @@ export function ProblemFilters() {
                 <Filter className="mr-2" />
                 <span>Difficulty</span>
               </div>
-              {filters.difficulties && filters.difficulties.length > 0 && (
-                <span className="ml-1 rounded-full bg-primary text-primary-foreground w-5 h-5 text-xs flex items-center justify-center">
-                  {filters.difficulties.length}
-                </span>
-              )}
+              {filters.difficulties && filters.difficulties.length > 0 && <span className="ml-1 rounded-full bg-primary text-primary-foreground w-5 h-5 text-xs flex items-center justify-center">{filters.difficulties.length}</span>}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuLabel>Difficulty Level</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {Object.values(DifficultyEnum).map((difficulty) => (
-              <DropdownMenuCheckboxItem
-                key={difficulty}
-                checked={filters.difficulties?.includes(difficulty)}
-                onCheckedChange={() => toggleDifficulty(difficulty)}
-              >
+              <DropdownMenuCheckboxItem key={difficulty} checked={filters.difficulties?.includes(difficulty)} onCheckedChange={() => toggleDifficulty(difficulty)}>
                 <span
                   className={`mr-2 rounded-full size-2 inline-block
-                        ${
-                          difficulty === DifficultyEnum.EASY
-                            ? "bg-success"
-                            : difficulty === DifficultyEnum.MEDIUM
-                            ? "bg-warning"
-                            : "bg-error"
-                        }`}
+                        ${difficulty === DifficultyEnum.EASY ? "bg-success" : difficulty === DifficultyEnum.MEDIUM ? "bg-warning" : "bg-error"}`}
                 />
                 {difficulty}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Categories Filter */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-40 flex justify-between">
-              <div className="flex items-center">
-                <Filter className="mr-2" />
-                <span>Categories</span>
-              </div>
-              {filters.categories && filters.categories.length > 0 && (
-                <span className="ml-1 rounded-full bg-primary text-primary-foreground w-5 h-5 text-xs flex items-center justify-center">
-                  {filters.categories.length}
-                </span>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Categories</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {CATEGORIES.map((category) => (
-              <DropdownMenuCheckboxItem
-                key={category.id}
-                checked={filters.categories?.includes(category.id)}
-                onCheckedChange={() => toggleCategory(category.id)}
-              >
-                {category.icon && <category.icon className="mr-2" />}
-                {category.name}
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuContent>

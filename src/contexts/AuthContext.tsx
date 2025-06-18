@@ -1,13 +1,7 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import Keycloak, { IProfile } from "keycloak-js";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import Keycloak from "keycloak-js";
 import { noop } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -15,7 +9,6 @@ type AuthContextType = {
   keycloak: Keycloak | null;
   authenticated: boolean;
   token: string | undefined;
-  profile: IProfile | undefined;
   loading: boolean;
   login: (redirectUri?: string) => void;
   logout: () => void;
@@ -25,7 +18,6 @@ const defaultValue: AuthContextType = {
   keycloak: null,
   authenticated: false,
   token: undefined,
-  profile: undefined,
   loading: true,
   login: noop,
   logout: noop,
@@ -33,9 +25,7 @@ const defaultValue: AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>(defaultValue);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
 
   useEffect(() => {
@@ -49,8 +39,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         await keycloak.init({
           pkceMethod: "S256",
-          silentCheckSsoRedirectUri:
-            window.location.origin + "/public/silent-check-sso.html",
+          silentCheckSsoRedirectUri: window.location.origin + "/public/silent-check-sso.html",
         });
 
         setKeycloak(keycloak);
@@ -80,10 +69,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         keycloak,
         authenticated: keycloak?.authenticated || false,
         token: keycloak?.token,
-        profile: keycloak?.tokenParsed as IProfile,
         loading: false,
-        login: noop,
-        logout: noop,
+        login: (redirectUri?: string) => keycloak?.login({ redirectUri }),
+        logout: () => keycloak?.logout(),
       }}
     >
       {children}

@@ -25,36 +25,15 @@ export function AppHeader() {
 
         {/* Main navbar - desktop */}
         <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
-          <Link
-            href="/"
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${
-              isActive("/")
-                ? "font-medium text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
+          <Link href="/" className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${isActive("/") ? "font-medium text-primary" : "text-muted-foreground hover:text-foreground"}`}>
             <Code className="size-4" />
             Playground
           </Link>
-          <Link
-            href="/problems"
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${
-              isActive("/problems")
-                ? "font-medium text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
+          <Link href="/problems" className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${isActive("/problems") ? "font-medium text-primary" : "text-muted-foreground hover:text-foreground"}`}>
             <BookOpen className="size-4" />
             Problems
           </Link>
-          <Link
-            href="/collections"
-            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${
-              isActive("/collections")
-                ? "font-medium text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
+          <Link href="/collections" className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${isActive("/collections") ? "font-medium text-primary" : "text-muted-foreground hover:text-foreground"}`}>
             <Lightbulb className="size-4" />
             Collections
           </Link>
@@ -62,11 +41,7 @@ export function AppHeader() {
 
         {/* Right side items - search + create + user */}
         <div className="flex items-center ml-auto gap-3">
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
+          <Button variant="outline" size="icon-sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             {theme === "dark" ? <Sun /> : <Moon />}
           </Button>
 

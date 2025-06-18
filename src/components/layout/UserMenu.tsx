@@ -3,22 +3,17 @@
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User, LogOut, Settings, Code } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
+import { useUserProfileStore } from "@/store/useUserProfileStore";
 
 export default function UserMenu() {
   const auth = useAuth();
-  const { authenticated, loading, profile } = auth;
+  const { authenticated, loading } = auth;
+  const profile = useUserProfileStore((state) => state.profile);
 
   if (loading) {
     return <Skeleton className="size-8 rounded-full" />;
@@ -40,9 +35,6 @@ export default function UserMenu() {
     if (profile?.firstName) {
       return profile.firstName.substring(0, 2).toUpperCase();
     }
-    if (profile?.username) {
-      return profile.username.substring(0, 2).toUpperCase();
-    }
     return "U";
   };
 
@@ -50,10 +42,7 @@ export default function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="cursor-pointer">
-          <AvatarImage
-            src={profile?.attributes.avatar || ""}
-            alt={profile?.firstName || "User"}
-          />
+          <AvatarImage src={profile?.avatarUrl || ""} alt={profile?.firstName || "User"} />
           <AvatarFallback>{getInitials()}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -63,11 +52,7 @@ export default function UserMenu() {
             <span className="font-medium">
               {profile?.firstName} {profile?.lastName}
             </span>
-            {profile?.username && (
-              <span className="text-xs text-muted-foreground">
-                @{profile?.username}
-              </span>
-            )}
+            {profile?.email && <span className="text-xs text-muted-foreground">{profile?.email}</span>}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -90,10 +75,7 @@ export default function UserMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => auth.logout()}
-          className="text-error cursor-pointer"
-        >
+        <DropdownMenuItem onClick={() => auth.logout()} className="text-error cursor-pointer">
           <LogOut />
           <span>Logout</span>
         </DropdownMenuItem>

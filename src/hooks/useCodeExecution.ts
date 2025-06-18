@@ -8,14 +8,11 @@ import { ResultStatusEnum } from "@/types/enums";
 export const useCodeExecution = () => {
   return useMutation({
     mutationFn: async (input: ICodeExecutionInput) => {
-      const response = await api.post<ICodeExecutionOutput>(
-        "/run/execute",
-        input
-      );
+      const response = await api.post<ICodeExecutionOutput>("/run/execute", input);
       return response.data;
     },
     onSuccess: (result: ICodeExecutionOutput) => {
-      if (result.status === ResultStatusEnum.PASSED) {
+      if (result.status === ResultStatusEnum.SUCCESS) {
         toast.success("Code executed successfully!");
       } else {
         toast.error("Code execution failed. Check the console for details.");

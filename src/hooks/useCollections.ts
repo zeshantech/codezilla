@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ICollectionCreateInput, ICollectionFilters } from "@/types";
 import { toast } from "sonner";
 import * as collectionsAPI from "@/lib/api/collections";
+import { ICollectionCreateInput, ICollectionFilters } from "@/types/collections";
 
 export function useCollections() {
   const allCollectionsQuery = useAllCollections();

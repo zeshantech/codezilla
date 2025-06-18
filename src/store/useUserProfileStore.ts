@@ -33,14 +33,6 @@ interface IUserProfile {
   errorUpdateSettings: Error | null;
   isSuccessUpdateSettings: boolean;
 
-  // executeCodeResult: ICodeExecutionOutput | null;
-  // executeCode: () => void;
-  // isExecutingCode: boolean;
-  // isSuccessExecutingCode: boolean;
-  // isErrorExecutingCode: boolean;
-  // errorExecutingCode: string | null;
-  // clearExecutionResult: () => void;
-
   updateAppearance: (appearance: IUpdateAppearanceInput) => void;
   updateAppearanceResult: IGetProfileOutput["settings"]["appearance"] | null;
   isPendingUpdateAppearance: boolean;

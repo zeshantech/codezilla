@@ -1,7 +1,6 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { DifficultyEnum, IProblem } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { ProblemCard } from "./ProblemCard";
 import { ProblemFilters, IProblemFilters } from "./ProblemFilters";
@@ -9,6 +8,7 @@ import { useAllProblems } from "@/hooks/useProblems";
 import { EmptyState, ErrorState } from "../ui/emptyState";
 import { Skeleton } from "../ui/skeleton";
 import { useSearchParams } from "next/navigation";
+import { DifficultyEnum } from "@/types/enums";
 
 export function ProblemList() {
   const searchParams = useSearchParams();
@@ -18,15 +18,10 @@ export function ProblemList() {
     search: searchParams.get("search") || undefined,
     difficulties: searchParams.getAll("difficulty") as DifficultyEnum[],
     categories: searchParams.getAll("category"),
-    sortBy:
-      (searchParams.get("sortBy") as IProblemFilters["sortBy"]) || undefined,
+    sortBy: (searchParams.get("sortBy") as IProblemFilters["sortBy"]) || undefined,
   };
 
-  const {
-    data: allProblems,
-    isLoading: isAllProblemsLoading,
-    error: allProblemsError,
-  } = useAllProblems(filters);
+  const { data: allProblems, isLoading: isAllProblemsLoading, error: allProblemsError } = useAllProblems(filters);
 
   console.log(allProblems, isAllProblemsLoading, allProblemsError);
 
@@ -44,22 +39,15 @@ export function ProblemList() {
           ))}
         </div>
       ) : allProblemsError ? (
-        <ErrorState
-          title="Error loading problems"
-          description="Something went wrong while loading problems. Please try again later."
-        />
+        <ErrorState title="Error loading problems" description="Something went wrong while loading problems. Please try again later." />
       ) : allProblems?.length ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allProblems.map((problem: IProblem) => (
+          {allProblems.map((problem) => (
             <ProblemCard key={problem.id} problem={problem} />
           ))}
         </div>
       ) : (
-        <EmptyState
-          title="No problems found"
-          description="Try adjusting your filters or search for something else"
-          icon={<Search />}
-        />
+        <EmptyState title="No problems found" description="Try adjusting your filters or search for something else" icon={<Search />} />
       )}
     </div>
   );

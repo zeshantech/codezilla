@@ -1,14 +1,13 @@
 "use client";
 
-import { IActivityStat } from "@/types/profile";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useMemo } from "react";
 import { useUserProfileStore } from "@/store/useUserProfileStore";
 
-export function ProfileSubmissionGraph() {
-  const activityHistory = useUserProfileStore((state) => state.activityStats) || [];
+export function ProfileSubmissionGraph({ isOverview = false }: { isOverview?: boolean }) {
+  const activityHistory = useUserProfileStore((state) => state.activityStats)?.slice(0, isOverview ? 4 : undefined) || [];
 
   const submissionData = useMemo(() => {
     const groupedByWeek: Record<string, { solved: number; attempted: number }> = {};
@@ -25,7 +24,6 @@ export function ProfileSubmissionGraph() {
       groupedByWeek[weekLabel].attempted += record.submissions - record.problemsSolved;
     });
 
-    // Convert to array format for chart
     return Object.entries(groupedByWeek).map(([week, data]) => ({
       week,
       solved: data.solved,
@@ -33,14 +31,13 @@ export function ProfileSubmissionGraph() {
     }));
   }, [activityHistory]);
 
-  // Utility to get week label in format "Mar 1-7"
   function getWeekLabel(date: Date): string {
     const weekStart = new Date(date);
     const dayOfWeek = date.getDay();
-    weekStart.setDate(date.getDate() - dayOfWeek); // Start of week (Sunday)
+    weekStart.setDate(date.getDate() - dayOfWeek);
 
     const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
+    weekEnd.setDate(weekStart.getDate() + 6);
 
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const startMonth = monthNames[weekStart.getMonth()];

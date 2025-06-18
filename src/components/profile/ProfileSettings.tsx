@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +16,7 @@ import { CheckIcon, SaveIcon } from "lucide-react";
 import { useUserProfileStore } from "@/store/useUserProfileStore";
 import { IUpdateAppearanceInput, IUpdateNotificationsInput, IUpdatePreferencesInput, IUpdatePrivacyInput, IUpdateProfileInput } from "@/types/profile";
 import { ProgrammingLanguageEnum } from "@/types/enums";
+import { enumToArray } from "@/lib/utils";
 
 // Profile form schema
 const profileFormSchema = z.object({
@@ -56,6 +57,8 @@ const privacyFormSchema = z.object({
   showSolutions: z.boolean(),
   showProfile: z.boolean(),
 });
+
+const VALID_TABS = ["profile", "appearance", "preferences", "notifications", "privacy"];
 
 export function ProfileSettings() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -290,7 +293,7 @@ export function ProfileSettings() {
             <form onSubmit={preferencesForm.handleSubmit(onPreferencesSubmit)} className="space-y-6">
               <CardContent className="space-y-6">
                 <Selector
-                  options={Object.values(ProgrammingLanguageEnum).map((language) => ({ label: language, value: language }))}
+                  options={enumToArray(ProgrammingLanguageEnum).map((language) => ({ label: language, value: language }))}
                   onChange={(value) => preferencesForm.setValue("defaultLanguage", value)}
                   defaultValue={preferencesForm.watch("defaultLanguage")}
                   label="Default Language"

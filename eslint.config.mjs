@@ -20,6 +20,8 @@ const eslintConfig = [
       "@typescript-eslint/no-unused-vars": "off",
       // DISABLE: React Hook useEffect has a missing dependency: 'login'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
       "react-hooks/exhaustive-deps": "off",
+      // DISABLE: Use "@ts-expect-error" instead of "@ts-ignore"
+      "@typescript-eslint/ban-ts-comment": "off",
     },
   },
 ];

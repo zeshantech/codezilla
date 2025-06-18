@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { IUserProfileUpdate, IUserProblemProgress } from "@/types";
 import * as userAPI from "@/lib/api/users";
 import { toast } from "sonner";
 
@@ -21,8 +20,9 @@ export function useUser() {
   // Update user profile
   const useUpdateProfile = () => {
     return useMutation({
-      mutationFn: (profileUpdate: IUserProfileUpdate) =>
-        userAPI.updateUserProfile(CURRENT_USER_ID, profileUpdate),
+      mutationFn: (
+        profileUpdate: any // TODO: Define a proper type for profileUpdate
+      ) => userAPI.updateUserProfile(CURRENT_USER_ID, profileUpdate),
       onSuccess: () => {
         // Invalidate the current user query to reflect changes
         queryClient.invalidateQueries({ queryKey: ["user", "current"] });
@@ -53,9 +53,8 @@ export function useUser() {
         progress,
       }: {
         problemId: string;
-        progress: Partial<IUserProblemProgress>;
-      }) =>
-        userAPI.updateUserProblemProgress(CURRENT_USER_ID, problemId, progress),
+        progress: Partial<any>; // TODO: Define a proper type for progress
+      }) => userAPI.updateUserProblemProgress(CURRENT_USER_ID, problemId, progress),
       onSuccess: (_, variables) => {
         // Invalidate specific problem progress and user data
         queryClient.invalidateQueries({

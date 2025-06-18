@@ -1,7 +1,6 @@
 "use client";
 
-import { LanguageStat } from "@/types/profile";
-import { ProgrammingLanguageEnum } from "@/types";
+import { ProgrammingLanguageEnum } from "@/types/enums";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useMemo } from "react";
@@ -43,10 +42,6 @@ const languageColors: Record<ProgrammingLanguageEnum, string> = {
   java: "bg-orange-500 text-white",
   cpp: "bg-blue-600 text-white",
 };
-
-interface ProfileLanguagesProps {
-  languageStats: Record<ProgrammingLanguageEnum, LanguageStat>;
-}
 
 export function ProfileLanguages() {
   const languageStats = useUserProfileStore((state) => state.languageStats) || [];

@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, Users, Folder, BookOpen, Award } from "lucide-react";
-import { ICollection } from "@/types";
+import { ICollection } from "@/types/collections";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
