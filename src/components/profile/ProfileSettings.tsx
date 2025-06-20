@@ -23,9 +23,12 @@ const profileFormSchema = z.object({
   firstName: z.string().min(2, {
     message: "First name must be at least 2 characters.",
   }),
-  lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters.",
-  }),
+  lastName: z
+    .string()
+    .min(2, {
+      message: "Last name must be at least 2 characters.",
+    })
+    .optional(),
   bio: z.string().optional(),
   avatarUrl: z.string().optional(),
 });
@@ -205,7 +208,7 @@ export function ProfileSettings() {
                 <Input id="firstName" placeholder="Your first name" error={profileForm.formState.errors.firstName?.message} {...profileForm.register("firstName")} label="First Name" info="This is your public display name" />
                 <Input id="lastName" placeholder="Your last name" error={profileForm.formState.errors.lastName?.message} {...profileForm.register("lastName")} label="Last Name" info="This is your public display name" />
 
-                <Input id="email" readOnly placeholder="your.email@example.com" type="email" label="Email" info="This email will be used for account recovery and notifications \n (cannot be changed)" />
+                <Input value={profile?.email} id="email" readOnly placeholder="your.email@example.com" type="email" label="Email" info="This email will be used for account recovery and notifications \n (cannot be changed)" />
 
                 <Textarea id="bio" label="Bio" info="This will be displayed on your public profile" placeholder="Tell us a bit about yourself" className="min-h-24 resize-none" error={profileForm.formState.errors.bio?.message} {...profileForm.register("bio")} />
               </CardContent>
@@ -292,14 +295,7 @@ export function ProfileSettings() {
             </CardHeader>
             <form onSubmit={preferencesForm.handleSubmit(onPreferencesSubmit)} className="space-y-6">
               <CardContent className="space-y-6">
-                <Selector
-                  options={enumToArray(ProgrammingLanguageEnum).map((language) => ({ label: language, value: language }))}
-                  onChange={(value) => preferencesForm.setValue("defaultLanguage", value)}
-                  defaultValue={preferencesForm.watch("defaultLanguage")}
-                  label="Default Language"
-                  info="Your preferred programming language"
-                  error={preferencesForm.formState.errors.defaultLanguage?.message}
-                />
+                <Selector options={enumToArray(ProgrammingLanguageEnum).map((language) => ({ label: language, value: language }))} onChange={(value) => preferencesForm.setValue("defaultLanguage", value)} defaultValue={preferencesForm.watch("defaultLanguage")} label="Default Language" info="Your preferred programming language" error={preferencesForm.formState.errors.defaultLanguage?.message} />
 
                 <Selector
                   options={[

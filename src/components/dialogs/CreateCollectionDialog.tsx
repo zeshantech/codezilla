@@ -20,11 +20,13 @@ import { useAllProblems } from "@/hooks/useProblems";
 import { useCreateCollection } from "@/hooks/useCollections";
 import { IProblem } from "@/types/problems";
 import { DifficultyEnum } from "@/types/enums";
+import { enumToArray } from "@/lib/utils";
+import { useProblemsStore } from "@/store/useProblemsStore";
 
 const createCollectionSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }).max(80, { message: "Title must be less than 80 characters" }),
   description: z.string().max(200, { message: "Description must be less than 200 characters" }).optional(),
-  difficulty: z.string().optional(),
+  difficulty: z.nativeEnum(DifficultyEnum).optional(),
   tags: z.array(z.string()).default([]),
   isPublic: z.boolean().default(true),
   problems: z.array(z.custom<IProblem>()).min(1, { message: "Please select at least one problem" }),
@@ -38,6 +40,29 @@ const defaultValues: Partial<CreateCollectionFormValues> = {
   tags: [],
 };
 
+const difficulties = [
+  {
+    value: DifficultyEnum.EASY,
+    label: "Easy",
+    color: "success",
+  },
+  {
+    value: DifficultyEnum.MEDIUM,
+    label: "Medium",
+    color: "warning",
+  },
+  {
+    value: DifficultyEnum.HARD,
+    label: "Hard",
+    color: "error",
+  },
+  {
+    value: DifficultyEnum.MIXED,
+    label: "Mixed",
+    color: "secondary",
+  },
+];
+
 const collectionTags = ["Beginner Friendly", "Top Interview Questions", "Algorithm Patterns", "Contest Prep", "System Design", "Database", "Frontend", "Backend", "Data Structures", "Company Specific", "Educational", "Weekly Challenge", "Coding Patterns"];
 
 export function CreateCollectionDialog() {
@@ -45,10 +70,18 @@ export function CreateCollectionDialog() {
   const [commandOpen, setCommandOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: allProblems, isLoading: isAllProblemsLoading } = useAllProblems();
+  const allProblems = useProblemsStore((store) => store.allProblems);
+  const isAllProblemsLoading = useProblemsStore((store) => store.isAllProblemsLoading);
   const { mutate: createCollection, isPending: isCreatingCollection } = useCreateCollection();
 
-  const { watch, setValue, handleSubmit, reset, formState, register } = useForm<CreateCollectionFormValues>({
+  const {
+    watch,
+    setValue,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    register,
+  } = useForm<CreateCollectionFormValues>({
     resolver: zodResolver(createCollectionSchema) as Resolver<CreateCollectionFormValues>,
     defaultValues,
   });
@@ -67,6 +100,7 @@ export function CreateCollectionDialog() {
   };
 
   const toggleProblem = (problem: IProblem) => {
+    console.log(problem);
     const isSelected = watch("problems")?.some((p) => p.id === problem.id);
 
     if (isSelected) {
@@ -116,27 +150,26 @@ export function CreateCollectionDialog() {
           {/* Basic information */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Input id="title" label="Collection Title" placeholder="e.g., Top Dynamic Programming Problems" error={formState.errors.title?.message} {...register("title")} />
+              <Input id="title" label="Collection Title" placeholder="e.g., Top Dynamic Programming Problems" error={errors.title?.message} {...register("title")} />
             </div>
 
             <div className="space-y-2">
-              <Textarea id="description" label="Description" placeholder="Describe what this collection is about and who it's for..." className="min-h-[100px]" error={formState.errors.description?.message} {...register("description")} />
+              <Textarea id="description" label="Description" placeholder="Describe what this collection is about and who it's for..." className="min-h-[100px]" error={errors.description?.message} {...register("description")} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Selector
-                  options={[
-                    { label: "Easy", value: "easy" },
-                    { label: "Medium", value: "medium" },
-                    { label: "Hard", value: "hard" },
-                  ]}
-                  label="Difficulty Level"
-                  info="Overall difficulty of problems in this collection"
-                  onChange={(value) => setValue("difficulty", value)}
-                  defaultValue={watch("difficulty")}
-                  placeholder="Select difficulty"
-                />
+                <div className="flex items-center">
+                  <label className="text-sm font-medium leading-none">Difficulty Level</label>
+                  {errors.difficulty && <span className="ml-2 text-sm text-error">{errors.difficulty.message}</span>}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {difficulties.map((diff) => (
+                    <Badge key={diff.value} variant={watch("difficulty") === diff.value ? (diff.color as any) : "muted"} className="py-1 px-3 cursor-pointer" onClick={() => setValue("difficulty", diff.value)}>
+                      {diff.label}
+                    </Badge>
+                  ))}
+                </div>
               </div>
 
               <div className="flex flex-row items-start space-x-3 space-y-0 pt-6">
@@ -190,9 +223,17 @@ export function CreateCollectionDialog() {
                 <PopoverContent className="w-[400px] p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Search problems..." value={searchTerm} onValueChange={setSearchTerm} />
-                    <CommandList>
+                    <CommandList
+                      onChange={(e) => {
+                        console.log(e);
+                      }}
+                    >
                       <CommandEmpty>No problems found.</CommandEmpty>
-                      <CommandGroup>
+                      <CommandGroup
+                        onSelect={(e) => {
+                          console.log(e);
+                        }}
+                      >
                         {isAllProblemsLoading ? (
                           <div className="flex items-center justify-center p-4">
                             <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -201,15 +242,25 @@ export function CreateCollectionDialog() {
                           filteredProblems?.map((problem) => {
                             const isSelected = watch("problems").some((p) => p.id === problem.id);
                             return (
-                              <CommandItem key={problem.id} value={problem.id} onSelect={() => toggleProblem(problem)} className="flex items-center gap-2">
-                                <div className={`flex-shrink-0 rounded-full p-1 ${isSelected ? "bg-primary text-primary-foreground" : "border"}`}>{isSelected ? <Check className="h-3 w-3" /> : <PlusCircle className="h-3 w-3 opacity-50" />}</div>
-                                <div className="flex flex-col">
-                                  <span>{problem.title}</span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {problem.difficulty} • {problem.category}
-                                  </span>
-                                </div>
-                              </CommandItem>
+                              <div key={problem.id}>
+                                <CommandItem
+                                  key={problem.id}
+                                  value={problem.id}
+                                  onClick={() => {
+                                    console.log(problem);
+                                    toggleProblem(problem);
+                                  }}
+                                  className="flex items-center gap-2"
+                                >
+                                  <div className={`flex-shrink-0 rounded-full p-1 ${isSelected ? "bg-primary text-primary-foreground" : "border"}`}>{isSelected ? <Check className="h-3 w-3" /> : <PlusCircle className="h-3 w-3 opacity-50" />}</div>
+                                  <div className="flex flex-col">
+                                    <span>{problem.title}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {problem.difficulty} • {problem.category}
+                                    </span>
+                                  </div>
+                                </CommandItem>
+                              </div>
                             );
                           })
                         )}
@@ -226,17 +277,19 @@ export function CreateCollectionDialog() {
                 <ScrollArea className="h-[200px] w-full">
                   <div className="p-2 space-y-1">
                     {watch("problems").map((problem, index) => (
-                      <div key={problem.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
+                      <div key={problem.id} className={`flex items-center justify-between p-2 rounded-md hover:bg-muted `}>
                         <div className="flex items-center gap-2">
                           <div className="size-5 flex items-center justify-center rounded-full bg-muted text-xs font-medium">{index + 1}</div>
-                          <div>
-                            <div className="font-medium">{problem.title}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {problem.difficulty} • {problem.category}
+                          {filteredProblems?.find((p) => p.id === problem.id) && (
+                            <div>
+                              <div className="font-medium">{filteredProblems?.find((p) => p.id === problem.id)?.title}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {filteredProblems?.find((p) => p.id === problem.id)?.difficulty} • {filteredProblems?.find((p) => p.id === problem.id)?.category}
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
-                        <Button type="button" variant="ghost" size="icon-xs" onClick={() => toggleProblem(problem)}>
+                        <Button type="button" variant="ghost" size="icon-xs" onClick={() => toggleProblem(filteredProblems?.find((p) => p.id === problem.id) as IProblem)}>
                           <X className="size-4" />
                         </Button>
                       </div>

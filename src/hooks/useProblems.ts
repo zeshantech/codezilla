@@ -7,54 +7,6 @@ import * as usersAPI from "@/lib/api/users";
 import { aiProblemCreator } from "@/lib/ai/problemCreator";
 import { ProgrammingLanguageEnum } from "@/types/enums";
 
-const CURRENT_USER_ID = "user123";
-
-export function useProblems() {
-  const getUserProblemProgress = useCallback(async (problemId: string) => {
-    try {
-      const progress = await usersAPI.getUserProblemProgress(CURRENT_USER_ID, problemId);
-      return progress;
-    } catch (error) {
-      console.error("Error getting problem progress:", error);
-      return null;
-    }
-  }, []);
-
-  const allProblemsQuery = useAllProblems();
-  const featuredProblemsQuery = useFeaturedProblems();
-  const randomProblemQuery = useRandomProblem();
-  const createProblemMutation = useCreateProblem();
-  const updateProblemCodeMutation = useUpdateProblemCode();
-
-  return {
-    getUserProblemProgress,
-
-    createProblem: createProblemMutation.mutateAsync,
-    updateProblemCode: updateProblemCodeMutation.mutateAsync,
-    isCreatingProblem: createProblemMutation.isPending,
-    isUpdatingProblemCode: updateProblemCodeMutation.isPending,
-
-    allProblemsError: allProblemsQuery.error,
-    featuredProblemsError: featuredProblemsQuery.error,
-    randomProblemError: randomProblemQuery.error,
-    createProblemError: createProblemMutation.error,
-    updateProblemCodeError: updateProblemCodeMutation.error,
-
-    isAllProblemsError: allProblemsQuery.error,
-    isFeaturedProblemsError: featuredProblemsQuery.error,
-    isRandomProblemError: randomProblemQuery.error,
-    isCreateProblemError: createProblemMutation.isError,
-    isUpdateProblemCodeError: updateProblemCodeMutation.isError,
-
-    allProblems: allProblemsQuery.data,
-    isAllProblemsLoading: allProblemsQuery.isLoading,
-    featuredProblems: featuredProblemsQuery.data,
-    isFeaturedProblemsLoading: featuredProblemsQuery.isLoading,
-    randomProblem: randomProblemQuery.data,
-    isRandomProblemLoading: randomProblemQuery.isLoading,
-  };
-}
-
 export const useAllProblems = (filters?: IProblemFilters) => {
   return useQuery({
     queryKey: ["problems", filters],
@@ -120,7 +72,7 @@ export const useCreateProblem = () => {
 export const useUpdateProblemCode = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ problemId, code, language }: { problemId: string; code: string; language: ProgrammingLanguageEnum }) => problemsAPI.updateProblemCode(CURRENT_USER_ID, problemId, code, language),
+    mutationFn: ({ problemId, code, language }: { problemId: string; code: string; language: ProgrammingLanguageEnum }) => problemsAPI.updateProblemCode(problemId, code, language),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", "progress"] });
       toast.success("Code saved successfully!");

@@ -33,6 +33,7 @@ const ProblemSchema: Schema<IProblem> = new Schema<IProblem>(
     createdBy: { type: String },
     isFeatured: { type: Boolean, default: false },
     tags: { type: [String], required: true },
+    isPublic: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -41,5 +42,4 @@ const ProblemSchema: Schema<IProblem> = new Schema<IProblem>(
 
 ProblemSchema.plugin(toJSON);
 
-export const Problem: Model<IProblem> =
-  models?.Problem || model<IProblem>("Problem", ProblemSchema);
+export const Problem: Model<IProblem> = models?.Problem || model<IProblem>("Problem", ProblemSchema);

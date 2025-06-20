@@ -3,15 +3,16 @@ import { apiHandler } from "@/lib/errorHandler";
 import { StatusCodes } from "@/constants/statusCodes";
 import { Problem } from "@/lib/db/models/problem.model";
 import { NotFoundException } from "@/lib/exceptions";
-
-const CURRENT_USER_ID = "666666666666666666666666";
-const ADMIN_USER_ID = "user123";
+import { auth0 } from "@/lib/auth0";
 
 export const GET = apiHandler(async (_, params: Promise<{ slug: string }>) => {
   const { slug } = await params;
+  const session = await auth0.getSession();
+  const userId = session?.user?.id;
+
   const problem = await Problem.findOne({
     slug,
-    $or: [{ createdBy: ADMIN_USER_ID }, { createdBy: CURRENT_USER_ID }],
+    $or: [{ createdBy: userId }, { isPublic: true }],
   });
 
   if (!problem) {

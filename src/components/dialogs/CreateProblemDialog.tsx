@@ -2,32 +2,14 @@
 
 import { useState } from "react";
 import { Sparkles, Info, ChevronDown } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useCreateProblem } from "@/hooks/useProblems";
 import { Card, CardContent } from "@/components/ui/card";
 import { Resolver, useForm } from "react-hook-form";
@@ -36,28 +18,7 @@ import * as z from "zod";
 import { DifficultyEnum } from "@/types/enums";
 
 // Programming topics/concepts
-const programmingTopics = [
-  "Arrays",
-  "Strings",
-  "Hash Tables",
-  "Dynamic Programming",
-  "Trees",
-  "Graphs",
-  "Sorting",
-  "Searching",
-  "Recursion",
-  "Backtracking",
-  "Greedy Algorithms",
-  "Linked Lists",
-  "Stacks",
-  "Queues",
-  "Binary Search",
-  "Divide and Conquer",
-  "Math",
-  "Bit Manipulation",
-  "Heaps",
-  "Two Pointers",
-];
+const programmingTopics = ["Arrays", "Strings", "Hash Tables", "Dynamic Programming", "Trees", "Graphs", "Sorting", "Searching", "Recursion", "Backtracking", "Greedy Algorithms", "Linked Lists", "Stacks", "Queues", "Binary Search", "Divide and Conquer", "Math", "Bit Manipulation", "Heaps", "Two Pointers"];
 
 // Difficulty options
 const difficulties = [
@@ -94,8 +55,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function CreateProblemDialog() {
   const [open, setOpen] = useState(false);
   const [advancedOptions, setAdvancedOptions] = useState(false);
-  const { mutate: createProblem, isPending: isCreatingProblem } =
-    useCreateProblem();
+  const { mutate: createProblem, isPending: isCreatingProblem } = useCreateProblem();
 
   // Initialize form with react-hook-form and zod validation
   const {
@@ -135,15 +95,9 @@ export function CreateProblemDialog() {
   // Set difficulty
   const selectDifficulty = (value: string) => {
     const currentDifficulty = getValues("difficulty");
-    setValue(
-      "difficulty",
-      value === currentDifficulty
-        ? DifficultyEnum.MEDIUM
-        : (value as DifficultyEnum),
-      {
-        shouldValidate: true,
-      }
-    );
+    setValue("difficulty", value === currentDifficulty ? DifficultyEnum.MEDIUM : (value as DifficultyEnum), {
+      shouldValidate: true,
+    });
   };
 
   // Handle form submission
@@ -167,8 +121,8 @@ export function CreateProblemDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Sparkles />
+        <Button loading={isCreatingProblem}>
+          <Sparkles className="animate-pulse" />
           Generate Problem
         </Button>
       </DialogTrigger>
@@ -176,12 +130,10 @@ export function CreateProblemDialog() {
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <Sparkles className="mr-2 size-5" />
+            <Sparkles className="mr-2 size-5 animate-pulse" />
             Generate Problem with AI
           </DialogTitle>
-          <DialogDescription>
-            Our AI will generate a coding problem based on your specifications.
-          </DialogDescription>
+          <DialogDescription>Our AI will generate a coding problem based on your specifications.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
@@ -189,27 +141,12 @@ export function CreateProblemDialog() {
             <CardContent className="pt-6 space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center">
-                  <label className="text-sm font-medium leading-none">
-                    Difficulty Level
-                  </label>
-                  {errors.difficulty && (
-                    <span className="ml-2 text-sm text-error">
-                      {errors.difficulty.message}
-                    </span>
-                  )}
+                  <label className="text-sm font-medium leading-none">Difficulty Level</label>
+                  {errors.difficulty && <span className="ml-2 text-sm text-error">{errors.difficulty.message}</span>}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {difficulties.map((diff) => (
-                    <Badge
-                      key={diff.value}
-                      variant={
-                        getValues("difficulty") === diff.value
-                          ? (diff.color as any)
-                          : "muted"
-                      }
-                      className="py-1 px-3 cursor-pointer"
-                      onClick={() => selectDifficulty(diff.value)}
-                    >
+                    <Badge key={diff.value} variant={getValues("difficulty") === diff.value ? (diff.color as any) : "muted"} className="py-1 px-3 cursor-pointer" onClick={() => selectDifficulty(diff.value)}>
                       {diff.label}
                     </Badge>
                   ))}
@@ -218,26 +155,11 @@ export function CreateProblemDialog() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium leading-none">
-                    Complexity Level
-                  </label>
-                  <span className="text-sm font-medium">
-                    {getValues("complexity")}/10
-                  </span>
+                  <label className="text-sm font-medium leading-none">Complexity Level</label>
+                  <span className="text-sm font-medium">{getValues("complexity")}/10</span>
                 </div>
-                <Slider
-                  min={1}
-                  max={10}
-                  step={1}
-                  value={[getValues("complexity")]}
-                  onValueChange={(value) =>
-                    setValue("complexity", value[0], { shouldValidate: true })
-                  }
-                  className="py-4"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Adjust how complex the generated problem should be
-                </p>
+                <Slider min={1} max={10} step={1} value={[getValues("complexity")]} onValueChange={(value) => setValue("complexity", value[0], { shouldValidate: true })} className="py-4" />
+                <p className="text-xs text-muted-foreground">Adjust how complex the generated problem should be</p>
               </div>
             </CardContent>
           </Card>
@@ -260,38 +182,18 @@ export function CreateProblemDialog() {
               <div className="flex flex-wrap gap-2 mb-2 min-h-8">
                 {getValues("topics").length > 0 ? (
                   getValues("topics").map((topic) => (
-                    <Badge
-                      key={topic}
-                      variant="secondary"
-                      onClick={() => toggleTopic(topic)}
-                      className="cursor-pointer"
-                    >
+                    <Badge key={topic} variant="secondary" onClick={() => toggleTopic(topic)} className="cursor-pointer">
                       {topic}
                     </Badge>
                   ))
                 ) : (
-                  <div className="text-sm text-muted-foreground">
-                    No topics selected
-                  </div>
+                  <div className="text-sm text-muted-foreground">No topics selected</div>
                 )}
               </div>
-              {errors.topics && (
-                <div className="text-sm text-error mb-2">
-                  {errors.topics.message}
-                </div>
-              )}
+              {errors.topics && <div className="text-sm text-error mb-2">{errors.topics.message}</div>}
               <div className="flex flex-wrap gap-1 pt-2 border-t">
                 {programmingTopics.map((topic) => (
-                  <Badge
-                    key={topic}
-                    variant={
-                      getValues("topics").includes(topic)
-                        ? "default"
-                        : "outline"
-                    }
-                    className="cursor-pointer"
-                    onClick={() => toggleTopic(topic)}
-                  >
+                  <Badge key={topic} variant={getValues("topics").includes(topic) ? "default" : "outline"} className="cursor-pointer" onClick={() => toggleTopic(topic)}>
                     {topic}
                   </Badge>
                 ))}
@@ -301,18 +203,9 @@ export function CreateProblemDialog() {
 
           <Collapsible open={advancedOptions} onOpenChange={setAdvancedOptions}>
             <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-between px-4 py-2 border rounded-md hover:bg-muted/50"
-                type="button"
-              >
+              <Button variant="ghost" size="sm" className="w-full justify-between px-4 py-2 border rounded-md hover:bg-muted/50" type="button">
                 <span className="font-medium">Advanced Options</span>
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform ${
-                    advancedOptions ? "rotate-180" : ""
-                  }`}
-                />
+                <ChevronDown className={`h-4 w-4 transition-transform ${advancedOptions ? "rotate-180" : ""}`} />
               </Button>
             </CollapsibleTrigger>
 
@@ -320,33 +213,11 @@ export function CreateProblemDialog() {
               <Card>
                 <CardContent className="pt-6 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Input
-                      label=" Example Count"
-                      type="number"
-                      info="Number of examples (1-5)"
-                      min={1}
-                      max={5}
-                      {...register("exampleCount", { valueAsNumber: true })}
-                      className="mt-1"
-                    />
+                    <Input label=" Example Count" type="number" info="Number of examples (1-5)" min={1} max={5} {...register("exampleCount", { valueAsNumber: true })} className="mt-1" />
 
-                    <Input
-                      label="Time Limit (s)"
-                      type="number"
-                      min={1}
-                      max={30}
-                      {...register("timeLimit", { valueAsNumber: true })}
-                      className="mt-1"
-                    />
+                    <Input label="Time Limit (s)" type="number" min={1} max={30} {...register("timeLimit", { valueAsNumber: true })} className="mt-1" />
 
-                    <Input
-                      label="Memory Limit (MB)"
-                      type="number"
-                      min={8}
-                      max={512}
-                      {...register("memoryLimit", { valueAsNumber: true })}
-                      className="mt-1"
-                    />
+                    <Input label="Memory Limit (MB)" type="number" min={8} max={512} {...register("memoryLimit", { valueAsNumber: true })} className="mt-1" />
                   </div>
 
                   <div className="space-y-2">
@@ -358,19 +229,12 @@ export function CreateProblemDialog() {
                             <Info className="h-4 w-4 ml-1.5 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent className="max-w-[300px]">
-                            <p>
-                              Add specific requirements or guidance for the AI
-                              when generating the problem.
-                            </p>
+                            <p>Add specific requirements or guidance for the AI when generating the problem.</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </label>
-                    <Textarea
-                      placeholder="Optional: Add specific requirements for the problem (e.g., 'Include a recursive approach' or 'Focus on space optimization')"
-                      className="min-h-[80px]"
-                      {...register("customPrompt")}
-                    />
+                    <Textarea placeholder="Optional: Add specific requirements for the problem (e.g., 'Include a recursive approach' or 'Focus on space optimization')" className="min-h-[80px]" {...register("customPrompt")} />
                   </div>
                 </CardContent>
               </Card>
@@ -384,6 +248,7 @@ export function CreateProblemDialog() {
               </Button>
             </DialogClose>
             <Button type="submit" loading={isCreatingProblem}>
+              <Sparkles className="mr-2" />
               Generate Problem
             </Button>
           </DialogFooter>

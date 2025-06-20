@@ -15,29 +15,15 @@ export function AppFooter() {
           <Link href="/" className="font-bold text-lg">
             CodeZilla
           </Link>
-          <Separator
-            orientation="vertical"
-            className="hidden md:inline-flex h-4"
-          />
-          <div className="text-center md:text-left text-muted-foreground">
-            &copy; {new Date().getFullYear()} CodeZilla. All rights reserved.
-          </div>
+          <Separator orientation="vertical" className="hidden md:inline-flex h-4" />
+          <div className="text-center md:text-left text-muted-foreground">&copy; {new Date().getFullYear()} CodeZilla. All rights reserved.</div>
         </div>
 
         <div className="flex flex-col md:flex-row items-center gap-4 text-sm">
           <div className="rounded border overflow-hidden flex gap-1 mr-4">
-            <Sun
-              className={`p-1 ${theme === "light" ? "bg-muted" : ""}`}
-              onClick={() => setTheme("light")}
-            />
-            <Moon
-              className={`p-1 ${theme === "dark" ? "bg-muted" : ""}`}
-              onClick={() => setTheme("dark")}
-            />
-            <Laptop
-              className={`p-1 ${theme === "system" ? "bg-muted" : ""}`}
-              onClick={() => setTheme("system")}
-            />
+            <Sun className={`p-1 ${theme === "light" ? "bg-muted" : ""}`} onClick={() => setTheme("light")} />
+            <Moon className={`p-1 ${theme === "dark" ? "bg-muted" : ""}`} onClick={() => setTheme("dark")} />
+            <Laptop className={`p-1 ${theme === "system" ? "bg-muted" : ""}`} onClick={() => setTheme("system")} />
           </div>
           <nav className="flex items-center space-x-4 text-muted-foreground">
             <Link href="/about" className="hover:text-foreground">
@@ -53,10 +39,7 @@ export function AppFooter() {
               Contact
             </Link>
           </nav>
-          <Separator
-            orientation="vertical"
-            className="hidden md:inline-flex h-4"
-          />
+          <Separator orientation="vertical" className="hidden md:inline-flex h-4" />
           <div className="flex items-center space-x-3">
             <Link href="https://github.com" target="_blank">
               <Github className="size-5" />

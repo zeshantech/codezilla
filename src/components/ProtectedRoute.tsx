@@ -2,29 +2,29 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
 import { SpinnerBackdrop } from "./ui/spinner";
 import UnAuthenticatedComponent from "./UnAuthenticatedComponent";
+import { useUser } from "@auth0/nextjs-auth0";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { authenticated, loading, login } = useAuth();
+  const { user, isLoading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !authenticated) {
-      login(window.location.href);
+    if (!isLoading && !user) {
+      router.push("/auth/login");
     }
-  }, [loading, authenticated, router]);
+  }, [isLoading, user, router]);
 
-  if (loading) {
+  if (isLoading) {
     return <SpinnerBackdrop />;
   }
 
-  return authenticated ? children : <UnAuthenticatedComponent />;
+  return user ? children : <UnAuthenticatedComponent />;
 };
 
 export default ProtectedRoute;

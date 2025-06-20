@@ -25,10 +25,6 @@ export function AppHeader() {
 
         {/* Main navbar - desktop */}
         <nav className="flex items-center space-x-4 lg:space-x-6 mx-6">
-          <Link href="/" className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${isActive("/") ? "font-medium text-primary" : "text-muted-foreground hover:text-foreground"}`}>
-            <Code className="size-4" />
-            Playground
-          </Link>
           <Link href="/problems" className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm ${isActive("/problems") ? "font-medium text-primary" : "text-muted-foreground hover:text-foreground"}`}>
             <BookOpen className="size-4" />
             Problems

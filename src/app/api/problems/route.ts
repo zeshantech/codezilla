@@ -5,28 +5,30 @@ import { apiHandler } from "@/lib/errorHandler";
 import { StatusCodes } from "@/constants/statusCodes";
 import { Problem } from "@/lib/db/models/problem.model";
 import { generateSlug } from "./helpers";
-
-const CURRENT_USER_ID = "666666666666666666666666";
+import { auth0 } from "@/lib/auth0";
+import { UnauthorizedException } from "@/lib/exceptions";
+import { TestCase } from "@/lib/db/models/testCase.model";
 
 const validateGetProblems = createValidator(getProblemsQuerySchema, "query");
 const validateCreateProblem = createValidator(createProblemSchema, "body");
 
 export const GET = apiHandler(async (request: NextRequest) => {
   const validatedParams = await validateGetProblems(request);
+  const session = await auth0.getSession();
+  const userId = session?.user?.id;
 
   let query = Problem.find();
 
   if (validatedParams.myProblems) {
-    query = query.where("createdBy").equals(CURRENT_USER_ID);
+    if (!userId) {
+      throw new UnauthorizedException();
+    }
+    query = query.where("createdBy").equals(userId);
   }
 
   if (validatedParams.search) {
     const searchTerm = validatedParams.search.toLowerCase();
-    query = query.or([
-      { title: { $regex: searchTerm, $options: "i" } },
-      { description: { $regex: searchTerm, $options: "i" } },
-      { tags: { $in: [new RegExp(searchTerm, "i")] } },
-    ]);
+    query = query.or([{ title: { $regex: searchTerm, $options: "i" } }, { description: { $regex: searchTerm, $options: "i" } }, { tags: { $in: [new RegExp(searchTerm, "i")] } }]);
   }
 
   if (validatedParams?.categories && validatedParams.categories.length > 0) {
@@ -37,10 +39,7 @@ export const GET = apiHandler(async (request: NextRequest) => {
     query = query.where("isFeatured").equals(validatedParams.featured);
   }
 
-  if (
-    validatedParams?.difficulties &&
-    validatedParams.difficulties.length > 0
-  ) {
+  if (validatedParams?.difficulties && validatedParams.difficulties.length > 0) {
     query = query.where("difficulty").in(validatedParams.difficulties);
   }
 
@@ -76,12 +75,25 @@ export const GET = apiHandler(async (request: NextRequest) => {
 
 export const POST = apiHandler(async (request: NextRequest) => {
   const validatedData = await validateCreateProblem(request);
+  const session = await auth0.getSession();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    throw new UnauthorizedException();
+  }
 
   const newProblem = await Problem.create({
     ...validatedData,
-    createdBy: CURRENT_USER_ID,
+    createdBy: userId,
     slug: await generateSlug(validatedData.title),
   });
+
+  TestCase.insertMany(
+    validatedData.testCases.map((testCase) => ({
+      ...testCase,
+      problem: newProblem._id,
+    }))
+  );
 
   return { data: newProblem, status: StatusCodes.CREATED };
 });

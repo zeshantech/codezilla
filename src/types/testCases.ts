@@ -12,7 +12,7 @@ export interface ITestCase extends ISchema {
 export interface ITestCaseSaveInput {
   input: string;
   expectedOutput: string;
-  isHidden: boolean;
+  isHidden?: boolean;
 }
 
 export interface ITestResult {

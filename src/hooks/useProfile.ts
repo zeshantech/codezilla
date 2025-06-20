@@ -1,91 +1,89 @@
 import { useQuery } from "@tanstack/react-query";
-import { ExperienceLevelType, IActivityStat, IGetProfileOutput, IGetStatsOutput, ILanguageStat, ISkillStat, IUser } from "@/types/profile";
+import { ExperienceLevelType, IActivityStat, IGetProfileOutput, IGetStatsOutput, ILanguageStat, ISkillStat } from "@/types/profile";
 import { ProgrammingLanguageEnum } from "@/types/enums";
-import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@auth0/nextjs-auth0";
+import { User } from "@auth0/nextjs-auth0/types";
 
-const MOCK_USER: IUser = {
-  id: "user-1",
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@example.com",
-  avatarUrl: "https://example.com/avatar.jpg",
-  bio: "I'm a software engineer",
-  createdAt: new Date(),
-};
+const GET_MOCK_PROFILE_OUTPUT = (user: User): IGetProfileOutput => {
+  if (!user) {
+    throw new Error("User not found");
+  }
 
-const MOCK_PROFILE_OUTPUT: IGetProfileOutput = {
-  settings: {
-    notifications: {
-      email: true,
-      browser: true,
-      mobile: false,
+  return {
+    settings: {
+      notifications: {
+        email: true,
+        browser: true,
+        mobile: false,
+      },
+      appearance: {
+        theme: "system",
+        codeFont: "Fira Code",
+        fontSize: 14,
+      },
+      preferences: {
+        defaultLanguage: ProgrammingLanguageEnum.JAVASCRIPT,
+        defaultTabSize: 2,
+        autosave: true,
+      },
+      privacy: {
+        showActivity: true,
+        showSolutions: false,
+        showProfile: true,
+      },
     },
-    appearance: {
-      theme: "system",
-      codeFont: "Fira Code",
-      fontSize: 14,
-    },
-    preferences: {
-      defaultLanguage: ProgrammingLanguageEnum.JAVASCRIPT,
-      defaultTabSize: 2,
-      autosave: true,
-    },
-    privacy: {
-      showActivity: true,
-      showSolutions: false,
-      showProfile: true,
-    },
-  },
-  badges: [
-    {
-      id: "badge-1",
-      name: "Problem Solver",
-      description: "Solved 10 problems",
-      imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
-      level: "bronze",
+    badges: [
+      {
+        id: "badge-1",
+        name: "Problem Solver",
+        description: "Solved 10 problems",
+        imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
+        level: "bronze",
+        createdAt: new Date(),
+      },
+      {
+        id: "badge-2",
+        name: "Streak Master",
+        description: "Maintained a 5-day streak",
+        imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
+        level: "silver",
+        createdAt: new Date(),
+      },
+      {
+        id: "badge-3",
+        name: "JavaScript Guru",
+        description: "Solved 5 problems in JavaScript",
+        imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
+        level: "bronze",
+        createdAt: new Date(),
+      },
+    ],
+    certificates: [
+      {
+        id: "cert-1",
+        name: "Data Structures & Algorithms",
+        description: "Completed the Data Structures & Algorithms course",
+        imageUrl: "https://www.w3schools.com/dsa/img_cert_dsa.jpg",
+        credentialId: "DSA-123456",
+        credentialUrl: "https://example.com/certificates/DSA-123456",
+        createdAt: new Date(),
+      },
+    ],
+    profile: {
+      id: crypto.randomUUID(),
+      auth0Id: user.sub,
+      completedCollections: 10,
+      completedProblems: 100,
+      streak: 10,
+      points: 1000,
       createdAt: new Date(),
+      firstName: user.given_name || "",
+      lastName: user.family_name || "",
+      email: user.email || "",
+      avatarUrl: user.picture || "",
+      bio: "Software Engineer",
     },
-    {
-      id: "badge-2",
-      name: "Streak Master",
-      description: "Maintained a 5-day streak",
-      imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
-      level: "silver",
-      createdAt: new Date(),
-    },
-    {
-      id: "badge-3",
-      name: "JavaScript Guru",
-      description: "Solved 5 problems in JavaScript",
-      imageUrl: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRf0gaVwscBNGuFtdm04hhfeJP40--fGT-7wZmMHmmx4qJKCTFm",
-      level: "bronze",
-      createdAt: new Date(),
-    },
-  ],
-  certificates: [
-    {
-      id: "cert-1",
-      name: "Data Structures & Algorithms",
-      description: "Completed the Data Structures & Algorithms course",
-      imageUrl: "https://www.w3schools.com/dsa/img_cert_dsa.jpg",
-      credentialId: "DSA-123456",
-      credentialUrl: "https://example.com/certificates/DSA-123456",
-      createdAt: new Date(),
-    },
-  ],
-  profile: {
-    id: "profile-1",
-    completedCollections: 10,
-    completedProblems: 100,
-    streak: 10,
-    points: 1000,
-    createdAt: new Date(),
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    avatarUrl: "https://yt3.googleusercontent.com/qGrcViAdsmfdL8NhR03s6jZVi2AP4A03XeBFShu2M4Jd88k1fNXDnpMEmHU6CvNJuMyA2z1maA0=s900-c-k-c0x00ffffff-no-rj",
-    bio: "Software Engineer",
-  },
+  };
 };
 
 const generateActivityStats = (): IActivityStat[] => {
@@ -140,44 +138,30 @@ const MOCK_STATS_OUTPUT: IGetStatsOutput = {
   languageStats: generateLanguageStats(),
 };
 
-export const useGetUser = () => {
-  const { authenticated } = useAuth();
-
-  return useQuery({
-    queryKey: ["user"],
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      return MOCK_USER;
-    },
-    staleTime: 1000 * 60 * 300,
-    enabled: authenticated,
-  });
-};
-
 export const useGetProfile = () => {
-  const { authenticated } = useAuth();
+  const { user } = useUser();
 
   return useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      return MOCK_PROFILE_OUTPUT;
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      return GET_MOCK_PROFILE_OUTPUT(user!);
     },
     staleTime: 1000 * 60 * 300,
-    enabled: authenticated,
+    enabled: !!user,
   });
 };
 
 export const useGetStats = () => {
-  const { authenticated } = useAuth();
+  const { user } = useUser();
 
   return useQuery({
     queryKey: ["stats"],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       return MOCK_STATS_OUTPUT;
     },
     staleTime: 1000 * 60 * 300,
-    enabled: authenticated,
+    enabled: !!user,
   });
 };

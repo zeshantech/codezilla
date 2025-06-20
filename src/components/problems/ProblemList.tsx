@@ -13,7 +13,6 @@ import { DifficultyEnum } from "@/types/enums";
 export function ProblemList() {
   const searchParams = useSearchParams();
 
-  // Extract filters from URL params
   const filters: IProblemFilters = {
     search: searchParams.get("search") || undefined,
     difficulties: searchParams.getAll("difficulty") as DifficultyEnum[],
@@ -23,15 +22,12 @@ export function ProblemList() {
 
   const { data: allProblems, isLoading: isAllProblemsLoading, error: allProblemsError } = useAllProblems(filters);
 
-  console.log(allProblems, isAllProblemsLoading, allProblemsError);
-
   return (
     <div className="space-y-6">
       <ProblemFilters />
 
       <Separator />
 
-      {/* Problems Grid */}
       {isAllProblemsLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (

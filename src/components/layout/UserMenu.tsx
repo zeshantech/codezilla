@@ -1,33 +1,28 @@
 "use client";
 
 import React from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User, LogOut, Settings, Code } from "lucide-react";
-import { Skeleton } from "../ui/skeleton";
 import { useUserProfileStore } from "@/store/useUserProfileStore";
+import { useUser } from "@auth0/nextjs-auth0";
+import { useRouter } from "next/navigation";
 
 export default function UserMenu() {
-  const auth = useAuth();
-  const { authenticated, loading } = auth;
+  const router = useRouter();
+  const { user } = useUser();
   const profile = useUserProfileStore((state) => state.profile);
 
-  if (loading) {
-    return <Skeleton className="size-8 rounded-full" />;
-  }
-
-  if (!authenticated) {
+  if (!user) {
     return (
-      <Button size="sm" onClick={() => auth.login()}>
+      <Button size="sm" href="/auth/login">
         Login
       </Button>
     );
   }
 
-  // Get user initials for avatar fallback
   const getInitials = () => {
     if (profile?.firstName && profile?.lastName) {
       return `${profile.firstName[0]}${profile.lastName[0]}`.toUpperCase();
@@ -69,13 +64,13 @@ export default function UserMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/settings">
+          <Link href="/profile?tab=settings">
             <Settings />
             <span>Settings</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => auth.logout()} className="text-error cursor-pointer">
+        <DropdownMenuItem onClick={() => router.push("/auth/logout")} className="text-error cursor-pointer">
           <LogOut />
           <span>Logout</span>
         </DropdownMenuItem>

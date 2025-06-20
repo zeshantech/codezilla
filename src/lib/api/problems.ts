@@ -4,6 +4,7 @@ import { Problem } from "../db/models/problem.model";
 import { IProblem, IProblemFilters, IProblemSaveInput } from "@/types/problems";
 import { ProgrammingLanguageEnum } from "@/types/enums";
 import api from "./api";
+import { auth0 } from "../auth0";
 
 export async function fetchProblems(filters?: IProblemFilters): Promise<IProblem[]> {
   const response = await api.get("/problems", { params: filters });
@@ -45,17 +46,18 @@ export async function createProblem(input: IProblemSaveInput): Promise<IProblem>
   return response.data;
 }
 
-export async function updateProblemCode(userId: string, problemId: string, code: string, language: ProgrammingLanguageEnum): Promise<boolean> {
-  // await dbConnect();
-
+export async function updateProblemCode(problemId: string, code: string, language: ProgrammingLanguageEnum): Promise<boolean> {
   try {
     const { User } = await import("../db/models/user.model");
+
+    const session = await auth0.getSession();
+    const userId = session?.user?.id;
 
     const user = await User.findById(userId);
     if (!user) return false;
 
     // let problemProgress: any = user.problemsProgress[problemId];
-    let problemProgress: any = {}
+    let problemProgress: any = {};
 
     if (!problemProgress) {
       problemProgress = {

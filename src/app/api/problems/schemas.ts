@@ -11,9 +11,7 @@ export const getProblemsQuerySchema = z.object({
     .enum(["true", "false"])
     .optional()
     .transform((val) => stbConverter(val)),
-  sortBy: z
-    .enum(["popularity", "newest", "title", "difficulty", "completion_rate"])
-    .optional(),
+  sortBy: z.enum(["popularity", "newest", "title", "difficulty", "completion_rate"]).optional(),
   myProblems: z.boolean().optional(),
 });
 
@@ -27,6 +25,13 @@ export const createProblemSchema = z.object({
       input: z.string(),
       output: z.string(),
       explanation: z.string(),
+    })
+  ),
+  testCases: z.array(
+    z.object({
+      input: z.string(),
+      expectedOutput: z.string(),
+      isHidden: z.boolean().optional(),
     })
   ),
   starterCode: z.record(z.string(), z.string()),

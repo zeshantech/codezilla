@@ -27,6 +27,7 @@ export interface IProblem extends ISchema {
   examples: IExample[];
   starterCode: Record<ProgrammingLanguageEnum, string>;
   solution?: Record<ProgrammingLanguageEnum, string>;
+  isPublic: boolean;
   popularity: number;
   completionCount: number;
   createdBy?: string;

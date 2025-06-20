@@ -12,11 +12,9 @@ interface ProblemCardProps {
 }
 
 export function ProblemCard({ problem }: ProblemCardProps) {
-  // Check user's progress on this problem
-  const userProgress = CURRENT_USER.problemsProgress['two-sum']; // TODO: problem.id
+  const userProgress = CURRENT_USER.problemsProgress["two-sum"]; // TODO: problem.id
   const problemStatus = userProgress?.status || "not_started";
 
-  // Generate the difficulty badge styles
   const getDifficultyBadge = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
@@ -91,7 +89,7 @@ export function ProblemCard({ problem }: ProblemCardProps) {
         </div>
       </CardContent>
       <CardFooter className="pt-2">
-        <Button variant="outline" size="sm" className="!w-full" href={`/playground/${problem.slug}`}>
+        <Button variant="outline" size="sm" href={`/h/playground/${problem.slug}`}>
           {problemStatus === "solved" ? "View Solution" : problemStatus === "attempted" ? "Continue Solving" : "Solve Problem"}
           <ArrowRight />
         </Button>

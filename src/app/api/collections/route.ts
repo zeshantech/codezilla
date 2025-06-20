@@ -4,8 +4,8 @@ import { StatusCodes } from "@/constants/statusCodes";
 import { Collection } from "@/lib/db/models/collection.model";
 import { createValidator } from "@/lib/validator";
 import { getCollectionsQuerySchema, createCollectionSchema } from "./schemas";
-
-const CURRENT_USER_ID = "666666666666666666666666";
+import { UnauthorizedException } from "@/lib/exceptions";
+import { auth0 } from "@/lib/auth0";
 
 const validateGetCollections = createValidator(getCollectionsQuerySchema, "query");
 const validateCreateCollection = createValidator(createCollectionSchema, "body");
@@ -13,6 +13,9 @@ const validateCreateCollection = createValidator(createCollectionSchema, "body")
 export const GET = apiHandler(async (request: NextRequest) => {
   const validatedParams = await validateGetCollections(request);
   let query = Collection.find();
+
+  const session = await auth0.getSession();
+  const userId = session?.user?.id;
 
   if (validatedParams?.search) {
     const searchTerm = validatedParams.search.toLowerCase();
@@ -24,7 +27,10 @@ export const GET = apiHandler(async (request: NextRequest) => {
   }
 
   if (validatedParams?.myCollections) {
-    query = query.where("createdBy", CURRENT_USER_ID);
+    if (!userId) {
+      throw new UnauthorizedException();
+    }
+    query = query.where("createdBy", userId);
   }
 
   if (validatedParams?.featured !== undefined) {
@@ -61,9 +67,15 @@ export const GET = apiHandler(async (request: NextRequest) => {
 export const POST = apiHandler(async (request: NextRequest) => {
   const validatedData = await validateCreateCollection(request);
 
+  const session = await auth0.getSession();
+  const userId = session?.user?.id;
+  if (!userId) {
+    throw new UnauthorizedException();
+  }
+
   const newCollection = await Collection.create({
     ...validatedData,
-    createdBy: CURRENT_USER_ID,
+    createdBy: userId,
     description: validatedData.description || `Collection for ${validatedData.title}`,
     slug: validatedData.title
       .toLowerCase()

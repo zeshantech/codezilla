@@ -6,8 +6,9 @@ export type ExperienceLevelType = "beginner" | "intermediate" | "advanced" | "ex
 export type ThemeType = "light" | "dark" | "system";
 
 export interface IUser extends ISchema {
+  auth0Id: string;
   firstName: string;
-  lastName: string;
+  lastName?: string;
   email: string;
   avatarUrl: string;
   bio: string;
@@ -117,7 +118,7 @@ export interface ISkillStat {
 // APIs inputs
 export interface IUpdateProfileInput {
   firstName: string;
-  lastName: string;
+  lastName?: string;
   bio?: string;
   avatarUrl?: string;
 }
